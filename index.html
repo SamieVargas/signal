@@ -414,6 +414,10 @@
     }
     .toast.show { opacity: 1; pointer-events: auto; }
   </style>
+  <!-- In-browser document parsers: PDF (pdf.js), DOCX (mammoth), XLSX (SheetJS) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -756,21 +760,97 @@
     }
 
     // ── File reading ──
-    function readFile(file, target) {
-      const reader = new FileReader();
-      reader.onload = e => {
-        const text = e.target.result;
-        const docType = detectType(file.name, text);
-        const doc = { name: file.name, type: docType, content: text, id: Date.now() + Math.random() };
-        if (target === 'modal') {
-          modalDocs.push(doc);
-          renderDocList('m-doc-list', modalDocs, 'modal');
+    const PDF_PAGE_CAP = 80; // safety cap on pages parsed per PDF
+
+    async function extractPdfText(file) {
+      const buf = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+      const pages = Math.min(pdf.numPages, PDF_PAGE_CAP);
+      let out = '';
+      for (let i = 1; i <= pages; i++) {
+        const page = await pdf.getPage(i);
+        const tc = await page.getTextContent();
+        out += tc.items.map(it => it.str).join(' ') + '\n\n';
+      }
+      return { text: out.trim(), pages: pdf.numPages };
+    }
+
+    async function extractDocxText(file) {
+      const buf = await file.arrayBuffer();
+      const r = await mammoth.extractRawText({ arrayBuffer: buf });
+      return (r.value || '').trim();
+    }
+
+    function extractXlsxText(buf) {
+      const wb = XLSX.read(buf, { type: 'array' });
+      return wb.SheetNames
+        .map(n => `=== Sheet: ${n} ===\n${XLSX.utils.sheet_to_csv(wb.Sheets[n])}`)
+        .join('\n\n')
+        .trim();
+    }
+
+    function addDoc(doc, target) {
+      if (target === 'modal') {
+        modalDocs.push(doc);
+        renderDocList('m-doc-list', modalDocs, 'modal');
+      } else {
+        ddExtraDocs.push(doc);
+        renderDocList('dd-doc-list', ddExtraDocs, 'dd');
+      }
+    }
+
+    async function readFile(file, target) {
+      const name = file.name;
+      const ext = (name.split('.').pop() || '').toLowerCase();
+      try {
+        let text;
+
+        if (ext === 'pdf' || file.type === 'application/pdf') {
+          if (!window.pdfjsLib) throw new Error('PDF reader failed to load');
+          const { text: t, pages } = await extractPdfText(file);
+          // A real text PDF yields plenty of characters per page; a scanned /
+          // image-only PDF yields almost none. Flag the latter explicitly —
+          // people upload scanned exports a lot.
+          if (t.length < Math.max(25, pages * 8)) {
+            showToast(
+              `"${name}" looks like a scanned or image-only PDF — it has no text layer to read ` +
+              `(${t.length} characters across ${pages} page${pages === 1 ? '' : 's'}). ` +
+              `Signal reads text, not images, and can't OCR. Fix: open it and re-save with selectable ` +
+              `text — "Print → Save as PDF" from the original file, export the source doc to PDF, or ` +
+              `paste the text directly into the box below.`,
+              11000
+            );
+            return;
+          }
+          text = t;
+
+        } else if (ext === 'docx') {
+          if (!window.mammoth) throw new Error('DOCX reader failed to load');
+          text = await extractDocxText(file);
+          if (!text) { showToast(`"${name}" has no readable text.`, 6000); return; }
+
+        } else if (ext === 'xlsx' || ext === 'xls') {
+          if (!window.XLSX) throw new Error('Spreadsheet reader failed to load');
+          text = extractXlsxText(await file.arrayBuffer());
+          if (!text) { showToast(`"${name}" has no readable data.`, 6000); return; }
+
+        } else if (ext === 'doc' || ext === 'ppt' || ext === 'pptx') {
+          showToast(
+            `"${name}": ${ext.toUpperCase()} files aren't supported yet. ` +
+            `Export to PDF, .docx${ext === 'doc' ? '' : ', or .xlsx'}, or paste the text directly.`,
+            8000
+          );
+          return;
+
         } else {
-          ddExtraDocs.push(doc);
-          renderDocList('dd-doc-list', ddExtraDocs, 'dd');
+          text = await file.text();
         }
-      };
-      reader.readAsText(file);
+
+        const docType = detectType(name, text);
+        addDoc({ name, type: docType, content: text, id: Date.now() + Math.random() }, target);
+      } catch (e) {
+        showToast(`Couldn't read "${name}": ${e.message}`, 6000);
+      }
     }
 
     function handleModalFiles(files) { Array.from(files).forEach(f => readFile(f, 'modal')); }
@@ -1196,6 +1276,10 @@ ${chatContext}`;
     }
 
     // ── Init ──
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
     buildPortfolio();
   </script>
 </body>
