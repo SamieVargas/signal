@@ -625,6 +625,36 @@
     const WORKER_URL = 'https://signal-proxy.samievargas.workers.dev';
     const MODEL = 'claude-sonnet-4-6';
 
+    // POST to the Worker. Surfaces the real API error message instead of a bare
+    // status code, and retries once on 429 (rate limit) with a short backoff.
+    async function postToWorker(payload, { retries = 1 } = {}) {
+      for (let attempt = 0; ; attempt++) {
+        const resp = await fetch(WORKER_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (resp.ok) return resp.json();
+
+        // Pull the real error message out of the body if there is one.
+        let detail = '';
+        try {
+          const err = await resp.json();
+          detail = (err && err.error && (err.error.message || err.error)) || '';
+        } catch (_) {}
+
+        if (resp.status === 429 && attempt < retries) {
+          const wait = Number(resp.headers.get('retry-after')) * 1000 || 2000 * (attempt + 1);
+          await new Promise(r => setTimeout(r, wait));
+          continue;
+        }
+        if (resp.status === 429) {
+          throw new Error('rate limited (429) — too many requests, wait a moment and retry' + (detail ? ': ' + detail : ''));
+        }
+        throw new Error('Worker returned ' + resp.status + (detail ? ' — ' + detail : ''));
+      }
+    }
+
     // ── Demo accounts ──
     const DEMO_ACCOUNTS = [
       {id:'korova',name:'Korova Media',arr:180000,renewal:47,risk:'high',riskType:'Champion loss',
@@ -936,17 +966,11 @@ Return exactly this JSON:
 }`;
 
       try {
-        const resp = await fetch(WORKER_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: MODEL,
-            max_tokens: 1500,
-            messages: [{ role: 'user', content: prompt }]
-          })
+        const data = await postToWorker({
+          model: MODEL,
+          max_tokens: 1500,
+          messages: [{ role: 'user', content: prompt }]
         });
-        if (!resp.ok) throw new Error('Worker returned ' + resp.status);
-        const data = await resp.json();
         const raw = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
         const clean = raw.replace(/```json|```/g, '').trim();
         briefData = JSON.parse(clean);
@@ -1044,22 +1068,17 @@ ${briefData._context}`;
       chatHistory.push({ role: 'user', content: msg });
 
       try {
-        const resp = await fetch(WORKER_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: MODEL,
-            max_tokens: 800,
-            system: sys,
-            messages: chatHistory.slice(-10)
-          })
+        const data = await postToWorker({
+          model: MODEL,
+          max_tokens: 800,
+          system: sys,
+          messages: chatHistory.slice(-10)
         });
-        const data = await resp.json();
         const reply = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
         chatHistory.push({ role: 'assistant', content: reply });
         document.getElementById(lid).querySelector('.chat-text').textContent = reply;
       } catch(e) {
-        document.getElementById(lid).querySelector('.chat-text').textContent = 'Error — try again.';
+        document.getElementById(lid).querySelector('.chat-text').textContent = e.message || 'Error — try again.';
       }
       document.getElementById('chat-send').disabled = false;
     }
