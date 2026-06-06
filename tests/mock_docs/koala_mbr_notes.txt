@@ -1,0 +1,21 @@
+Koala — Monthly Business Review notes (Feb 27)
+
+Only Sarah attended from the customer side; Marcus and the CPO were no-shows
+despite being invited. Sarah was apologetic but candid.
+
+Usage data we walked through:
+- 6 of 40 seats activated. 3 weekly-active (all on Sarah's immediate team).
+- Import flow: never used. Marcus never logged in.
+- Two legacy tools they wanted to replace are still in daily use.
+
+Sarah's framing: "we're still exploring how this fits our workflow." Said the
+audit ate Q1 and adoption "slipped." Renewal is in ~67 days. ARR 180k.
+
+Sentiment read: Sarah personally still believes, but she's isolated and out of
+political capital internally. No exec air cover. This is drifting toward a quiet
+non-renewal if nothing changes. Green flag: Sarah still replies fast and wants
+it to work. Red flag: zero org-level adoption, champion is a single point of
+failure.
+
+Action items: get a real usage summary in front of Sarah she can forward to the
+CPO; find the 2 people who *should* be power users; re-engage Marcus directly.

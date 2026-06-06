@@ -42,3 +42,76 @@ The API key never touches the browser.
 - [ ] Multi-contact persona — different reads for champion vs economic buyer
 - [ ] Revenue trend visualization from CSV input
 - [ ] Export brief as PDF / shareable link
+
+---
+
+# Signal — Python CLI
+
+> "I spent eight years doing this hour of account digging manually every month
+> across a $14M enterprise book. This is the Python version of what I wished existed."
+
+A command-line rebuild of the analysis engine using the Anthropic Python SDK
+directly — no browser, no Worker proxy. Built to keep token usage under control
+on real, messy account data.
+
+## Highlights
+
+- **Two-call LLM architecture** with explicit token management: summarize each
+  doc individually (cheap), then analyze the small summaries — not the raw docs.
+  On large inputs this cuts the main analysis call by **~96%** (measured via
+  `--dry-run`: 22,976 → ≤1,012 input tokens for two long transcripts).
+- **Smart document truncation** — front/back extraction (45% front, 35% back),
+  preserving intros/stated concerns + action items and dropping middle filler.
+- **Content-type auto-detection** across 15+ formats (transcripts, MBR/QBR/EBR,
+  Teams/Slack, CSV, email, SWOT), ported from the JS `detectType()` logic.
+- **Structured JSON output** with the 11-type risk taxonomy and 5-field contact
+  persona carried over from the web app; tolerant JSON parsing.
+- **`rich` terminal output**, JSON saved to `./output/`, interactive chat loop.
+
+## Setup
+
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+export ANTHROPIC_API_KEY=sk-ant-...      # or put it in a .env file
+```
+
+## Usage
+
+```bash
+# Analyze a directory of account docs
+python signal_cli.py --account "Koala" --contact "Sarah Chen, VP of Product" \
+  --arr 180000 --renewal 67 --docs ./tests/mock_docs/
+
+# Paste a single doc from stdin
+python signal_cli.py --account "Koala" --paste
+
+# Inspect token counts before spending credits — no API calls
+python signal_cli.py --account "Koala" --docs ./tests/mock_docs/ --dry-run
+
+# Skip the interactive chat loop
+python signal_cli.py --account "Koala" --docs ./tests/mock_docs/ --no-chat
+```
+
+> The entry point is `signal_cli.py`, **not** `signal.py`: a module named
+> `signal.py` on the path shadows the standard-library `signal` module that
+> `anthropic`/`anyio` import at startup, which would crash the pipeline.
+
+## Project layout
+
+```
+signal_cli.py     # CLI entry — argparse, orchestration, rich output, --dry-run
+ingest.py         # file reading, type detection, smart truncation
+summarize.py      # Call 1: per-doc summarization
+analyze.py        # Call 2: synthesis -> structured JSON brief
+chat.py           # interactive follow-up loop
+prompts.py        # all prompt templates
+config.py         # model, token limits, client setup
+tests/            # mock_docs/ + offline pipeline test (no API key needed)
+```
+
+## Tests
+
+```bash
+python tests/test_pipeline.py     # offline, uses a stub client
+```
