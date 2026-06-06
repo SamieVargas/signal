@@ -16,10 +16,20 @@ MAX_CHAT_TOKENS = 600       # per chat response
 # Rough estimate used for truncation + dry-run token accounting (1 tok ~ 4 chars)
 CHARS_PER_TOKEN = 4
 
-# ── Model ──
-# Brief specified claude-sonnet-4-20250514, which is deprecated (retires
-# 2026-06-15). claude-sonnet-4-6 is its drop-in replacement.
-MODEL = "claude-sonnet-4-6"
+# ── Models ──
+# One place to swap models per role. Brief specified claude-sonnet-4-20250514
+# (deprecated, retires 2026-06-15); claude-sonnet-4-6 is its replacement.
+# Haiku handles extraction/summarization and chat — ~25x cheaper than Sonnet,
+# and plenty for that work. Sonnet stays on the main synthesis where reasoning
+# quality matters. All must be in the Worker's allowlist if proxied.
+MODELS = {
+    "analysis": "claude-sonnet-4-6",  # main synthesis — keep the strong model
+    "summary": "claude-haiku-4-5",    # per-doc extraction — cheap + fast
+    "chat": "claude-haiku-4-5",       # follow-up Q&A — cheap + fast
+}
+
+# Backward-compatible alias for anything still referencing a single model.
+MODEL = MODELS["analysis"]
 
 
 def get_client():
