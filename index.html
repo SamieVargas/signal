@@ -414,8 +414,10 @@
     }
     .toast.show { opacity: 1; pointer-events: auto; }
   </style>
-  <!-- pdf.js (Mozilla) — extract text from uploaded PDFs in the browser -->
+  <!-- In-browser document parsers: PDF (pdf.js), DOCX (mammoth), XLSX (SheetJS) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -770,7 +772,21 @@
         const tc = await page.getTextContent();
         out += tc.items.map(it => it.str).join(' ') + '\n\n';
       }
-      return out.trim();
+      return { text: out.trim(), pages: pdf.numPages };
+    }
+
+    async function extractDocxText(file) {
+      const buf = await file.arrayBuffer();
+      const r = await mammoth.extractRawText({ arrayBuffer: buf });
+      return (r.value || '').trim();
+    }
+
+    function extractXlsxText(buf) {
+      const wb = XLSX.read(buf, { type: 'array' });
+      return wb.SheetNames
+        .map(n => `=== Sheet: ${n} ===\n${XLSX.utils.sheet_to_csv(wb.Sheets[n])}`)
+        .join('\n\n')
+        .trim();
     }
 
     function addDoc(doc, target) {
@@ -784,23 +800,56 @@
     }
 
     async function readFile(file, target) {
-      const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+      const name = file.name;
+      const ext = (name.split('.').pop() || '').toLowerCase();
       try {
         let text;
-        if (isPdf) {
+
+        if (ext === 'pdf' || file.type === 'application/pdf') {
           if (!window.pdfjsLib) throw new Error('PDF reader failed to load');
-          text = await extractPdfText(file);
-          if (!text) {
-            showToast(`"${file.name}" has no extractable text — looks scanned/image-only.`);
+          const { text: t, pages } = await extractPdfText(file);
+          // A real text PDF yields plenty of characters per page; a scanned /
+          // image-only PDF yields almost none. Flag the latter explicitly —
+          // people upload scanned exports a lot.
+          if (t.length < Math.max(25, pages * 8)) {
+            showToast(
+              `"${name}" looks like a scanned or image-only PDF — it has no text layer to read ` +
+              `(${t.length} characters across ${pages} page${pages === 1 ? '' : 's'}). ` +
+              `Signal reads text, not images, and can't OCR. Fix: open it and re-save with selectable ` +
+              `text — "Print → Save as PDF" from the original file, export the source doc to PDF, or ` +
+              `paste the text directly into the box below.`,
+              11000
+            );
             return;
           }
+          text = t;
+
+        } else if (ext === 'docx') {
+          if (!window.mammoth) throw new Error('DOCX reader failed to load');
+          text = await extractDocxText(file);
+          if (!text) { showToast(`"${name}" has no readable text.`, 6000); return; }
+
+        } else if (ext === 'xlsx' || ext === 'xls') {
+          if (!window.XLSX) throw new Error('Spreadsheet reader failed to load');
+          text = extractXlsxText(await file.arrayBuffer());
+          if (!text) { showToast(`"${name}" has no readable data.`, 6000); return; }
+
+        } else if (ext === 'doc' || ext === 'ppt' || ext === 'pptx') {
+          showToast(
+            `"${name}": ${ext.toUpperCase()} files aren't supported yet. ` +
+            `Export to PDF, .docx${ext === 'doc' ? '' : ', or .xlsx'}, or paste the text directly.`,
+            8000
+          );
+          return;
+
         } else {
           text = await file.text();
         }
-        const docType = detectType(file.name, text);
-        addDoc({ name: file.name, type: docType, content: text, id: Date.now() + Math.random() }, target);
+
+        const docType = detectType(name, text);
+        addDoc({ name, type: docType, content: text, id: Date.now() + Math.random() }, target);
       } catch (e) {
-        showToast(`Couldn't read "${file.name}": ${e.message}`);
+        showToast(`Couldn't read "${name}": ${e.message}`, 6000);
       }
     }
 

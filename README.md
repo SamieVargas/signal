@@ -26,7 +26,7 @@ The API key never touches the browser.
 ## What's in v0.0.1
 
 - Portfolio view — 4 demo accounts + add your own
-- File upload — .txt, .csv, .vtt, .srt, .md, .json, .html, .log, .tsv
+- File upload — PDF, DOCX, XLSX/XLS, plus .txt, .csv, .vtt, .srt, .md, .json, .html, .log, .tsv (parsed in-browser; scanned/image-only PDFs are flagged with a clear message since they have no text layer to read)
 - Paste input — raw text, Teams chat, MBR notes, etc.
 - Auto content-type detection (transcript, MBR/QBR, CSV, chat log, email, SWOT)
 - AI synthesis — situation read, contact persona, ranked leverage points, "do this today"
