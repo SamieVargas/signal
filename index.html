@@ -623,6 +623,7 @@
     // ── Config ──
     // REPLACE this with your Cloudflare Worker URL after deploying worker.js
     const WORKER_URL = 'https://signal-proxy.samievargas.workers.dev';
+    const MODEL = 'claude-sonnet-4-6';
 
     // ── Demo accounts ──
     const DEMO_ACCOUNTS = [
@@ -939,7 +940,7 @@ Return exactly this JSON:
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
+            model: MODEL,
             max_tokens: 1500,
             messages: [{ role: 'user', content: prompt }]
           })
@@ -1047,7 +1048,7 @@ ${briefData._context}`;
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
+            model: MODEL,
             max_tokens: 800,
             system: sys,
             messages: chatHistory.slice(-10)
