@@ -1169,17 +1169,27 @@ Return exactly this JSON:
       try {
         const data = await postToWorker({
           model: MODELS.analysis,
-          max_tokens: 1500,
+          max_tokens: 4000,
           messages: [{ role: 'user', content: prompt }]
         });
         const raw = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
+        // If the model hit the output cap, the JSON is truncated — say so clearly
+        // instead of letting JSON.parse throw a cryptic "unterminated string".
+        if (data.stop_reason === 'max_tokens') {
+          throw new Error('the analysis response was cut off at the token limit — too much source content. Remove a document or trim pasted text, then re-analyze.');
+        }
         const clean = raw.replace(/```json|```/g, '').trim();
-        const brief = JSON.parse(clean);
+        let brief;
+        try {
+          brief = JSON.parse(clean);
+        } catch (pe) {
+          throw new Error('the model returned incomplete JSON (likely cut off). Try fewer or shorter documents.');
+        }
         brief._context = context;            // full summaries, kept for reference
         analysisCache[cacheKey] = brief;     // cache for re-analysis this session
         applyBrief(brief);
       } catch(e) {
-        showToast('Analysis failed: ' + e.message + ' — check your Worker URL and try again.');
+        showToast('Analysis failed: ' + e.message);
         btn.disabled = false;
         btn.classList.remove('analyzing');
         btn.innerHTML = 'Analyze this account &#8594;';
