@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signal — Account Intelligence</title>
+  <meta name="description" content="Paste the mess. Get the read. AI-powered account intelligence for CS teams.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230f6e56'/><text x='50%' y='54%' dominant-baseline='middle' text-anchor='middle' font-size='18' font-family='Georgia,serif' font-weight='700' fill='%23e1f5ee'>S</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0f0e0c;
+      --paper: #f7f4ef;
+      --accent: #0f6e56;
+      --accent-light: #e1f5ee;
+      --accent-mid: #9fe1cb;
+      --accent-dark: #085041;
+      --muted: #7a7570;
+      --border: rgba(15,14,12,0.12);
+      --border-strong: rgba(15,14,12,0.22);
+      --red: #a32d2d;
+      --red-bg: #fcebeb;
+      --amber: #854f0b;
+      --amber-bg: #faeeda;
+      --green: #3b6d11;
+      --green-bg: #eaf3de;
+      --purple: #3c3489;
+      --purple-bg: #eeedfe;
+      --surface: #ffffff;
+      --surface2: #f0ede8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Layout ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--paper);
+      border-bottom: 0.5px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1.5rem; height: 52px;
+    }
+    .wordmark {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px; font-weight: 500;
+      color: var(--ink); letter-spacing: -0.01em;
+      display: flex; align-items: center; gap: 2px;
+    }
+    .wordmark-dot { color: var(--accent); }
+    .topbar-right { display: flex; align-items: center; gap: 8px; }
+    .version-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; color: var(--muted);
+      background: var(--surface2); border-radius: 4px;
+      padding: 2px 7px; border: 0.5px solid var(--border);
+    }
+    .privacy-pill {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 11px; color: var(--accent-dark);
+      background: var(--accent-light); border-radius: 20px;
+      padding: 3px 10px; border: 0.5px solid var(--accent-mid);
+    }
+
+    .main { max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    /* ── Nav breadcrumb ── */
+    .breadcrumb {
+      display: flex; align-items: center; gap: 6px;
+      margin-bottom: 1.5rem;
+    }
+    .breadcrumb-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 13px; font-weight: 500;
+      color: var(--accent); background: var(--accent-light);
+      border: 0.5px solid var(--accent-mid); border-radius: 20px;
+      padding: 4px 12px; cursor: pointer;
+      transition: background 0.15s;
+      text-decoration: none;
+    }
+    .breadcrumb-btn:hover { background: var(--accent-mid); }
+    .breadcrumb-sep { font-size: 13px; color: var(--muted); }
+    .breadcrumb-current { font-size: 13px; color: var(--muted); }
+
+    /* ── Portfolio ── */
+    .portfolio-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; font-weight: 500; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .risk-group-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px; font-weight: 500; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--muted);
+      margin: 1.25rem 0 8px;
+    }
+    .risk-group-label:first-child { margin-top: 0; }
+
+    .acct-card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: 12px; padding: 1rem 1.1rem;
+      margin-bottom: 7px; cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .acct-card:hover { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(15,110,86,0.07); }
+    .acct-risk-bar { width: 3px; border-radius: 2px; min-height: 40px; align-self: stretch; flex-shrink: 0; }
+    .acct-risk-bar.high { background: #e24b4a; }
+    .acct-risk-bar.medium { background: #ef9f27; }
+    .acct-risk-bar.low { background: #639922; }
+    .acct-risk-bar.custom { background: #7f77dd; }
+    .acct-body { flex: 1; min-width: 0; }
+    .acct-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+    .acct-name { font-size: 14px; font-weight: 500; color: var(--ink); }
+    .acct-meta { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+    .arr { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); }
+    .days { font-size: 12px; color: var(--muted); }
+    .risk-badge { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .risk-badge.high { background: var(--red-bg); color: var(--red); }
+    .risk-badge.medium { background: var(--amber-bg); color: var(--amber); }
+    .risk-badge.low { background: var(--green-bg); color: var(--green); }
+    .risk-badge.custom { background: var(--purple-bg); color: var(--purple); }
+    .risk-badge.pending { background: var(--surface2); color: var(--muted); }
+    .acct-flag { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .risk-type-label { font-size: 11px; color: var(--muted); margin-top: 2px; opacity: 0.7; }
+
+    /* ── Add Account button ── */
+    .add-acct-btn {
+      display: flex; align-items: center; gap: 8px;
+      width: 100%; padding: 0.9rem 1.1rem;
+      background: none; border: 0.5px dashed var(--border-strong);
+      border-radius: 12px; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: var(--accent);
+      margin-top: 8px; transition: border-color 0.15s, background 0.15s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .add-acct-btn:hover { border-color: var(--accent); background: var(--accent-light); }
+    .add-icon { font-size: 18px; line-height: 1; }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(15,14,12,0.5);
+      align-items: center; justify-content: center; padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--surface); border: 0.5px solid var(--border);
+      border-radius: 16px; padding: 1.5rem; width: 100%; max-width: 560px;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .modal-head {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 1.25rem;
+    }
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px; font-weight: 500; color: var(--ink);
+    }
+    .modal-close {
+      background: var(--surface2); border: 0.5px solid var(--border);
+      border-radius: 8px; width: 32px; height: 32px;
+      cursor: pointer; font-size: 18px; color: var(--muted);
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    .modal-close:hover { background: var(--border); }
+    .field-label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 5px; }
+    .field-row { margin-bottom: 12px; }
+    .field-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    input[type=text], input[type=number] {
+      width: 100%; font-size: 13px; height: 38px;
+      border: 0.5px solid var(--border-strong); border-radius: 8px;
+      padding: 0 12px; background: var(--paper); color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      transition: border-color 0.15s;
+    }
+    input:focus { outline: none; border-color: var(--accent); }
+
+    /* ── File upload zone ── */
+    .upload-zone {
+      border: 0.5px dashed var(--border-strong); border-radius: 10px;
+      padding: 1rem; background: var(--paper); margin-bottom: 10px;
+    }
+    .upload-zone-label { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 6px; }
+    .upload-zone-sub { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+    .file-type-pills { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
+    .ft-pill { font-size: 11px; color: var(--accent-dark); background: var(--accent-light); border-radius: 4px; padding: 2px 8px; }
+
+    /* ── Styled upload button ── */
+    .upload-file-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 13px; font-weight: 500; color: var(--ink);
+      background: var(--surface); border: 0.5px solid var(--border-strong);
+      border-radius: 8px; padding: 8px 14px; cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      font-family: 'DM Sans', sans-serif; width: 100%; margin-bottom: 8px;
+      justify-content: center;
+    }
+    .upload-file-btn:hover { background: var(--surface2); border-color: var(--accent); }
+    .upload-icon { font-size: 16px; }
+
+    textarea {
+      width: 100%; min-height: 90px; font-size: 13px;
+      font-family: 'DM Sans', sans-serif; resize: vertical;
+      border: 0.5px solid var(--border-strong); border-radius: 8px;
+      padding: 10px 12px; background: var(--paper); color: var(--ink);
+      transition: border-color 0.15s; line-height: 1.5;
+    }
+    textarea:focus { outline: none; border-color: var(--accent); }
+    select {
+      width: 100%; font-size: 13px; height: 38px;
+      border: 0.5px solid var(--border-strong); border-radius: 8px;
+      padding: 0 12px; background: var(--paper); color: var(--ink);
+      font-family: 'DM Sans', sans-serif; cursor: pointer;
+      margin-top: 8px; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237a7570' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
+    }
+    select:focus { outline: none; border-color: var(--accent); }
+
+    .doc-list { margin-top: 8px; }
+    .doc-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 10px; background: var(--surface);
+      border: 0.5px solid var(--border); border-radius: 8px;
+      margin-bottom: 4px;
+    }
+    .doc-type-tag { font-size: 10px; color: var(--accent-dark); background: var(--accent-light); border-radius: 4px; padding: 1px 6px; flex-shrink: 0; font-weight: 500; }
+    .doc-name { flex: 1; font-size: 12px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .doc-remove { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 16px; padding: 0 2px; line-height: 1; transition: color 0.15s; }
+    .doc-remove:hover { color: var(--red); }
+
+    .modal-actions { display: flex; gap: 8px; margin-top: 1.25rem; }
+    .btn-primary {
+      flex: 1; padding: 10px; font-size: 14px; font-weight: 500;
+      background: var(--accent); color: var(--accent-light);
+      border: none; border-radius: 8px; cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: var(--accent-dark); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-ghost {
+      padding: 10px 16px; font-size: 13px; font-weight: 500;
+      background: none; border: 0.5px solid var(--border-strong);
+      border-radius: 8px; cursor: pointer; color: var(--muted);
+      font-family: 'DM Sans', sans-serif; transition: background 0.15s;
+    }
+    .btn-ghost:hover { background: var(--surface2); }
+
+    /* ── Deep dive ── */
+    .dd-hero { margin-bottom: 1.5rem; }
+    .dd-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px; font-weight: 500; color: var(--ink);
+      margin-bottom: 4px;
+    }
+    .dd-meta { font-size: 13px; color: var(--muted); }
+
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1.5rem; }
+    .stat { background: var(--surface2); border-radius: 10px; padding: 0.85rem; }
+    .stat-label { font-size: 11px; color: var(--muted); margin-bottom: 5px; }
+    .stat-val { font-size: 20px; font-weight: 500; color: var(--ink); font-family: 'DM Mono', monospace; }
+    .stat-val.danger { color: var(--red); }
+    .stat-val.warn { color: var(--amber); }
+
+    .docs-loaded {
+      display: flex; flex-wrap: wrap; gap: 5px;
+      margin-bottom: 1.25rem;
+    }
+    .doc-loaded-pill {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 11px; color: var(--accent-dark);
+      background: var(--accent-light); border-radius: 20px;
+      padding: 3px 10px; border: 0.5px solid var(--accent-mid);
+    }
+
+    /* ── Add more zone ── */
+    .add-more-zone {
+      border: 0.5px solid var(--border); border-radius: 12px;
+      padding: 1.1rem; margin-bottom: 1rem; background: var(--surface);
+    }
+    .add-more-head { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 3px; }
+    .add-more-sub { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+
+    /* ── Analyze button ── */
+    .analyze-btn {
+      width: 100%; padding: 12px; font-size: 15px; font-weight: 500;
+      background: var(--accent); color: var(--accent-light);
+      border: none; border-radius: 10px; cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.15s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .analyze-btn:hover { background: var(--accent-dark); }
+    .analyze-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .analyze-btn.analyzing { background: var(--accent-dark); }
+
+    /* ── Brief output ── */
+    .brief { margin-top: 1.5rem; }
+    .brief-block { margin-bottom: 1.25rem; }
+    .brief-heading {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px; font-weight: 500; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .situation-text { font-size: 14px; color: var(--ink); line-height: 1.7; }
+    .confidence-note { font-size: 12px; color: var(--muted); margin-top: 8px; font-style: italic; }
+
+    .persona-card { background: var(--surface2); border-radius: 10px; padding: 1rem; }
+    .persona-row { display: flex; gap: 10px; margin-bottom: 8px; font-size: 13px; align-items: flex-start; }
+    .persona-row:last-child { margin-bottom: 0; }
+    .persona-lbl { color: var(--muted); min-width: 115px; flex-shrink: 0; font-size: 12px; line-height: 1.6; }
+    .persona-val { color: var(--ink); line-height: 1.6; }
+
+    .leverage-item {
+      background: var(--surface); border: 0.5px solid var(--border);
+      border-radius: 10px; padding: 0.9rem; margin-bottom: 7px;
+    }
+    .lev-top { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .lev-rank {
+      font-size: 10px; font-weight: 500; color: var(--accent-dark);
+      background: var(--accent-light); border-radius: 20px; padding: 2px 9px;
+    }
+    .lev-timeline { font-size: 11px; color: var(--muted); margin-left: auto; font-family: 'DM Mono', monospace; }
+    .lev-what { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 3px; }
+    .lev-why { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    .do-today {
+      background: var(--accent-light); border-radius: 10px; padding: 1rem;
+      border: 0.5px solid var(--accent-mid);
+    }
+    .do-today-lbl { font-size: 10px; font-weight: 500; color: var(--accent-dark); margin-bottom: 5px; letter-spacing: 0.05em; text-transform: uppercase; font-family: 'DM Mono', monospace; }
+    .do-today-text { font-size: 13px; color: var(--accent-dark); line-height: 1.6; }
+
+    /* ── Chat ── */
+    .chat-section { margin-top: 1.5rem; border-top: 0.5px solid var(--border); padding-top: 1.5rem; }
+    .chat-label { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .suggested-qs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1rem; }
+    .sq {
+      font-size: 12px; color: var(--accent-dark);
+      background: var(--accent-light); border: 0.5px solid var(--accent-mid);
+      border-radius: 20px; padding: 4px 12px; cursor: pointer;
+      transition: background 0.15s; font-family: 'DM Sans', sans-serif;
+    }
+    .sq:hover { background: var(--accent-mid); }
+    .chat-messages { min-height: 40px; margin-bottom: 12px; }
+    .chat-msg { margin-bottom: 12px; }
+    .chat-who { font-size: 11px; font-weight: 500; color: var(--muted); margin-bottom: 3px; font-family: 'DM Mono', monospace; }
+    .chat-msg.you .chat-who { color: var(--accent-dark); }
+    .chat-text { font-size: 13px; color: var(--ink); line-height: 1.6; }
+    .chat-row { display: flex; gap: 8px; }
+    .chat-input {
+      flex: 1; font-size: 13px; height: 40px;
+      border: 0.5px solid var(--border-strong); border-radius: 8px;
+      padding: 0 12px; background: var(--surface); color: var(--ink);
+      font-family: 'DM Sans', sans-serif; transition: border-color 0.15s;
+    }
+    .chat-input:focus { outline: none; border-color: var(--accent); }
+    .chat-send {
+      padding: 0 16px; background: var(--accent); color: var(--accent-light);
+      border: none; border-radius: 8px; cursor: pointer; height: 40px;
+      font-size: 16px; transition: background 0.15s;
+    }
+    .chat-send:hover { background: var(--accent-dark); }
+    .chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── Loading ── */
+    .dots { display: inline-flex; gap: 3px; align-items: center; }
+    .dots span { width: 5px; height: 5px; border-radius: 50%; background: var(--muted); animation: dot 1.2s infinite; }
+    .dots span:nth-child(2) { animation-delay: 0.2s; }
+    .dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dot { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
+
+    /* ── Sources detected ── */
+    .sources-detected { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 1.25rem; }
+    .source-tag {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 11px; color: var(--accent-dark);
+      background: var(--accent-light); border-radius: 20px;
+      padding: 3px 10px; border: 0.5px solid var(--accent-mid);
+    }
+
+    /* ── Views ── */
+    #portfolio-view { display: block; }
+    #deep-dive { display: none; }
+    .hidden { display: none !important; }
+
+    /* ── Divider ── */
+    .divider { height: 0.5px; background: var(--border); margin: 1.25rem 0; }
+
+    /* ── Error toast ── */
+    .toast {
+      position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+      background: var(--ink); color: #fff; border-radius: 10px;
+      padding: 10px 18px; font-size: 13px; z-index: 500;
+      opacity: 0; transition: opacity 0.2s; pointer-events: none;
+      max-width: 420px; text-align: center;
+    }
+    .toast.show { opacity: 1; pointer-events: auto; }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="wordmark">Signal<span class="wordmark-dot">.</span></div>
+    <div class="topbar-right">
+      <span class="version-tag">v0.0.1</span>
+      <div class="privacy-pill">&#128274; Nothing stored — session only</div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- ══ PORTFOLIO VIEW ══ -->
+    <div id="portfolio-view">
+      <div class="portfolio-header">
+        <div class="section-label">Book of business</div>
+      </div>
+      <div id="acct-list"></div>
+      <button class="add-acct-btn" onclick="showAddModal()">
+        <span class="add-icon">+</span> Add account
+      </button>
+    </div>
+
+    <!-- ══ DEEP DIVE VIEW ══ -->
+    <div id="deep-dive">
+      <div class="breadcrumb">
+        <button class="breadcrumb-btn" onclick="showPortfolio()">&#8592; All accounts</button>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current" id="dd-breadcrumb"></span>
+      </div>
+
+      <div class="dd-hero">
+        <div class="dd-name" id="dd-name"></div>
+        <div class="dd-meta" id="dd-meta"></div>
+      </div>
+
+      <div class="stats-row" id="dd-stats"></div>
+
+      <div id="dd-docs-loaded" class="hidden">
+        <div class="section-label" style="margin-bottom:8px">Documents loaded</div>
+        <div class="docs-loaded" id="dd-docs-pills"></div>
+        <div class="divider"></div>
+      </div>
+
+      <div class="add-more-zone">
+        <div class="add-more-head">&#128196; Add context</div>
+        <div class="add-more-sub">Upload files or paste anything — Signal merges all sources into the analysis.</div>
+        <div class="file-type-pills">
+          <span class="ft-pill">Zoom / Teams transcript</span>
+          <span class="ft-pill">MBR / ABR / QBR</span>
+          <span class="ft-pill">CSV / usage data</span>
+          <span class="ft-pill">Slack / internal chat</span>
+          <span class="ft-pill">SWOT doc</span>
+          <span class="ft-pill">Email thread</span>
+          <span class="ft-pill">CRM snapshot</span>
+        </div>
+        <input type="file" id="dd-file-input" multiple
+          accept=".txt,.csv,.md,.json,.html,.log,.tsv,.vtt,.srt,.rtf"
+          style="display:none" onchange="handleDDFiles(this.files)">
+        <button class="upload-file-btn" onclick="document.getElementById('dd-file-input').click()">
+          <span class="upload-icon">&#8679;</span> Upload files (.txt, .csv, .vtt, .srt, .md, .json…)
+        </button>
+        <div id="dd-doc-list"></div>
+        <textarea id="dd-paste" placeholder="Paste a Teams chat, call notes, MBR summary, a CSV — anything. Signal figures out what it's looking at."></textarea>
+        <select id="dd-doctype">
+          <option value="auto">Auto-detect content type</option>
+          <option value="zoom_transcript">Zoom / Teams transcript</option>
+          <option value="mbr">MBR / ABR / QBR notes</option>
+          <option value="internal_notes">Internal notes / Slack / Teams chat</option>
+          <option value="email">Email thread</option>
+          <option value="swot">SWOT / strategic doc</option>
+          <option value="csv">CSV / usage data</option>
+          <option value="crm">CRM snapshot / dashboard notes</option>
+          <option value="qualitative">Qualitative feedback</option>
+        </select>
+      </div>
+
+      <button class="analyze-btn" id="analyze-btn" onclick="runAnalysis()">
+        Analyze this account &#8594;
+      </button>
+
+      <!-- Brief output -->
+      <div class="brief hidden" id="brief">
+        <div class="divider"></div>
+
+        <div id="sources-row" class="hidden">
+          <div class="section-label" style="margin-bottom:8px">Signal read</div>
+          <div class="sources-detected" id="sources-list"></div>
+          <div class="divider"></div>
+        </div>
+
+        <div class="brief-block">
+          <div class="brief-heading">Situation</div>
+          <div class="situation-text" id="b-situation"></div>
+          <div class="confidence-note" id="b-confidence"></div>
+        </div>
+
+        <div class="brief-block">
+          <div class="brief-heading">Contact read</div>
+          <div class="persona-card" id="b-persona"></div>
+        </div>
+
+        <div class="brief-block">
+          <div class="brief-heading">Where to press — ranked</div>
+          <div id="b-leverage"></div>
+        </div>
+
+        <div class="brief-block">
+          <div class="brief-heading">Do this today</div>
+          <div class="do-today">
+            <div class="do-today-lbl">While the longer plays run in the background</div>
+            <div class="do-today-text" id="b-today"></div>
+          </div>
+        </div>
+
+        <div class="chat-section">
+          <div class="chat-label">Ask Signal about this account</div>
+          <div class="suggested-qs" id="suggested-qs"></div>
+          <div class="chat-messages" id="chat-msgs"></div>
+          <div class="chat-row">
+            <input class="chat-input" id="chat-input"
+              placeholder="What if I go to the economic buyer instead?"
+              onkeydown="if(event.key==='Enter')sendChat()">
+            <button class="chat-send" id="chat-send" onclick="sendChat()">&#8594;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ADD ACCOUNT MODAL ══ -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-title">Add account</div>
+        <button class="modal-close" onclick="hideModal()">&#215;</button>
+      </div>
+      <div class="field-row-2">
+        <div class="field-row">
+          <label class="field-label" for="m-name">Account name *</label>
+          <input type="text" id="m-name" placeholder="Acme Corp">
+        </div>
+        <div class="field-row">
+          <label class="field-label" for="m-arr">ARR (optional)</label>
+          <input type="number" id="m-arr" placeholder="150000">
+        </div>
+      </div>
+      <div class="field-row-2">
+        <div class="field-row">
+          <label class="field-label" for="m-renewal">Days to renewal</label>
+          <input type="number" id="m-renewal" placeholder="90">
+        </div>
+        <div class="field-row">
+          <label class="field-label" for="m-contact">Primary contact</label>
+          <input type="text" id="m-contact" placeholder="Name, Title">
+        </div>
+      </div>
+      <div class="field-row">
+        <label class="field-label">Upload documents</label>
+        <div class="upload-zone">
+          <div class="upload-zone-label">Drop in your data — any format, any mix</div>
+          <div class="upload-zone-sub">The messier the better — Signal identifies what it's looking at.</div>
+          <div class="file-type-pills">
+            <span class="ft-pill">Transcript</span>
+            <span class="ft-pill">MBR/QBR</span>
+            <span class="ft-pill">CSV</span>
+            <span class="ft-pill">SWOT</span>
+            <span class="ft-pill">Chat log</span>
+            <span class="ft-pill">Email</span>
+            <span class="ft-pill">CRM snapshot</span>
+            <span class="ft-pill">Internal notes</span>
+          </div>
+          <input type="file" id="m-file-input" multiple
+            accept=".txt,.csv,.md,.json,.html,.log,.tsv,.vtt,.srt,.rtf"
+            style="display:none" onchange="handleModalFiles(this.files)">
+          <button class="upload-file-btn" onclick="document.getElementById('m-file-input').click()">
+            <span class="upload-icon">&#8679;</span> Choose files to upload
+          </button>
+          <div id="m-doc-list"></div>
+          <div style="font-size:12px;color:var(--muted);margin:10px 0 6px">Or paste text directly —</div>
+          <textarea id="m-paste" style="min-height:80px"
+            placeholder="Teams chat, MBR notes, call transcript, anything. Paste raw and Signal will read it."></textarea>
+          <select id="m-doctype" style="margin-top:8px">
+            <option value="auto">Auto-detect content type</option>
+            <option value="zoom_transcript">Zoom / Teams transcript</option>
+            <option value="mbr">MBR / ABR / QBR notes</option>
+            <option value="internal_notes">Internal notes / Slack / Teams</option>
+            <option value="email">Email thread</option>
+            <option value="swot">SWOT / strategic doc</option>
+            <option value="csv">CSV / usage data</option>
+            <option value="crm">CRM snapshot</option>
+            <option value="qualitative">Qualitative feedback</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-ghost" onclick="hideModal()">Cancel</button>
+        <button class="btn-primary" onclick="createAccount()">&#10003; Create account</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ── Config ──
+    // REPLACE this with your Cloudflare Worker URL after deploying worker.js
+    const WORKER_URL = 'YOUR_WORKER_URL_HERE';
+
+    // ── Demo accounts ──
+    const DEMO_ACCOUNTS = [
+      {id:'korova',name:'Korova Media',arr:180000,renewal:47,risk:'high',riskType:'Champion loss',
+       flag:'VP Analytics left 3 weeks ago. New stakeholder unknown.',
+       seats:42,seatsUsed:38,healthScore:52,lastContact:21,isDemo:true,
+       contacts:[{name:'Jamie Osei',title:'VP Analytics (departed)',style:'Data-driven, fast, async Slack preferred'}],
+       demoData:`Account: Korova Media | ARR: $180K | Renewal: 47 days\nSeats: 42 licensed, 38 active\nHealth score: 52/100 (was 74 six weeks ago)\nChampion: Jamie Osei, VP Analytics — gave notice 3 weeks ago, last login 19 days ago\nNew VP not identified. IT contact (Marcus Webb) is point of contact but not a product user.\nLast QBR: 90 days ago — Jamie flagged dashboard feature as transformational\nNo renewal conversation started.`,docs:[]},
+      {id:'blueframe',name:'Blueframe Health',arr:320000,renewal:112,risk:'high',riskType:'Silent decay',
+       flag:'Seat utilization 89% → 41% in 60 days. No tickets. No signal.',
+       seats:80,seatsUsed:33,healthScore:38,lastContact:14,isDemo:true,
+       contacts:[{name:'Priya Nair',title:'Director of Data Strategy',style:'Formal, email preferred, risk-averse, needs data before decisions'}],
+       demoData:`Account: Blueframe Health | ARR: $320K | Renewal: 112 days\nSeats: 80 licensed, 33 active (was 71 active / 89% 60 days ago)\nHealth score: 38/100 (was 81)\nMain contact: Priya Nair. Last active: 18 days ago.\nSupport tickets: 0. Dashboard views down 67%. Export feature stopped 45 days ago.\nLast call: Priya said things are good, just busy season.`,docs:[]},
+      {id:'ironclad',name:'Ironclad Logistics',arr:540000,renewal:38,risk:'high',riskType:'Frustrated — not gone',
+       flag:'4 support tickets in 30 days, same feature. Renewal in 38 days.',
+       seats:95,seatsUsed:91,healthScore:71,lastContact:5,isDemo:true,
+       contacts:[{name:'Sandra Mwangi',title:'VP Operations',style:'Direct, numbers-first, low patience for ambiguity'}],
+       demoData:`Account: Ironclad Logistics | ARR: $540K | Renewal: 38 days\nSeats: 95 licensed, 91 active\nHealth score: 71/100\nTickets last 30 days: 4 — all export + API rate limits. Opened by Dev Patel (tech lead), tone increasingly terse.\nVP Sandra Mwangi: called 5 days ago to discuss platform direction. Did not mention tickets.\nUsage strong: sessions up 12% MoM. SLA breach: avg ticket response 3.4 days vs 2 day SLA.`,docs:[]},
+      {id:'solace',name:'Solace Partners',arr:265000,renewal:44,risk:'high',riskType:'Vibe risk',
+       flag:'Everything looks fine. CSM gut says otherwise.',
+       seats:55,seatsUsed:53,healthScore:81,lastContact:7,isDemo:true,
+       contacts:[{name:'Dominique Leroy',title:'VP Customer Experience',style:'Warm, relationship-driven, hard to read when something is wrong'}],
+       demoData:`Account: Solace Partners | ARR: $265K | Renewal: 44 days\nSeats: 55, 53 active\nHealth score: 81/100. Usage strong.\nLast contact: 7 days ago — warm call, Dominique slightly shorter than usual. Didn't ask roadmap questions (usually asks 2-3).\nSupport tickets: 0. No commercial conversation started.`,docs:[]},
+    ];
+
+    let ACCOUNTS = DEMO_ACCOUNTS.map(a => ({...a, docs: []}));
+    let currentAccount = null;
+    let chatHistory = [];
+    let briefData = null;
+    let ddExtraDocs = [];
+    let modalDocs = [];
+
+    // ── Toast ──
+    function showToast(msg, duration=3500) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), duration);
+    }
+
+    // ── Formatting ──
+    function fmtARR(n) { return n ? '$' + Math.round(n/1000) + 'K' : '—'; }
+    function riskOrder(r) { return {high:0,medium:1,low:2,custom:3,pending:4}[r] ?? 5; }
+
+    // ── Content type detection ──
+    function detectType(filename, content) {
+      const fn = (filename || '').toLowerCase();
+      if (fn.endsWith('.vtt') || fn.endsWith('.srt') || fn.includes('transcript')) return 'Transcript';
+      if (fn.includes('mbr') || fn.includes('abr') || fn.includes('qbr')) return 'MBR/QBR';
+      if (fn.endsWith('.csv') || fn.endsWith('.tsv')) return 'CSV data';
+      if (fn.includes('swot')) return 'SWOT';
+      if (fn.includes('slack') || fn.includes('teams') || fn.includes('chat')) return 'Chat log';
+      if (fn.includes('email') || fn.includes('mail')) return 'Email';
+      const lower = (content || '').toLowerCase().slice(0, 2000);
+      if (lower.includes('zoom meeting') || lower.includes('transcript') || (content||'').match(/\d{1,2}:\d{2}:\d{2}/g)?.length > 3) return 'Transcript';
+      if (lower.includes('mbr') || lower.includes('monthly business review') || lower.includes('qbr')) return 'MBR/QBR';
+      if (lower.includes('from:') && lower.includes('subject:')) return 'Email';
+      if ((content||'').split('\n').slice(0,5).some(l => l.split(',').length > 3)) return 'CSV data';
+      return 'Document';
+    }
+
+    // ── File reading ──
+    function readFile(file, target) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const text = e.target.result;
+        const docType = detectType(file.name, text);
+        const doc = { name: file.name, type: docType, content: text, id: Date.now() + Math.random() };
+        if (target === 'modal') {
+          modalDocs.push(doc);
+          renderDocList('m-doc-list', modalDocs, 'modal');
+        } else {
+          ddExtraDocs.push(doc);
+          renderDocList('dd-doc-list', ddExtraDocs, 'dd');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function handleModalFiles(files) { Array.from(files).forEach(f => readFile(f, 'modal')); }
+    function handleDDFiles(files) { Array.from(files).forEach(f => readFile(f, 'dd')); }
+
+    function renderDocList(elId, docs, target) {
+      const el = document.getElementById(elId);
+      if (!el) return;
+      el.innerHTML = docs.map(d => `
+        <div class="doc-item">
+          <span class="doc-type-tag">${d.type}</span>
+          <span class="doc-name" title="${d.name}">${d.name.length > 30 ? d.name.slice(0,30)+'…' : d.name}</span>
+          <button class="doc-remove" onclick="removeDoc('${d.id}','${target}')" aria-label="Remove">&#215;</button>
+        </div>`).join('');
+    }
+
+    function removeDoc(id, target) {
+      const idNum = parseFloat(id);
+      if (target === 'modal') { modalDocs = modalDocs.filter(d => d.id !== idNum); renderDocList('m-doc-list', modalDocs, 'modal'); }
+      else { ddExtraDocs = ddExtraDocs.filter(d => d.id !== idNum); renderDocList('dd-doc-list', ddExtraDocs, 'dd'); }
+    }
+
+    // ── Portfolio ──
+    function buildPortfolio() {
+      const sorted = [...ACCOUNTS].sort((a,b) => riskOrder(a.risk) - riskOrder(b.risk));
+      let html = '';
+      let lastGroup = '';
+      sorted.forEach(a => {
+        const groupLabel = {high:'Needs attention',medium:'Watch closely',low:'Stable',custom:'Your accounts',pending:'Pending analysis'}[a.risk] || '';
+        if (groupLabel !== lastGroup) {
+          html += `<div class="risk-group-label">${groupLabel}</div>`;
+          lastGroup = groupLabel;
+        }
+        html += `<div class="acct-card" onclick="openAccount('${a.id}')">
+          <div class="acct-risk-bar ${a.risk}"></div>
+          <div class="acct-body">
+            <div class="acct-top">
+              <div class="acct-name">${a.name}</div>
+              <div class="acct-meta">
+                <span class="arr">${fmtARR(a.arr)}</span>
+                ${a.renewal ? `<span class="days">${a.renewal}d</span>` : ''}
+                <span class="risk-badge ${a.risk}">${a.risk === 'custom' ? 'new' : a.risk === 'pending' ? 'pending' : a.risk}</span>
+              </div>
+            </div>
+            <div class="acct-flag">${a.flag || 'Click to analyze'}</div>
+            ${a.riskType ? `<div class="risk-type-label">${a.riskType}</div>` : ''}
+          </div>
+        </div>`;
+      });
+      document.getElementById('acct-list').innerHTML = html;
+    }
+
+    // ── Modal ──
+    function showAddModal() {
+      modalDocs = [];
+      ['m-name','m-arr','m-renewal','m-contact','m-paste'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('m-doctype').value = 'auto';
+      document.getElementById('m-doc-list').innerHTML = '';
+      document.getElementById('m-file-input').value = '';
+      document.getElementById('modal-overlay').classList.add('open');
+    }
+    function hideModal() { document.getElementById('modal-overlay').classList.remove('open'); modalDocs = []; }
+
+    function createAccount() {
+      const name = document.getElementById('m-name').value.trim();
+      if (!name) { document.getElementById('m-name').focus(); showToast('Account name is required'); return; }
+      const arr = parseInt(document.getElementById('m-arr').value) || null;
+      const renewal = parseInt(document.getElementById('m-renewal').value) || null;
+      const contact = document.getElementById('m-contact').value.trim();
+      const pasteText = document.getElementById('m-paste').value.trim();
+      const doctype = document.getElementById('m-doctype').value;
+      const allDocs = [...modalDocs];
+      if (pasteText) {
+        const dtype = doctype === 'auto' ? detectType('pasted', pasteText) : doctype.replace(/_/g,' ');
+        allDocs.push({ name: 'Pasted content', type: dtype, content: pasteText, id: Date.now() });
+      }
+      const id = 'custom-' + Date.now();
+      ACCOUNTS.push({
+        id, name, arr, renewal,
+        risk: allDocs.length > 0 ? 'custom' : 'pending',
+        riskType: '', flag: '',
+        seats: null, seatsUsed: null, healthScore: null, lastContact: null,
+        contacts: contact ? [{ name: contact, title: '', style: '' }] : [],
+        demoData: '', docs: allDocs, isCustom: true
+      });
+      hideModal();
+      buildPortfolio();
+      openAccount(id);
+    }
+
+    // ── Deep dive ──
+    function openAccount(id) {
+      currentAccount = ACCOUNTS.find(a => a.id === id);
+      chatHistory = []; briefData = null; ddExtraDocs = [];
+      document.getElementById('portfolio-view').style.display = 'none';
+      document.getElementById('deep-dive').style.display = 'block';
+      document.getElementById('brief').classList.add('hidden');
+      document.getElementById('dd-paste').value = '';
+      document.getElementById('dd-doctype').value = 'auto';
+      document.getElementById('dd-doc-list').innerHTML = '';
+      document.getElementById('chat-msgs').innerHTML = '';
+      document.getElementById('suggested-qs').innerHTML = '';
+      document.getElementById('dd-file-input').value = '';
+
+      document.getElementById('dd-breadcrumb').textContent = currentAccount.name;
+      document.getElementById('dd-name').textContent = currentAccount.name;
+
+      const metaParts = [];
+      if (currentAccount.arr) metaParts.push(fmtARR(currentAccount.arr) + ' ARR');
+      if (currentAccount.renewal) metaParts.push('Renewal in ' + currentAccount.renewal + ' days');
+      if (currentAccount.riskType) metaParts.push(currentAccount.riskType);
+      document.getElementById('dd-meta').textContent = metaParts.join(' · ') || 'New account — no data yet';
+
+      const util = currentAccount.seats ? Math.round((currentAccount.seatsUsed / currentAccount.seats) * 100) : null;
+      document.getElementById('dd-stats').innerHTML = `
+        <div class="stat"><div class="stat-label">Seat utilization</div><div class="stat-val ${util !== null && util < 60 ? 'danger' : util !== null && util < 75 ? 'warn' : ''}">${util !== null ? util + '%' : '—'}</div></div>
+        <div class="stat"><div class="stat-label">Health score</div><div class="stat-val ${currentAccount.healthScore !== null && currentAccount.healthScore < 50 ? 'danger' : currentAccount.healthScore !== null && currentAccount.healthScore < 70 ? 'warn' : ''}">${currentAccount.healthScore !== null ? currentAccount.healthScore + '/100' : '—'}</div></div>
+        <div class="stat"><div class="stat-label">Last contact</div><div class="stat-val ${currentAccount.lastContact !== null && currentAccount.lastContact > 30 ? 'danger' : currentAccount.lastContact !== null && currentAccount.lastContact > 14 ? 'warn' : ''}">${currentAccount.lastContact !== null ? currentAccount.lastContact + 'd ago' : '—'}</div></div>`;
+
+      const docs = currentAccount.docs || [];
+      const docsLoaded = document.getElementById('dd-docs-loaded');
+      if (docs.length > 0) {
+        docsLoaded.classList.remove('hidden');
+        document.getElementById('dd-docs-pills').innerHTML = docs.map(d =>
+          `<div class="doc-loaded-pill">&#128196; ${d.type}: ${d.name.length > 28 ? d.name.slice(0,28)+'…' : d.name}</div>`
+        ).join('');
+      } else {
+        docsLoaded.classList.add('hidden');
+      }
+
+      document.getElementById('analyze-btn').disabled = false;
+      document.getElementById('analyze-btn').innerHTML = 'Analyze this account &#8594;';
+    }
+
+    function showPortfolio() {
+      document.getElementById('portfolio-view').style.display = 'block';
+      document.getElementById('deep-dive').style.display = 'none';
+    }
+
+    // ── Build context ──
+    function buildContext() {
+      const allDocs = [...(currentAccount.docs || []), ...ddExtraDocs];
+      const pasteExtra = document.getElementById('dd-paste').value.trim();
+      const ddDoctype = document.getElementById('dd-doctype').value;
+      if (pasteExtra) {
+        const dtype = ddDoctype === 'auto' ? detectType('pasted', pasteExtra) : ddDoctype.replace(/_/g,' ');
+        allDocs.push({ name: 'Additional pasted content', type: dtype, content: pasteExtra });
+      }
+      let ctx = '';
+      if (currentAccount.demoData) ctx += `=== Account overview ===\n${currentAccount.demoData}\n\n`;
+      allDocs.forEach(d => { ctx += `=== ${d.type}: ${d.name} ===\n${d.content}\n\n`; });
+      return ctx.trim() || `Account: ${currentAccount.name}\nNo structured data provided.`;
+    }
+
+    // ── Analysis ──
+    async function runAnalysis() {
+      if (WORKER_URL === 'YOUR_WORKER_URL_HERE') {
+        showToast('⚠️ Set your WORKER_URL in the script before analyzing. See setup instructions.');
+        return;
+      }
+      const btn = document.getElementById('analyze-btn');
+      btn.disabled = true;
+      btn.classList.add('analyzing');
+      btn.innerHTML = '<span class="dots"><span></span><span></span><span></span></span> Analyzing…';
+
+      const context = buildContext();
+      const contactsText = (currentAccount.contacts || [])
+        .map(c => `${c.name}${c.title ? ' (' + c.title + ')' : ''}${c.style ? ': ' + c.style : ''}`)
+        .join('\n') || 'Not specified';
+
+      const prompt = `You are Signal, an expert CS strategist. Analyze this account data and return ONLY valid JSON with no markdown, no backticks, nothing outside the JSON.
+
+The data may include transcripts, MBR/QBR notes, CSV exports, Slack/Teams chat logs, SWOT docs, internal notes, or email threads — or any mix. Read everything holistically.
+
+ACCOUNT DATA:
+${context}
+
+KNOWN CONTACTS:
+${contactsText}
+
+Return exactly this JSON:
+{
+  "situation": "2-4 sentences: what is actually happening — synthesize ALL input sources, name the pattern, not just metrics",
+  "risk_type": "Champion loss | Silent decay | Power user concentration | Frustrated not gone | Stalled expansion | Adoption failure | Sentiment mismatch | Relationship gap | Reduced footprint | Vibe risk | Healthy | Unknown",
+  "risk_severity": "high or medium or low or unknown",
+  "data_sources_detected": ["list each content type you found and used in the analysis"],
+  "leverage_points": [
+    {"rank": 1, "what": "specific action grounded in this account's data", "why": "reason from the actual signals", "timeline": "this week"},
+    {"rank": 2, "what": "specific action", "why": "reason", "timeline": "this month"},
+    {"rank": 3, "what": "specific action", "why": "reason", "timeline": "this quarter"}
+  ],
+  "do_this_today": "one concrete action the CSM takes in the next 24 hours — specific, not generic",
+  "contact_persona": {
+    "primary_contact": "name or Unknown",
+    "comm_style": "how they prefer to communicate based on evidence in the data",
+    "decision_style": "how they make decisions",
+    "what_they_say_vs_mean": "surface read vs subtext — what signals suggest vs what they said",
+    "approach_recommendation": "exactly how to engage this specific person given the current situation"
+  },
+  "confidence": "high or medium or low",
+  "confidence_note": "what information would sharpen or change this read",
+  "suggested_questions": ["question a CSM would ask Signal", "question 2", "question 3"]
+}`;
+
+      try {
+        const resp = await fetch(WORKER_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1500,
+            messages: [{ role: 'user', content: prompt }]
+          })
+        });
+        if (!resp.ok) throw new Error('Worker returned ' + resp.status);
+        const data = await resp.json();
+        const raw = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
+        const clean = raw.replace(/```json|```/g, '').trim();
+        briefData = JSON.parse(clean);
+        briefData._context = context;
+
+        if (currentAccount.isCustom) {
+          currentAccount.risk = briefData.risk_severity || 'custom';
+          currentAccount.riskType = briefData.risk_type || '';
+          currentAccount.flag = briefData.situation ? briefData.situation.slice(0, 90) + (briefData.situation.length > 90 ? '…' : '') : '';
+        }
+        renderBrief(briefData);
+        buildPortfolio();
+      } catch(e) {
+        showToast('Analysis failed: ' + e.message + ' — check your Worker URL and try again.');
+        btn.disabled = false;
+        btn.classList.remove('analyzing');
+        btn.innerHTML = 'Analyze this account &#8594;';
+      }
+    }
+
+    function renderBrief(b) {
+      document.getElementById('brief').classList.remove('hidden');
+      document.getElementById('b-situation').textContent = b.situation;
+      document.getElementById('b-confidence').textContent = b.confidence_note
+        ? 'Confidence: ' + b.confidence + ' — ' + b.confidence_note : '';
+
+      if (b.data_sources_detected && b.data_sources_detected.length) {
+        document.getElementById('sources-row').classList.remove('hidden');
+        document.getElementById('sources-list').innerHTML = b.data_sources_detected
+          .map(s => `<div class="source-tag">&#10003; ${s}</div>`).join('');
+      }
+
+      const p = b.contact_persona;
+      document.getElementById('b-persona').innerHTML = `
+        <div class="persona-row"><span class="persona-lbl">Primary contact</span><span class="persona-val">${p.primary_contact}</span></div>
+        <div class="persona-row"><span class="persona-lbl">Comm style</span><span class="persona-val">${p.comm_style}</span></div>
+        <div class="persona-row"><span class="persona-lbl">Decision style</span><span class="persona-val">${p.decision_style}</span></div>
+        <div class="persona-row"><span class="persona-lbl">Says vs means</span><span class="persona-val">${p.what_they_say_vs_mean}</span></div>
+        <div class="persona-row"><span class="persona-lbl">How to engage</span><span class="persona-val">${p.approach_recommendation}</span></div>`;
+
+      document.getElementById('b-leverage').innerHTML = b.leverage_points.map(lp => `
+        <div class="leverage-item">
+          <div class="lev-top">
+            <span class="lev-rank">Priority ${lp.rank}</span>
+            <span class="lev-timeline">${lp.timeline}</span>
+          </div>
+          <div class="lev-what">${lp.what}</div>
+          <div class="lev-why">${lp.why}</div>
+        </div>`).join('');
+
+      document.getElementById('b-today').textContent = b.do_this_today;
+
+      if (b.suggested_questions) {
+        document.getElementById('suggested-qs').innerHTML = b.suggested_questions
+          .map(q => `<button class="sq" onclick="askSuggested(this, \`${q.replace(/`/g,"'")}\`)">${q}</button>`).join('');
+      }
+
+      document.getElementById('analyze-btn').disabled = false;
+      document.getElementById('analyze-btn').classList.remove('analyzing');
+      document.getElementById('analyze-btn').innerHTML = '&#8635; Re-analyze with updated data';
+
+      chatHistory = [
+        { role: 'user', content: '[Account data loaded — Signal has full context]' },
+        { role: 'assistant', content: 'Ready. Ask me anything about this account.' }
+      ];
+    }
+
+    function askSuggested(el, q) {
+      document.getElementById('chat-input').value = q;
+      el.style.display = 'none';
+      sendChat();
+    }
+
+    async function sendChat() {
+      const input = document.getElementById('chat-input');
+      const msg = input.value.trim();
+      if (!msg || !briefData) { if (!briefData) showToast('Run analysis first'); return; }
+      input.value = '';
+      document.getElementById('chat-send').disabled = true;
+
+      const msgs = document.getElementById('chat-msgs');
+      msgs.innerHTML += `<div class="chat-msg you"><div class="chat-who">You</div><div class="chat-text">${msg}</div></div>`;
+
+      const lid = 'ld-' + Date.now();
+      msgs.innerHTML += `<div class="chat-msg" id="${lid}"><div class="chat-who">Signal</div><div class="chat-text"><div class="dots"><span></span><span></span><span></span></div></div></div>`;
+
+      const sys = `You are Signal, an expert CS strategist with full context on this account. Answer questions directly and specifically — never generically. If the CSM shares new information mid-conversation, revise your read explicitly and say what changed.
+
+ACCOUNT BRIEF:
+${JSON.stringify(briefData, null, 2)}
+
+FULL SOURCE DATA:
+${briefData._context}`;
+
+      chatHistory.push({ role: 'user', content: msg });
+
+      try {
+        const resp = await fetch(WORKER_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 800,
+            system: sys,
+            messages: chatHistory.slice(-10)
+          })
+        });
+        const data = await resp.json();
+        const reply = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
+        chatHistory.push({ role: 'assistant', content: reply });
+        document.getElementById(lid).querySelector('.chat-text').textContent = reply;
+      } catch(e) {
+        document.getElementById(lid).querySelector('.chat-text').textContent = 'Error — try again.';
+      }
+      document.getElementById('chat-send').disabled = false;
+    }
+
+    // ── Init ──
+    buildPortfolio();
+  </script>
+</body>
+</html>
