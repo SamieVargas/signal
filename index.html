@@ -414,6 +414,8 @@
     }
     .toast.show { opacity: 1; pointer-events: auto; }
   </style>
+  <!-- pdf.js (Mozilla) — extract text from uploaded PDFs in the browser -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
 
@@ -756,21 +758,50 @@
     }
 
     // ── File reading ──
-    function readFile(file, target) {
-      const reader = new FileReader();
-      reader.onload = e => {
-        const text = e.target.result;
-        const docType = detectType(file.name, text);
-        const doc = { name: file.name, type: docType, content: text, id: Date.now() + Math.random() };
-        if (target === 'modal') {
-          modalDocs.push(doc);
-          renderDocList('m-doc-list', modalDocs, 'modal');
+    const PDF_PAGE_CAP = 80; // safety cap on pages parsed per PDF
+
+    async function extractPdfText(file) {
+      const buf = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+      const pages = Math.min(pdf.numPages, PDF_PAGE_CAP);
+      let out = '';
+      for (let i = 1; i <= pages; i++) {
+        const page = await pdf.getPage(i);
+        const tc = await page.getTextContent();
+        out += tc.items.map(it => it.str).join(' ') + '\n\n';
+      }
+      return out.trim();
+    }
+
+    function addDoc(doc, target) {
+      if (target === 'modal') {
+        modalDocs.push(doc);
+        renderDocList('m-doc-list', modalDocs, 'modal');
+      } else {
+        ddExtraDocs.push(doc);
+        renderDocList('dd-doc-list', ddExtraDocs, 'dd');
+      }
+    }
+
+    async function readFile(file, target) {
+      const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+      try {
+        let text;
+        if (isPdf) {
+          if (!window.pdfjsLib) throw new Error('PDF reader failed to load');
+          text = await extractPdfText(file);
+          if (!text) {
+            showToast(`"${file.name}" has no extractable text — looks scanned/image-only.`);
+            return;
+          }
         } else {
-          ddExtraDocs.push(doc);
-          renderDocList('dd-doc-list', ddExtraDocs, 'dd');
+          text = await file.text();
         }
-      };
-      reader.readAsText(file);
+        const docType = detectType(file.name, text);
+        addDoc({ name: file.name, type: docType, content: text, id: Date.now() + Math.random() }, target);
+      } catch (e) {
+        showToast(`Couldn't read "${file.name}": ${e.message}`);
+      }
     }
 
     function handleModalFiles(files) { Array.from(files).forEach(f => readFile(f, 'modal')); }
@@ -1196,6 +1227,10 @@ ${chatContext}`;
     }
 
     // ── Init ──
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
     buildPortfolio();
   </script>
 </body>
