@@ -1,7 +1,7 @@
 """Call 1: summarize each document individually (cheap, keeps tokens small)."""
 from __future__ import annotations
 
-from config import MODEL, MAX_SUMMARY_TOKENS
+from config import MODELS, MAX_SUMMARY_TOKENS
 from prompts import SUMMARIZE_PROMPT
 
 
@@ -17,7 +17,7 @@ def summarize_doc(client, doc: dict) -> str:
         content=doc["content"],
     )
     resp = client.messages.create(
-        model=MODEL,
+        model=MODELS["summary"],
         max_tokens=MAX_SUMMARY_TOKENS,
         messages=[{"role": "user", "content": prompt}],
     )

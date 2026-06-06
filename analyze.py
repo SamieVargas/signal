@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 import re
 
-from config import MODEL, MAX_ANALYSIS_TOKENS
+from config import MODELS, MAX_ANALYSIS_TOKENS
 from prompts import ANALYZE_PROMPT
 
 
@@ -39,7 +39,7 @@ def extract_json(text: str) -> dict:
 
 def analyze(client, prompt: str) -> dict:
     resp = client.messages.create(
-        model=MODEL,
+        model=MODELS["analysis"],
         max_tokens=MAX_ANALYSIS_TOKENS,
         messages=[{"role": "user", "content": prompt}],
     )

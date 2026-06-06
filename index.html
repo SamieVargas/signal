@@ -623,7 +623,15 @@
     // ── Config ──
     // REPLACE this with your Cloudflare Worker URL after deploying worker.js
     const WORKER_URL = 'https://signal-proxy.samievargas.workers.dev';
-    const MODEL = 'claude-sonnet-4-6';
+    // Model set — one place to swap models per role. Must match the Worker's
+    // ALLOWED_MODELS allowlist (claude-sonnet-4-6, claude-opus-4-8, claude-haiku-4-5).
+    const MODELS = {
+      analysis: 'claude-sonnet-4-6',  // main synthesis — keep the strong model
+      summary:  'claude-haiku-4-5',   // cheap + fast per-doc extraction pass
+      chat:     'claude-haiku-4-5',   // follow-up Q&A — cheap + fast, fine for this
+    };
+    // Risk taxonomy — defined once, referenced in the analysis prompt.
+    const RISK_TYPES = 'Champion loss, Silent decay, Power user concentration, Frustrated not gone, Stalled expansion, Adoption failure, Sentiment mismatch, Relationship gap, Reduced footprint, Vibe risk, Healthy, Unknown';
 
     // POST to the Worker. Surfaces the real API error message instead of a bare
     // status code, and retries once on 429 (rate limit) with a short backoff.
@@ -683,8 +691,10 @@
     let currentAccount = null;
     let chatHistory = [];
     let briefData = null;
+    let chatContext = '';          // compact brief used as chat system context
     let ddExtraDocs = [];
     let modalDocs = [];
+    const analysisCache = {};      // session-only cache of briefs, keyed by doc fingerprint
 
     // ── Toast ──
     function showToast(msg, duration=3500) {
@@ -901,7 +911,9 @@
     }
 
     // ── Build context ──
-    function buildContext() {
+    // Gather every doc for the current account, including anything pasted into
+    // the "Add context" box.
+    function collectDocs() {
       const allDocs = [...(currentAccount.docs || []), ...ddExtraDocs];
       const pasteExtra = document.getElementById('dd-paste').value.trim();
       const ddDoctype = document.getElementById('dd-doctype').value;
@@ -909,10 +921,106 @@
         const dtype = ddDoctype === 'auto' ? detectType('pasted', pasteExtra) : ddDoctype.replace(/_/g,' ');
         allDocs.push({ name: 'Additional pasted content', type: dtype, content: pasteExtra });
       }
+      return allDocs;
+    }
+
+    // Raw context (no summarization) — kept as a fallback.
+    function buildContext() {
+      const allDocs = collectDocs();
       let ctx = '';
       if (currentAccount.demoData) ctx += `=== Account overview ===\n${currentAccount.demoData}\n\n`;
       allDocs.forEach(d => { ctx += `=== ${d.type}: ${d.name} ===\n${d.content}\n\n`; });
       return ctx.trim() || `Account: ${currentAccount.name}\nNo structured data provided.`;
+    }
+
+    // Summarize one doc with Haiku (cheap + fast). Falls back to a truncated
+    // raw slice if the summary call fails, so one bad doc can't kill analysis.
+    // Strip zero-signal noise from spoken/chat transcripts before summarizing.
+    // Conservative — only applied to transcript/chat-type docs so it can't
+    // mangle CSVs, SWOTs, or prose notes.
+    function cleanTranscript(content) {
+      return content
+        .replace(/^\d{1,2}:\d{2}(:\d{2})?\s*/gm, '')          // leading timestamps
+        .replace(/^(um|uh|like|you know|so|right)[,\s]/gim, '') // filler at line start
+        .replace(/\[.*?\]/g, '')                               // [inaudible], [crosstalk]
+        .replace(/\n{3,}/g, '\n\n')                            // excess blank lines
+        .trim();
+    }
+
+    async function summarizeDoc(doc) {
+      let content = doc.content || '';
+      if (/transcript|teams|slack|chat|call/i.test(doc.type || '')) {
+        content = cleanTranscript(content);
+      }
+      content = content.slice(0, 8000); // safety net on input size
+      if (!content.trim()) return '(empty document)';
+      try {
+        const data = await postToWorker({
+          model: MODELS.summary,
+          max_tokens: 300,
+          messages: [{
+            role: 'user',
+            content: `You are analyzing one document from a customer account file.
+Extract only what matters for account health assessment in 3-5 sentences:
+- Key signals (positive or negative sentiment shifts)
+- Anything about value, risk, competitors, budget, or renewal
+- Action items or commitments made
+- Tone and relationship signals
+
+Document type: ${doc.type}
+Document name: ${doc.name}
+
+DOCUMENT:
+${content}`
+          }]
+        });
+        const summary = data.content.filter(b => b.type === 'text').map(b => b.text).join('').trim();
+        return summary || content.slice(0, 1200);
+      } catch (e) {
+        return content.slice(0, 1200); // summary failed — degrade to truncated raw
+      }
+    }
+
+    // Summarize all docs first, then build context from the summaries instead
+    // of raw content. Drops the main analysis call from ~25k tokens to ~2k.
+    async function buildSummarizedContext(allDocs = collectDocs()) {
+      const summaries = await Promise.all(allDocs.map(d => summarizeDoc(d)));
+      let ctx = '';
+      if (currentAccount.demoData) ctx += `=== Account overview ===\n${currentAccount.demoData}\n\n`;
+      allDocs.forEach((d, i) => { ctx += `=== ${d.type}: ${d.name} ===\n${summaries[i]}\n\n`; });
+      return ctx.trim() || `Account: ${currentAccount.name}\nNo structured data provided.`;
+    }
+
+    // Session-only fingerprint for the analysis cache. Per-account (name +
+    // overview) plus a doc fingerprint, so re-analyzing the same inputs is a hit
+    // but adding/changing a doc is a miss. Rough, not cryptographic.
+    function getCacheKey(allDocs) {
+      const docPart = allDocs.map(d => `${d.name}:${(d.content || '').length}`).join('|');
+      return `${currentAccount.name}::${(currentAccount.demoData || '').length}::${docPart}`;
+    }
+
+    // Compact brief for chat system context — ~150 tok vs ~800 for the full
+    // brief JSON + summaries, on every chat message.
+    function buildChatContext(b) {
+      const p = b.contact_persona || {};
+      return `Account: ${b.situation || ''}
+Risk: ${b.risk_type || 'Unknown'} (${b.risk_severity || 'unknown'})
+Contact: ${p.primary_contact || 'Unknown'} — ${p.comm_style || ''}
+Top action: ${b.do_this_today || ''}
+Priorities: ${(b.leverage_points || []).map(l => l.what).join(' | ')}`.trim();
+    }
+
+    // Apply a brief (fresh or cached) to the UI + state.
+    function applyBrief(brief) {
+      briefData = brief;
+      chatContext = buildChatContext(brief);
+      if (currentAccount.isCustom) {
+        currentAccount.risk = brief.risk_severity || 'custom';
+        currentAccount.riskType = brief.risk_type || '';
+        currentAccount.flag = brief.situation ? brief.situation.slice(0, 90) + (brief.situation.length > 90 ? '…' : '') : '';
+      }
+      renderBrief(brief);
+      buildPortfolio();
     }
 
     // ── Analysis ──
@@ -921,12 +1029,25 @@
         showToast('⚠️ Set your WORKER_URL in the script before analyzing. See setup instructions.');
         return;
       }
+      // Cache check — re-analyzing the same account+docs skips the API entirely
+      // (huge win when iterating on UI/chat against the same account).
+      const allDocs = collectDocs();
+      const cacheKey = getCacheKey(allDocs);
+      if (analysisCache[cacheKey]) {
+        applyBrief(analysisCache[cacheKey]);
+        showToast('Loaded cached analysis — no API call.');
+        return;
+      }
+
       const btn = document.getElementById('analyze-btn');
       btn.disabled = true;
       btn.classList.add('analyzing');
-      btn.innerHTML = '<span class="dots"><span></span><span></span><span></span></span> Analyzing…';
+      const spinner = '<span class="dots"><span></span><span></span><span></span></span>';
+      btn.innerHTML = spinner + ' Summarizing sources…';
 
-      const context = buildContext();
+      // Pass 1: summarize each doc with Haiku, then build context from summaries.
+      const context = await buildSummarizedContext(allDocs);
+      btn.innerHTML = spinner + ' Analyzing…';
       const contactsText = (currentAccount.contacts || [])
         .map(c => `${c.name}${c.title ? ' (' + c.title + ')' : ''}${c.style ? ': ' + c.style : ''}`)
         .join('\n') || 'Not specified';
@@ -944,7 +1065,7 @@ ${contactsText}
 Return exactly this JSON:
 {
   "situation": "2-4 sentences: what is actually happening — synthesize ALL input sources, name the pattern, not just metrics",
-  "risk_type": "Champion loss | Silent decay | Power user concentration | Frustrated not gone | Stalled expansion | Adoption failure | Sentiment mismatch | Relationship gap | Reduced footprint | Vibe risk | Healthy | Unknown",
+  "risk_type": "one of: ${RISK_TYPES}",
   "risk_severity": "high or medium or low or unknown",
   "data_sources_detected": ["list each content type you found and used in the analysis"],
   "leverage_points": [
@@ -967,22 +1088,16 @@ Return exactly this JSON:
 
       try {
         const data = await postToWorker({
-          model: MODEL,
+          model: MODELS.analysis,
           max_tokens: 1500,
           messages: [{ role: 'user', content: prompt }]
         });
         const raw = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
         const clean = raw.replace(/```json|```/g, '').trim();
-        briefData = JSON.parse(clean);
-        briefData._context = context;
-
-        if (currentAccount.isCustom) {
-          currentAccount.risk = briefData.risk_severity || 'custom';
-          currentAccount.riskType = briefData.risk_type || '';
-          currentAccount.flag = briefData.situation ? briefData.situation.slice(0, 90) + (briefData.situation.length > 90 ? '…' : '') : '';
-        }
-        renderBrief(briefData);
-        buildPortfolio();
+        const brief = JSON.parse(clean);
+        brief._context = context;            // full summaries, kept for reference
+        analysisCache[cacheKey] = brief;     // cache for re-analysis this session
+        applyBrief(brief);
       } catch(e) {
         showToast('Analysis failed: ' + e.message + ' — check your Worker URL and try again.');
         btn.disabled = false;
@@ -1060,19 +1175,16 @@ Return exactly this JSON:
       const sys = `You are Signal, an expert CS strategist with full context on this account. Answer questions directly and specifically — never generically. If the CSM shares new information mid-conversation, revise your read explicitly and say what changed.
 
 ACCOUNT BRIEF:
-${JSON.stringify(briefData, null, 2)}
-
-FULL SOURCE DATA:
-${briefData._context}`;
+${chatContext}`;
 
       chatHistory.push({ role: 'user', content: msg });
 
       try {
         const data = await postToWorker({
-          model: MODEL,
+          model: MODELS.chat,
           max_tokens: 800,
           system: sys,
-          messages: chatHistory.slice(-10)
+          messages: chatHistory.slice(-6)
         });
         const reply = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
         chatHistory.push({ role: 'assistant', content: reply });

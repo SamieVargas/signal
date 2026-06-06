@@ -12,6 +12,7 @@ from types import SimpleNamespace
 # Make the package importable when run as a plain script from anywhere.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from config import MODELS
 from ingest import read_docs, make_doc, smart_truncate, detect_type
 from summarize import summarize_all
 from analyze import build_analysis_prompt, analyze, extract_json
@@ -95,6 +96,7 @@ def main():
     summaries = summarize_all(client, docs)
     check("one summary per doc", len(summaries) == len(docs))
     check("Call 1 used MAX_SUMMARY_TOKENS cap", client.messages.calls[0]["max_tokens"] == 300)
+    check("Call 1 routed to summary model", client.messages.calls[0]["model"] == MODELS["summary"])
 
     prompt = build_analysis_prompt("Koala", "Sarah Chen, VP", 67, 180000, summaries)
     check("analysis prompt embeds account", "Koala" in prompt)
@@ -103,6 +105,8 @@ def main():
     brief = analyze(client, prompt)
     check("analyze parses fenced JSON", brief["risk_type"] == "Adoption failure")
     check("brief has leverage points", brief["leverage_points"][0]["rank"] == 1)
+    check("Call 2 routed to analysis model",
+          client.messages.calls[len(docs)]["model"] == MODELS["analysis"])
 
     print("extract_json robustness")
     check("plain JSON", extract_json('{"a": 1}') == {"a": 1})
@@ -117,6 +121,7 @@ def main():
               ask=lambda _p: next(scripted), say=replies.append)
     check("chat produced a reply", replies == ["Here's my read on that."])
     check("chat sent system prompt", client.messages.calls[-1]["system"] is not None)
+    check("chat routed to chat model", client.messages.calls[-1]["model"] == MODELS["chat"])
 
     print("paste-mode doc")
     d = make_doc("pasted_input.txt", "Sarah said churn risk is high.")

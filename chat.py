@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import json
 
-from config import MODEL, MAX_CHAT_TOKENS
+from config import MODELS, MAX_CHAT_TOKENS
 from prompts import CHAT_SYSTEM_PROMPT
 from analyze import format_summaries
 
@@ -34,7 +34,7 @@ def chat_loop(client, brief: dict, summaries: list[dict], ask=input, say=print):
 
         history.append({"role": "user", "content": msg})
         resp = client.messages.create(
-            model=MODEL,
+            model=MODELS["chat"],
             max_tokens=MAX_CHAT_TOKENS,
             system=system,
             messages=history[-10:],  # keep the last few turns
