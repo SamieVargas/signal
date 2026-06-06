@@ -17,7 +17,8 @@ const ALLOWED_MODELS = [
 ]
 const DEFAULT_MODEL = 'claude-sonnet-4-6'
 // Hard cap on output tokens, regardless of what the client asks for.
-const MAX_TOKENS_CAP = 2048
+// 4096 leaves room for the full analysis JSON; summary/chat ask for far less.
+const MAX_TOKENS_CAP = 4096
 
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request))
