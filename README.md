@@ -1,4 +1,4 @@
-# Signal v0.0.1
+# Signal v0.3
 
 **Paste the mess --> get the read.**  
 AI-powered account intelligence for CS teams.
@@ -22,6 +22,13 @@ Browser renders brief + chat
 The API key never touches the browser. 
 
 ---
+
+## New in v0.3
+
+- Source weighting (all-hands/CRM as primary, chat as secondary) + a contact read that targets the economic buyer, not chat-log noise
+- Per-section source attribution and a Data Gaps callout
+- Per-document removal, plus an analysis focus toggle (Full / Revenue Risk / Relationship / Pre-Call) that trims tokens on focused modes
+- Collapsible + copy-to-clipboard brief sections, skeleton loader, Export to PDF, Cmd/Ctrl+Enter to re-analyze, mobile layout, and assorted polish
 
 ## What's in v0.0.1
 

@@ -413,6 +413,114 @@
       max-width: 420px; text-align: center;
     }
     .toast.show { opacity: 1; pointer-events: auto; }
+
+    /* ── v0.3 ── */
+    /* §3 focus toggle */
+    .focus-toggle { display: flex; gap: 6px; margin: 0 0 12px; flex-wrap: wrap; }
+    .focus-pill {
+      flex: 1 1 auto; display: flex; align-items: center; justify-content: center; gap: 6px;
+      font-size: 12px; font-weight: 600; color: var(--muted);
+      background: var(--surface2); border: 0.5px solid var(--border);
+      border-radius: 8px; padding: 8px 10px; cursor: pointer; transition: all .15s;
+    }
+    .focus-pill:hover { border-color: var(--border-strong); color: var(--ink); }
+    .focus-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .focus-ic { font-size: 13px; line-height: 1; }
+
+    /* §4e brief toolbar + §5a timestamp */
+    .brief-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .last-analyzed { font-size: 12px; color: var(--muted); }
+    .export-btn {
+      font-size: 12px; font-weight: 600; color: var(--accent-dark);
+      background: var(--accent-light); border: 0.5px solid var(--accent-mid);
+      border-radius: 8px; padding: 6px 12px; cursor: pointer;
+    }
+    .export-btn:hover { background: var(--accent-mid); }
+
+    /* §4a/§4b collapsible, copyable sections */
+    .b-section { border: 0.5px solid var(--border); border-radius: 10px; margin-bottom: 12px; background: var(--surface); overflow: hidden; }
+    .b-section-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; cursor: pointer; user-select: none; }
+    .b-sec-title { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); }
+    .b-sec-actions { display: flex; align-items: center; gap: 10px; }
+    .b-copy { font-size: 11px; color: var(--muted); background: none; border: none; cursor: pointer; padding: 2px 4px; }
+    .b-copy:hover { color: var(--accent); }
+    .b-copy.copied { color: var(--green); }
+    .b-chev { font-size: 18px; color: var(--muted); transition: transform .2s ease; }
+    .b-section.collapsed .b-chev { transform: rotate(90deg); }
+    .b-section-body { max-height: 4000px; overflow: hidden; transition: max-height .2s ease; }
+    .b-section.collapsed .b-section-body { max-height: 0; }
+    .b-section-inner { padding: 0 16px 16px; }
+    .sec-sources { margin-top: 12px; font-size: 11px; font-style: italic; color: var(--muted); }
+
+    /* secondary contacts + data gaps */
+    .secondary-contacts { margin-top: 12px; padding-top: 12px; border-top: 0.5px solid var(--border); }
+    .secondary-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 6px; }
+    .secondary-item { font-size: 13px; color: var(--ink); margin-bottom: 4px; }
+    .data-gap-list { margin: 0; padding-left: 18px; }
+    .data-gap-list li { font-size: 13px; color: var(--ink); margin-bottom: 4px; }
+
+    /* §4d skeleton loader */
+    .skeleton { display: flex; flex-direction: column; gap: 14px; }
+    .skel-row { display: flex; gap: 14px; }
+    .skel-cards { display: flex; gap: 14px; }
+    .skel-block, .skel-card {
+      border-radius: 10px;
+      background: linear-gradient(90deg, var(--surface2) 25%, #e7e3dc 37%, var(--surface2) 63%);
+      background-size: 400% 100%; animation: shimmer 1.4s ease infinite;
+    }
+    .skel-wide { height: 70px; }
+    .skel-half { flex: 1; height: 90px; }
+    .skel-card { flex: 1; height: 80px; }
+    .skel-action { height: 60px; }
+    @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+
+    /* §5c empty state */
+    .brief-empty { text-align: center; color: var(--muted); padding: 48px 16px; }
+    .be-icon { font-size: 30px; margin-bottom: 10px; }
+    .be-title { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+    .be-sub { font-size: 13px; line-height: 1.6; }
+
+    /* §2 remove loaded doc */
+    .doc-loaded-pill { display: inline-flex; align-items: center; gap: 6px; }
+    .doc-loaded-remove { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 15px; line-height: 1; padding: 0 2px; }
+    .doc-loaded-remove:hover { color: var(--accent); }
+
+    /* §5d dim re-analyze + §4c chip hover indicator */
+    .analyze-btn.dim { opacity: 0.8; }
+    .sq { position: relative; }
+    .sq::after { content: ' →'; opacity: 0; transition: opacity .15s; }
+    .sq:hover::after { opacity: 1; }
+
+    /* §4g mobile responsive */
+    @media (max-width: 768px) {
+      .main { padding-left: 14px; padding-right: 14px; }
+      .stats-row { flex-direction: column; }
+      .skel-row, .skel-cards { flex-direction: column; }
+      .chat-row { position: sticky; bottom: 0; background: var(--paper); padding-top: 8px; }
+    }
+    @media (max-width: 480px) {
+      body { font-size: 14px; }
+      .focus-lbl { display: none; }
+      .focus-pill { padding: 8px; }
+      .dd-name { font-size: 22px; }
+      .b-sec-title { font-size: 11px; }
+    }
+
+    /* §4e print stylesheet */
+    @media print {
+      .no-print, .topbar, .add-more-zone, #focus-toggle, .analyze-btn,
+      .breadcrumb, .stats-row, #dd-docs-loaded, .chat-section, .b-sec-actions { display: none !important; }
+      body, .main { background: #fff; color: #000; }
+      .b-section { border: none; page-break-inside: avoid; }
+      .b-section-body { max-height: none !important; }
+      .b-section-inner { padding: 0 0 12px; }
+      .source-tag { border: 0.5px solid #999; }
+      #brief::after {
+        content: 'Generated by Signal · samievargas.github.io/signal';
+        display: block; margin-top: 24px; padding-top: 12px;
+        border-top: 0.5px solid #ccc; font-size: 11px; color: #555;
+      }
+    }
   </style>
   <!-- In-browser document parsers: PDF (pdf.js), DOCX (mammoth), XLSX (SheetJS) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -424,7 +532,7 @@
   <div class="topbar">
     <div class="wordmark">Signal<span class="wordmark-dot">.</span></div>
     <div class="topbar-right">
-      <span class="version-tag">v0.0.1</span>
+      <span class="version-tag">v0.3</span>
       <div class="privacy-pill">&#128274; Nothing stored — session only</div>
     </div>
   </div>
@@ -496,45 +604,36 @@
         </select>
       </div>
 
+      <div class="focus-toggle no-print" id="focus-toggle">
+        <button class="focus-pill active" data-mode="full" onclick="setFocus('full',this)"><span class="focus-ic">&#9776;</span><span class="focus-lbl">Full Brief</span></button>
+        <button class="focus-pill" data-mode="revenue" onclick="setFocus('revenue',this)"><span class="focus-ic">&#36;</span><span class="focus-lbl">Revenue Risk</span></button>
+        <button class="focus-pill" data-mode="relationship" onclick="setFocus('relationship',this)"><span class="focus-ic">&#9786;</span><span class="focus-lbl">Relationship Read</span></button>
+        <button class="focus-pill" data-mode="precall" onclick="setFocus('precall',this)"><span class="focus-ic">&#9742;</span><span class="focus-lbl">Pre-Call</span></button>
+      </div>
+
       <button class="analyze-btn" id="analyze-btn" onclick="runAnalysis()">
         Analyze this account &#8594;
       </button>
+
+      <div id="brief-empty" class="brief-empty hidden">
+        <div class="be-icon">&#128196;&#10024;</div>
+        <div class="be-title">No analysis yet</div>
+        <div class="be-sub">Upload documents above to generate your account brief.<br>Signal reads Zoom transcripts, MBR/QBR decks, Teams chats, CSV data, SWOT docs, and email threads.</div>
+      </div>
 
       <!-- Brief output -->
       <div class="brief hidden" id="brief">
         <div class="divider"></div>
 
-        <div id="sources-row" class="hidden">
-          <div class="section-label" style="margin-bottom:8px">Signal read</div>
-          <div class="sources-detected" id="sources-list"></div>
-          <div class="divider"></div>
+        <div class="brief-toolbar no-print">
+          <span class="last-analyzed" id="b-last-analyzed"></span>
+          <button class="export-btn" onclick="exportBrief()" title="Print / Save as PDF">&#9113; Export brief</button>
         </div>
 
-        <div class="brief-block">
-          <div class="brief-heading">Situation</div>
-          <div class="situation-text" id="b-situation"></div>
-          <div class="confidence-note" id="b-confidence"></div>
-        </div>
+        <div id="brief-sources" class="sources-detected"></div>
+        <div id="brief-sections"></div>
 
-        <div class="brief-block">
-          <div class="brief-heading">Contact read</div>
-          <div class="persona-card" id="b-persona"></div>
-        </div>
-
-        <div class="brief-block">
-          <div class="brief-heading">Where to press — ranked</div>
-          <div id="b-leverage"></div>
-        </div>
-
-        <div class="brief-block">
-          <div class="brief-heading">Do this today</div>
-          <div class="do-today">
-            <div class="do-today-lbl">While the longer plays run in the background</div>
-            <div class="do-today-text" id="b-today"></div>
-          </div>
-        </div>
-
-        <div class="chat-section">
+        <div class="chat-section no-print">
           <div class="chat-label">Ask Signal about this account</div>
           <div class="suggested-qs" id="suggested-qs"></div>
           <div class="chat-messages" id="chat-msgs"></div>
@@ -636,6 +735,17 @@
     };
     // Risk taxonomy — defined once, referenced in the analysis prompt.
     const RISK_TYPES = 'Champion loss, Silent decay, Power user concentration, Frustrated not gone, Stalled expansion, Adoption failure, Sentiment mismatch, Relationship gap, Reduced footprint, Vibe risk, Healthy, Unknown';
+
+    // Analysis focus modes — constrain what the model generates (and cut tokens).
+    const FOCUS_INSTRUCTIONS = {
+      full:         'Generate the complete account brief — fill every section.',
+      revenue:      'REVENUE RISK SCAN: fill situation, leverage_points (Priority 1 ONLY — return a single-item array), and do_this_today. Leave contact_persona fields as empty strings, secondary_contacts as [], and data_gaps as []. Keep each section tight.',
+      relationship: 'RELATIONSHIP READ: fill contact_persona deeply and include up to 3 secondary_contacts (each note covering comm style, decision style, says-vs-means, how to engage). Leave situation as "", leverage_points as [], do_this_today as "", and data_gaps as []. Skip revenue metrics.',
+      precall:      'PRE-CALL PREP: expand do_this_today into 3-4 specific action items (use \\n between them) with exact suggested language where relevant, and return 5 suggested_questions to ask in the upcoming call. Leave situation as "", contact_persona fields as "", secondary_contacts as [], leverage_points as [], and data_gaps as [].'
+    };
+    const FOCUS_MAX_TOKENS = { full: 4000, revenue: 2200, relationship: 2600, precall: 2000 };
+    const FOCUS_LABELS = { full: 'Full Brief', revenue: 'Revenue Risk', relationship: 'Relationship Read', precall: 'Pre-Call' };
+    let focusMode = 'full';
 
     // POST to the Worker. Surfaces the real API error message instead of a bare
     // status code, and retries once on 429 (rate limit) with a short backoff.
@@ -796,6 +906,9 @@
       } else {
         ddExtraDocs.push(doc);
         renderDocList('dd-doc-list', ddExtraDocs, 'dd');
+        updateUploadSubtext();
+        document.getElementById('analyze-btn').disabled = false; // re-enable if it was empty
+        markChanged();
       }
     }
 
@@ -870,8 +983,70 @@
     function removeDoc(id, target) {
       const idNum = parseFloat(id);
       if (target === 'modal') { modalDocs = modalDocs.filter(d => d.id !== idNum); renderDocList('m-doc-list', modalDocs, 'modal'); }
-      else { ddExtraDocs = ddExtraDocs.filter(d => d.id !== idNum); renderDocList('dd-doc-list', ddExtraDocs, 'dd'); }
+      else { ddExtraDocs = ddExtraDocs.filter(d => d.id !== idNum); renderDocList('dd-doc-list', ddExtraDocs, 'dd'); updateUploadSubtext(); markChanged(); }
     }
+
+    // §3 — analysis focus toggle
+    function setFocus(mode, el) {
+      focusMode = mode;
+      document.querySelectorAll('#focus-toggle .focus-pill').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      markChanged(); // a different mode produces a different brief
+    }
+
+    // §5d — Re-analyze button state
+    function dimReanalyze(noChanges) {
+      const btn = document.getElementById('analyze-btn');
+      if (noChanges) { btn.classList.add('dim'); btn.title = 'No changes since last analysis.'; }
+      else { btn.classList.remove('dim'); btn.title = 'Re-analyze with updated documents — or ⌘↩'; }
+    }
+    function markChanged() { if (briefData) dimReanalyze(false); }
+
+    // §5b — upload-area subtext reflects how many docs are loaded
+    function updateUploadSubtext() {
+      const n = (currentAccount?.docs || []).length + (ddExtraDocs || []).length;
+      const sub = document.querySelector('#deep-dive .add-more-sub');
+      if (!sub) return;
+      sub.textContent = n > 0
+        ? `${n} document${n === 1 ? '' : 's'} loaded · Upload more or paste below`
+        : 'Upload files or paste anything — Signal merges all sources into the analysis.';
+    }
+
+    // §5c — empty state in the brief area
+    function showEmpty(show) { document.getElementById('brief-empty').classList.toggle('hidden', !show); }
+
+    // §2 — remove an already-loaded document
+    function renderLoadedDocs() {
+      const docs = currentAccount.docs || [];
+      const wrap = document.getElementById('dd-docs-loaded');
+      if (docs.length > 0) {
+        wrap.classList.remove('hidden');
+        document.getElementById('dd-docs-pills').innerHTML = docs.map(d =>
+          `<div class="doc-loaded-pill">&#128196; ${d.type}: ${d.name.length > 28 ? d.name.slice(0, 28) + '…' : d.name}` +
+          `<button class="doc-loaded-remove no-print" title="Remove document" onclick="removeLoadedDoc('${d.id}')">&#215;</button></div>`
+        ).join('');
+      } else {
+        wrap.classList.add('hidden');
+      }
+    }
+
+    function removeLoadedDoc(id) {
+      currentAccount.docs = (currentAccount.docs || []).filter(d => String(d.id) !== String(id));
+      renderLoadedDocs();
+      updateUploadSubtext();
+      const noSources = (currentAccount.docs || []).length === 0 && (ddExtraDocs || []).length === 0 && !currentAccount.demoData;
+      if (noSources) {
+        briefData = null;
+        document.getElementById('brief').classList.add('hidden');
+        document.getElementById('analyze-btn').disabled = true;
+        showEmpty(true);
+      } else {
+        markChanged();
+      }
+    }
+
+    // §4e — export the brief via the browser's print-to-PDF
+    function exportBrief() { window.print(); }
 
     // ── Portfolio ──
     function buildPortfolio() {
@@ -970,19 +1145,21 @@
         <div class="stat"><div class="stat-label">Health score</div><div class="stat-val ${currentAccount.healthScore !== null && currentAccount.healthScore < 50 ? 'danger' : currentAccount.healthScore !== null && currentAccount.healthScore < 70 ? 'warn' : ''}">${currentAccount.healthScore !== null ? currentAccount.healthScore + '/100' : '—'}</div></div>
         <div class="stat"><div class="stat-label">Last contact</div><div class="stat-val ${currentAccount.lastContact !== null && currentAccount.lastContact > 30 ? 'danger' : currentAccount.lastContact !== null && currentAccount.lastContact > 14 ? 'warn' : ''}">${currentAccount.lastContact !== null ? currentAccount.lastContact + 'd ago' : '—'}</div></div>`;
 
-      const docs = currentAccount.docs || [];
-      const docsLoaded = document.getElementById('dd-docs-loaded');
-      if (docs.length > 0) {
-        docsLoaded.classList.remove('hidden');
-        document.getElementById('dd-docs-pills').innerHTML = docs.map(d =>
-          `<div class="doc-loaded-pill">&#128196; ${d.type}: ${d.name.length > 28 ? d.name.slice(0,28)+'…' : d.name}</div>`
-        ).join('');
-      } else {
-        docsLoaded.classList.add('hidden');
-      }
+      renderLoadedDocs();
+      updateUploadSubtext();
+      showEmpty(true);
 
-      document.getElementById('analyze-btn').disabled = false;
-      document.getElementById('analyze-btn').innerHTML = 'Analyze this account &#8594;';
+      // reset focus toggle to Full Brief
+      focusMode = 'full';
+      document.querySelectorAll('#focus-toggle .focus-pill')
+        .forEach(p => p.classList.toggle('active', p.dataset.mode === 'full'));
+
+      const hasSources = (currentAccount.docs || []).length > 0 || !!currentAccount.demoData;
+      const ab = document.getElementById('analyze-btn');
+      ab.disabled = !hasSources;
+      ab.classList.remove('dim', 'analyzing');
+      ab.title = '';
+      ab.innerHTML = 'Analyze this account &#8594;';
     }
 
     function showPortfolio() {
@@ -1040,12 +1217,17 @@
           max_tokens: 300,
           messages: [{
             role: 'user',
-            content: `You are analyzing one document from a customer account file.
-Extract only what matters for account health assessment in 3-5 sentences:
-- Key signals (positive or negative sentiment shifts)
-- Anything about value, risk, competitors, budget, or renewal
-- Action items or commitments made
-- Tone and relationship signals
+            content: `You are summarizing one document from an enterprise account intelligence package.
+
+SOURCE TYPE HIERARCHY — apply this when deciding what to surface:
+- All-hands meeting decks (monthly/quarterly): PRIMARY source. Revenue metrics, pipeline data, YoY trends, competitive signals, and team action items are the most important content. Extract numbers precisely.
+- Kick-off / annual review decks: PRIMARY source. Strategic context, SWOT, org structure, relationship map, contract details.
+- Internal chat logs (Teams, Slack): SECONDARY source. Use for relationship texture, communication style signals, and anecdotes — but do NOT let individual names from chat logs dominate the account read. A person mentioned frequently in chat is not necessarily the economic buyer or primary contact.
+- CRM snapshots / CSV data: PRIMARY for numbers, SECONDARY for narrative.
+- Zoom / call transcripts: SECONDARY. Tone and relationship signals only.
+- Email threads: SECONDARY. Sentiment and responsiveness signals only.
+
+Summarize the key facts, metrics, risks, and relationship signals from this document. Be precise about numbers. Flag any competitive mentions explicitly. Do not editorialize — just summarize what is in the document.
 
 Document type: ${doc.type}
 Document name: ${doc.name}
@@ -1076,7 +1258,7 @@ ${content}`
     // but adding/changing a doc is a miss. Rough, not cryptographic.
     function getCacheKey(allDocs) {
       const docPart = allDocs.map(d => `${d.name}:${(d.content || '').length}`).join('|');
-      return `${currentAccount.name}::${(currentAccount.demoData || '').length}::${docPart}`;
+      return `${currentAccount.name}::${focusMode}::${(currentAccount.demoData || '').length}::${docPart}`;
     }
 
     // Compact brief for chat system context — ~150 tok vs ~800 for the full
@@ -1124,6 +1306,7 @@ Priorities: ${(b.leverage_points || []).map(l => l.what).join(' | ')}`.trim();
       btn.classList.add('analyzing');
       const spinner = '<span class="dots"><span></span><span></span><span></span></span>';
       btn.innerHTML = spinner + ' Summarizing sources…';
+      showSkeleton(); // §4d
 
       // Pass 1: summarize each doc with Haiku, then build context from summaries.
       const context = await buildSummarizedContext(allDocs);
@@ -1134,7 +1317,14 @@ Priorities: ${(b.leverage_points || []).map(l => l.what).join(' | ')}`.trim();
 
       const prompt = `You are Signal, an expert CS strategist. Analyze this account data and return ONLY valid JSON with no markdown, no backticks, nothing outside the JSON.
 
-The data may include transcripts, MBR/QBR notes, CSV exports, Slack/Teams chat logs, SWOT docs, internal notes, or email threads — or any mix. Read everything holistically.
+The data may include all-hands decks, kick-off/annual review decks, MBR/QBR notes, CSV/CRM exports, Slack/Teams chat logs, SWOT docs, internal notes, transcripts, or email threads — or any mix. Read everything holistically. Weight all-hands decks, kick-off/annual decks, and CRM/CSV numbers as PRIMARY; weight chat logs, transcripts, and email as SECONDARY (relationship texture only).
+
+CONTACT READ:
+Identify the PRIMARY CONTACT as the most senior stakeholder who has budget authority or vendor decision-making power — NOT the person most frequently mentioned in internal chat logs. Look for titles like Director, Senior Manager (client-side, not vendor-side), VP, Partner, or Principal. If a Teams/Slack chat references someone by name as an end-user of projects, that person is a secondary contact, not the primary. Base communication style on observed behavior in the documents, not assumed from title. For "says vs means," be specific and honest, not diplomatic.
+
+SOURCE ATTRIBUTION (required): populate "section_sources" with the document types that actually contributed to each section.
+
+FOCUS: ${FOCUS_INSTRUCTIONS[focusMode]}
 
 ACCOUNT DATA:
 ${context}
@@ -1142,7 +1332,7 @@ ${context}
 KNOWN CONTACTS:
 ${contactsText}
 
-Return exactly this JSON:
+Return exactly this JSON (respect the FOCUS instruction — leave non-focused sections empty as directed):
 {
   "situation": "2-4 sentences: what is actually happening — synthesize ALL input sources, name the pattern, not just metrics",
   "risk_type": "one of: ${RISK_TYPES}",
@@ -1155,12 +1345,22 @@ Return exactly this JSON:
   ],
   "do_this_today": "one concrete action the CSM takes in the next 24 hours — specific, not generic",
   "contact_persona": {
-    "primary_contact": "name or Unknown",
-    "comm_style": "how they prefer to communicate based on evidence in the data",
-    "decision_style": "how they make decisions",
-    "what_they_say_vs_mean": "surface read vs subtext — what signals suggest vs what they said",
-    "approach_recommendation": "exactly how to engage this specific person given the current situation"
+    "primary_contact": "Name and title — most senior stakeholder with budget/decision authority (not a chat-log end-user)",
+    "comm_style": "based on observed behavior in the documents, not assumed from title",
+    "decision_style": "relationship-driven, data-driven, pragmatic, etc.",
+    "what_they_say_vs_mean": "surface commitment vs actual behavioral signals — specific and honest",
+    "approach_recommendation": "concrete tactical guidance for the next interaction"
   },
+  "secondary_contacts": [
+    {"name_title": "name and title", "note": "their role and why they are secondary"}
+  ],
+  "section_sources": {
+    "situation": ["doc types that informed this section"],
+    "contact_read": ["doc types"],
+    "where_to_press": ["doc types"],
+    "do_this_today": ["doc types"]
+  },
+  "data_gaps": ["specific info that would sharpen the read — e.g. 'renewal conversation notes beyond all-hands summaries'", "gap 2", "gap 3"],
   "confidence": "high or medium or low",
   "confidence_note": "what information would sharpen or change this read",
   "suggested_questions": ["question a CSM would ask Signal", "question 2", "question 3"]
@@ -1169,7 +1369,7 @@ Return exactly this JSON:
       try {
         const data = await postToWorker({
           model: MODELS.analysis,
-          max_tokens: 4000,
+          max_tokens: FOCUS_MAX_TOKENS[focusMode] || 4000,
           messages: [{ role: 'user', content: prompt }]
         });
         const raw = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
@@ -1190,52 +1390,149 @@ Return exactly this JSON:
         applyBrief(brief);
       } catch(e) {
         showToast('Analysis failed: ' + e.message);
+        if (!briefData) document.getElementById('brief').classList.add('hidden'); // clear skeleton
         btn.disabled = false;
         btn.classList.remove('analyzing');
-        btn.innerHTML = 'Analyze this account &#8594;';
+        btn.innerHTML = (currentAccount.docs && currentAccount.docs.length) ? '&#8635; Re-analyze with updated data' : 'Analyze this account &#8594;';
       }
     }
 
-    function renderBrief(b) {
-      document.getElementById('brief').classList.remove('hidden');
-      document.getElementById('b-situation').textContent = b.situation;
-      document.getElementById('b-confidence').textContent = b.confidence_note
-        ? 'Confidence: ' + b.confidence + ' — ' + b.confidence_note : '';
+    let sectionText = {};  // plain-text per section, for copy-to-clipboard
 
-      if (b.data_sources_detected && b.data_sources_detected.length) {
-        document.getElementById('sources-row').classList.remove('hidden');
-        document.getElementById('sources-list').innerHTML = b.data_sources_detected
-          .map(s => `<div class="source-tag">&#10003; ${s}</div>`).join('');
-      }
+    function esc(s) {
+      return (s == null ? '' : String(s))
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
 
-      const p = b.contact_persona;
-      document.getElementById('b-persona').innerHTML = `
-        <div class="persona-row"><span class="persona-lbl">Primary contact</span><span class="persona-val">${p.primary_contact}</span></div>
-        <div class="persona-row"><span class="persona-lbl">Comm style</span><span class="persona-val">${p.comm_style}</span></div>
-        <div class="persona-row"><span class="persona-lbl">Decision style</span><span class="persona-val">${p.decision_style}</span></div>
-        <div class="persona-row"><span class="persona-lbl">Says vs means</span><span class="persona-val">${p.what_they_say_vs_mean}</span></div>
-        <div class="persona-row"><span class="persona-lbl">How to engage</span><span class="persona-val">${p.approach_recommendation}</span></div>`;
-
-      document.getElementById('b-leverage').innerHTML = b.leverage_points.map(lp => `
-        <div class="leverage-item">
-          <div class="lev-top">
-            <span class="lev-rank">Priority ${lp.rank}</span>
-            <span class="lev-timeline">${lp.timeline}</span>
+    // One collapsible, copyable brief section with optional source attribution.
+    function briefSection(key, title, bodyHTML, sources, copyText) {
+      sectionText[key] = copyText || '';
+      const srcLine = (sources && sources.length)
+        ? `<div class="sec-sources">Sources: ${esc(sources.join(', '))}</div>` : '';
+      return `
+        <div class="b-section" data-key="${key}">
+          <div class="b-section-head" onclick="toggleSection(this)">
+            <span class="b-sec-title">${title}</span>
+            <span class="b-sec-actions no-print">
+              <button class="b-copy" title="Copy this section" onclick="copySection(event,'${key}')">&#9112; Copy</button>
+              <span class="b-chev">&#8250;</span>
+            </span>
           </div>
-          <div class="lev-what">${lp.what}</div>
-          <div class="lev-why">${lp.why}</div>
-        </div>`).join('');
+          <div class="b-section-body"><div class="b-section-inner">${bodyHTML}${srcLine}</div></div>
+        </div>`;
+    }
 
-      document.getElementById('b-today').textContent = b.do_this_today;
+    function toggleSection(head) { head.parentElement.classList.toggle('collapsed'); }
 
-      if (b.suggested_questions) {
-        document.getElementById('suggested-qs').innerHTML = b.suggested_questions
-          .map(q => `<button class="sq" onclick="askSuggested(this, \`${q.replace(/`/g,"'")}\`)">${q}</button>`).join('');
+    function copySection(ev, key) {
+      ev.stopPropagation();
+      const btn = ev.currentTarget;
+      navigator.clipboard.writeText(sectionText[key] || '').then(() => {
+        const orig = btn.innerHTML;
+        btn.innerHTML = 'Copied &#10003;'; btn.classList.add('copied');
+        setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 1500);
+      }).catch(() => showToast('Copy failed — browser blocked clipboard access.'));
+    }
+
+    // §4d — skeleton placeholder shown while analysis runs.
+    function showSkeleton() {
+      const brief = document.getElementById('brief');
+      brief.classList.remove('hidden');
+      showEmpty(false);
+      document.getElementById('b-last-analyzed').textContent = '';
+      document.getElementById('brief-sources').innerHTML = '';
+      document.querySelector('#brief .chat-section').style.display = 'none';
+      document.getElementById('brief-sections').innerHTML = `
+        <div class="skeleton">
+          <div class="skel-block skel-wide"></div>
+          <div class="skel-row"><div class="skel-block skel-half"></div><div class="skel-block skel-half"></div></div>
+          <div class="skel-cards"><div class="skel-card"></div><div class="skel-card"></div><div class="skel-card"></div></div>
+          <div class="skel-block skel-action"></div>
+        </div>`;
+    }
+
+    function renderBrief(b) {
+      const brief = document.getElementById('brief');
+      brief.classList.remove('hidden');
+      showEmpty(false);
+      document.querySelector('#brief .chat-section').style.display = '';
+      sectionText = {};
+      const ss = b.section_sources || {};
+
+      document.getElementById('brief-sources').innerHTML = (b.data_sources_detected || [])
+        .map(s => `<div class="source-tag">&#10003; ${esc(s)}</div>`).join('');
+
+      let html = '';
+
+      // SITUATION
+      if (b.situation) {
+        const conf = b.confidence_note
+          ? `<div class="confidence-note">Confidence: ${esc(b.confidence)} — ${esc(b.confidence_note)}</div>` : '';
+        html += briefSection('situation', 'Situation',
+          `<div class="situation-text">${esc(b.situation)}</div>${conf}`,
+          ss.situation,
+          b.situation + (b.confidence_note ? `\n\nConfidence: ${b.confidence} — ${b.confidence_note}` : ''));
       }
+
+      // CONTACT READ (+ secondary contacts)
+      const p = b.contact_persona || {};
+      const secondary = b.secondary_contacts || [];
+      if (p.primary_contact || p.comm_style || p.decision_style || p.what_they_say_vs_mean || p.approach_recommendation || secondary.length) {
+        let rows = '';
+        const addRow = (l, v) => { if (v) rows += `<div class="persona-row"><span class="persona-lbl">${l}</span><span class="persona-val">${esc(v)}</span></div>`; };
+        addRow('Primary contact', p.primary_contact);
+        addRow('Comm style', p.comm_style);
+        addRow('Decision style', p.decision_style);
+        addRow('Says vs means', p.what_they_say_vs_mean);
+        addRow('How to engage', p.approach_recommendation);
+        let secHTML = '';
+        if (secondary.length) {
+          secHTML = `<div class="secondary-contacts"><div class="secondary-lbl">Secondary contacts</div>` +
+            secondary.map(c => `<div class="secondary-item"><strong>${esc(c.name_title || c.name || 'Unknown')}</strong> — ${esc(c.note || '')}</div>`).join('') + `</div>`;
+        }
+        const copy = [p.primary_contact, p.comm_style, p.decision_style, p.what_they_say_vs_mean, p.approach_recommendation].filter(Boolean).join('\n') +
+          (secondary.length ? '\n\nSecondary: ' + secondary.map(c => `${c.name_title || c.name || ''} — ${c.note || ''}`).join('; ') : '');
+        html += briefSection('contact', 'Contact read', `<div class="persona-card">${rows}</div>${secHTML}`, ss.contact_read, copy);
+      }
+
+      // WHERE TO PRESS
+      const lev = b.leverage_points || [];
+      if (lev.length) {
+        const body = lev.map(lp => `
+          <div class="leverage-item">
+            <div class="lev-top"><span class="lev-rank">Priority ${esc(lp.rank)}</span><span class="lev-timeline">${esc(lp.timeline)}</span></div>
+            <div class="lev-what">${esc(lp.what)}</div>
+            <div class="lev-why">${esc(lp.why)}</div>
+          </div>`).join('');
+        html += briefSection('leverage', 'Where to press — ranked', body, ss.where_to_press,
+          lev.map(lp => `Priority ${lp.rank} [${lp.timeline}] ${lp.what} — ${lp.why}`).join('\n'));
+      }
+
+      // DO THIS TODAY
+      if (b.do_this_today) {
+        const body = `<div class="do-today"><div class="do-today-lbl">While the longer plays run in the background</div><div class="do-today-text">${esc(b.do_this_today).replace(/\n/g, '<br>')}</div></div>`;
+        html += briefSection('today', 'Do this today', body, ss.do_this_today, b.do_this_today);
+      }
+
+      // DATA GAPS (§1d)
+      const gaps = b.data_gaps || [];
+      if (gaps.length) {
+        html += briefSection('gaps', 'Data gaps',
+          `<ul class="data-gap-list">${gaps.map(g => `<li>${esc(g)}</li>`).join('')}</ul>`,
+          null, gaps.map(g => '• ' + g).join('\n'));
+      }
+
+      document.getElementById('brief-sections').innerHTML = html;
+
+      document.getElementById('suggested-qs').innerHTML = (b.suggested_questions || [])
+        .map(q => `<button class="sq" onclick="askSuggested(this, \`${q.replace(/`/g, "'")}\`)">${esc(q)}</button>`).join('');
+
+      document.getElementById('b-last-analyzed').textContent = 'Last analyzed: ' + new Date().toLocaleString();
 
       document.getElementById('analyze-btn').disabled = false;
       document.getElementById('analyze-btn').classList.remove('analyzing');
       document.getElementById('analyze-btn').innerHTML = '&#8635; Re-analyze with updated data';
+      dimReanalyze(true);
 
       chatHistory = [
         { role: 'user', content: '[Account data loaded — Signal has full context]' },
@@ -1243,10 +1540,11 @@ Return exactly this JSON:
       ];
     }
 
+    // §4c — populate the chat input only; let the user review/edit before sending.
     function askSuggested(el, q) {
-      document.getElementById('chat-input').value = q;
-      el.style.display = 'none';
-      sendChat();
+      const input = document.getElementById('chat-input');
+      input.value = q;
+      input.focus();
     }
 
     async function sendChat() {
@@ -1290,6 +1588,34 @@ ${chatContext}`;
       pdfjsLib.GlobalWorkerOptions.workerSrc =
         'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     }
+
+    // §4f — Cmd/Ctrl+Enter re-analyzes when on the deep-dive view
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        const dd = document.getElementById('deep-dive');
+        const btn = document.getElementById('analyze-btn');
+        if (dd && dd.style.display !== 'none' && btn && !btn.disabled) {
+          e.preventDefault();
+          runAnalysis();
+        }
+      }
+    });
+
+    // §5e — rotate chat input placeholder on focus
+    const CHAT_PLACEHOLDERS = [
+      "What's the real risk here?",
+      "Who else should we be talking to?",
+      "What would you do differently with this account?"
+    ];
+    let chatPhIdx = 0;
+    const chatInputEl = document.getElementById('chat-input');
+    if (chatInputEl) {
+      chatInputEl.addEventListener('focus', (e) => {
+        e.target.placeholder = CHAT_PLACEHOLDERS[chatPhIdx % CHAT_PLACEHOLDERS.length];
+        chatPhIdx++;
+      });
+    }
+
     buildPortfolio();
   </script>
 </body>
