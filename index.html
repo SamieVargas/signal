@@ -472,10 +472,10 @@
           <span class="ft-pill">CRM snapshot</span>
         </div>
         <input type="file" id="dd-file-input" multiple
-          accept=".txt,.csv,.md,.json,.html,.log,.tsv,.vtt,.srt,.rtf"
+          accept="*/*"
           style="display:none" onchange="handleDDFiles(this.files)">
         <button class="upload-file-btn" onclick="document.getElementById('dd-file-input').click()">
-          <span class="upload-icon">&#8679;</span> Upload files (.txt, .csv, .vtt, .srt, .md, .json…)
+          <span class="upload-icon">&#8679;</span> Upload files — any format
         </button>
         <div id="dd-doc-list"></div>
         <textarea id="dd-paste" placeholder="Paste a Teams chat, call notes, MBR summary, a CSV — anything. Signal figures out what it's looking at."></textarea>
@@ -588,10 +588,10 @@
             <span class="ft-pill">Internal notes</span>
           </div>
           <input type="file" id="m-file-input" multiple
-            accept=".txt,.csv,.md,.json,.html,.log,.tsv,.vtt,.srt,.rtf"
+            accept="*/*"
             style="display:none" onchange="handleModalFiles(this.files)">
           <button class="upload-file-btn" onclick="document.getElementById('m-file-input').click()">
-            <span class="upload-icon">&#8679;</span> Choose files to upload
+            <span class="upload-icon">&#8679;</span> Upload files — any format
           </button>
           <div id="m-doc-list"></div>
           <div style="font-size:12px;color:var(--muted);margin:10px 0 6px">Or paste text directly —</div>
@@ -621,7 +621,8 @@
 
   <script>
     // ── Config ──
-    const WORKER_URL = 'https://signal-proxy.samievargas.workers.dev/';
+    // REPLACE this with your Cloudflare Worker URL after deploying worker.js
+    const WORKER_URL = 'YOUR_WORKER_URL_HERE';
 
     // ── Demo accounts ──
     const DEMO_ACCOUNTS = [
@@ -669,17 +670,47 @@
     // ── Content type detection ──
     function detectType(filename, content) {
       const fn = (filename || '').toLowerCase();
-      if (fn.endsWith('.vtt') || fn.endsWith('.srt') || fn.includes('transcript')) return 'Transcript';
-      if (fn.includes('mbr') || fn.includes('abr') || fn.includes('qbr')) return 'MBR/QBR';
-      if (fn.endsWith('.csv') || fn.endsWith('.tsv')) return 'CSV data';
+      const lower = (content || '').toLowerCase().slice(0, 3000);
+
+      // Filename-first — most specific wins
+      if (fn.includes('kick') && fn.includes('off')) return 'Kick-off deck';
+      if (fn.includes('kickoff') || fn.includes('kick_off')) return 'Kick-off deck';
+      if (fn.includes('abr')) return 'ABR notes';
+      if (fn.includes('mbr')) return 'MBR notes';
+      if (fn.includes('qbr')) return 'QBR notes';
+      if (fn.includes('ebr')) return 'EBR notes';
       if (fn.includes('swot')) return 'SWOT';
-      if (fn.includes('slack') || fn.includes('teams') || fn.includes('chat')) return 'Chat log';
-      if (fn.includes('email') || fn.includes('mail')) return 'Email';
-      const lower = (content || '').toLowerCase().slice(0, 2000);
-      if (lower.includes('zoom meeting') || lower.includes('transcript') || (content||'').match(/\d{1,2}:\d{2}:\d{2}/g)?.length > 3) return 'Transcript';
-      if (lower.includes('mbr') || lower.includes('monthly business review') || lower.includes('qbr')) return 'MBR/QBR';
-      if (lower.includes('from:') && lower.includes('subject:')) return 'Email';
+      if (fn.includes('onboarding') || fn.includes('onboard')) return 'Onboarding doc';
+      if (fn.includes('renewal') || fn.includes('contract')) return 'Contract / renewal';
+      if (fn.includes('proposal')) return 'Proposal';
+      if (fn.includes('transcript') || fn.endsWith('.vtt') || fn.endsWith('.srt')) return 'Call transcript';
+      if (fn.includes('zoom')) return 'Zoom transcript';
+      if (fn.includes('teams') || fn.includes('chat')) return 'Teams chat';
+      if (fn.includes('slack')) return 'Slack thread';
+      if (fn.includes('email') || fn.includes('mail')) return 'Email thread';
+      if (fn.includes('notes') && fn.includes('call')) return 'Call notes';
+      if (fn.includes('notes')) return 'Internal notes';
+      if (fn.includes('health') || fn.includes('score')) return 'Health score data';
+      if (fn.includes('usage') || fn.includes('adoption')) return 'Usage data';
+      if (fn.includes('revenue') || fn.includes('arr')) return 'Revenue data';
+      if (fn.endsWith('.csv') || fn.endsWith('.tsv')) return 'CSV data';
+      if (fn.endsWith('.pdf')) return 'PDF doc';
+      if (fn.endsWith('.pptx') || fn.endsWith('.ppt')) return 'Presentation';
+
+      // Content sniffing fallback
+      if ((content||'').match(/\d{1,2}:\d{2}:\d{2}/g)?.length > 3) return 'Call transcript';
+      if (lower.includes('zoom meeting') || lower.includes('meeting transcript')) return 'Call transcript';
+      if (lower.includes('kick-off') || lower.includes('kickoff') || lower.includes('kick off agenda')) return 'Kick-off deck';
+      if (lower.includes('quarterly business review') || lower.includes('qbr')) return 'QBR notes';
+      if (lower.includes('monthly business review') || lower.includes('mbr')) return 'MBR notes';
+      if (lower.includes('annual business review') || lower.includes('abr')) return 'ABR notes';
+      if (lower.includes('swot') && (lower.includes('strength') || lower.includes('weakness'))) return 'SWOT';
+      if (lower.includes('from:') && lower.includes('subject:')) return 'Email thread';
+      if ((lower.match(/\[.*?\]:\s/g) || []).length > 5) return 'Teams chat';
       if ((content||'').split('\n').slice(0,5).some(l => l.split(',').length > 3)) return 'CSV data';
+      if (lower.includes('health score') || lower.includes('nps')) return 'Health score data';
+      if (lower.includes('arr') && lower.includes('renewal')) return 'Revenue data';
+
       return 'Document';
     }
 
