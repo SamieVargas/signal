@@ -1,0 +1,138 @@
+ZOOM CALL TRANSCRIPT — AUTO-GENERATED + LIGHTLY EDITED
+Meeting: Apex Consulting // Veridian Monthly Business Review
+Date: November 12, 2025
+Duration: 47:22 (scheduled 60 min)
+Attendees:
+  Apex: Marcus Webb (VP Strategy & Analytics), Priya Nair (Director Research Ops), Tom Gillis (Sr. Analyst)
+  Veridian: Jamie Reyes (CSM), Dev Patel (Solutions Engineer — joined at 00:18:04, left at 00:34:11)
+Recording: Consent confirmed by all attendees
+Transcript confidence: HIGH (auto-generated, minor edits for clarity)
+
+Note: [inaudible] = section could not be transcribed. Timestamps approximate.
+---
+
+[00:00:14]
+JAMIE: Okay, I think we're all in. Marcus, Priya, Tom — good to see you all. Dev's going to join us in about 15 minutes for the Attribution v2 section. How is everyone?
+
+MARCUS: Good, good. Little hectic but that's the season, right? [laughs] We just wrapped a big deliverable for one of our banking clients so the team's coming up for air.
+
+JAMIE: That's great to hear actually. Was Veridian part of that deliverable at all?
+
+MARCUS: Yeah, actually — we used the cohort module to segment the client's customer base by engagement tier. It was, uh — [pause] — it worked well. Saved the team some time on the analysis layer.
+
+JAMIE: Love that. That's exactly the use case we'd talked about.
+
+PRIYA: Yeah Kofi's team has been using it pretty regularly for that kind of thing. [pause] I think. I'm a little removed from the day-to-day on that.
+
+[00:02:41]
+JAMIE: Got it. Okay let me pull up the usage dashboard. So just to orient everyone — seat utilization is at 81% this week which is solid, and I'm seeing strong activity in the core reporting and dashboard modules. Attribution v2 is showing lighter adoption so we're going to talk through that today and Dev's going to walk us through some use cases.
+
+MARCUS: Mm. Yeah I wanted to ask about that. Tom, have you had a chance to dig into it at all?
+
+TOM: A little bit. I poked around. It's — I think I need a clearer sense of how it maps to what we're actually doing before I spend a lot of time in it.
+
+MARCUS: Yeah, fair.
+
+JAMIE: That's exactly why Dev's joining. We'll make it concrete.
+
+[00:05:18]
+JAMIE: So one thing I wanted to cover — we had talked at the QBR about the Data Export API, the $18K add-on. Marcus, you mentioned you'd take it to the team. Any update on that?
+
+MARCUS: [pause] Yeah that's — I honestly haven't gotten to it yet. Q4 is really busy for us. It's not off the table, I just — it's not the right timing right now.
+
+JAMIE: Totally makes sense. No pressure. Should I circle back in January or do you want to flag it when the timing opens up?
+
+MARCUS: Circle back in January, sure.
+
+[note from Jamie: flagging this for myself — in Q3 he said he'd take it to the team. he's had it for 4 weeks and hasn't moved it. in October he said "genuine maybe." today he said "not off the table" but he also didn't ask a single question about it. the language is getting more passive each time.]
+
+[00:09:44]
+JAMIE: Let's talk about the Looker connector. Dev added you to the beta list a few weeks ago — have you had a chance to kick the tires on that at all?
+
+MARCUS: I got the access email. Haven't had time to get in there yet. Priya, did anyone on your side look at it?
+
+PRIYA: I don't think so. We've been heads-down on the deliverable.
+
+MARCUS: Yeah, that. We'll look at it. Probably after the holidays.
+
+JAMIE: Of course. Just want to make sure you know it's there.
+
+[00:12:00]
+JAMIE: Any feedback for us on the tool overall? Anything you wish worked differently?
+
+[3.2 second pause]
+
+MARCUS: No, it's — it's good. The team uses it. [pause] I think the main thing is just time. We're always trying to do more with fewer people, and Veridian helps when we use it, it's just a matter of making the time to use it.
+
+JAMIE: That's helpful context. Is there anything we can do to make it easier to use in the flow you already have? Training, office hours, anything like that?
+
+MARCUS: That's a good question. [pause] I'd have to think about what would actually be useful. I don't want to commit to something and then not have people show up.
+
+PRIYA: Yeah, we're not great at making time for training sessions right now. [small laugh]
+
+TOM: [inaudible — sounds like agreement]
+
+[note from Jamie: "the team uses it when we use it" is not a ringing endorsement. he used to cite specific things. the board deck. the 6-hour saving. today he couldn't come up with a concrete example unprompted.]
+
+[00:18:04] — DEV PATEL JOINS
+
+[00:18:22]
+DEV: Hey everyone, sorry for the delay. Good to see you, Marcus. Tom, I'm going to share my screen in a sec — I've got three Attribution v2 use cases I think are going to land really well for what your team does.
+
+TOM: Sure.
+
+DEV: So the first one — [screen share starts] — is retroactive cohort analysis. Marcus, you asked about this at the QBR. The short version is yes, you can run Attribution v2 backwards on historical data, and here's what that looks like...
+
+[00:19:45 — 00:33:48: Dev walks through three use cases. Marcus asks two questions, both clarifying rather than strategic. Tom asks one question about export format. Priya is silent throughout. All three say "interesting" or "okay" at various points. Nobody takes notes visibly. No one asks "can we try this?" or "when could we set this up?"]
+
+[00:33:55]
+DEV: So that's the three scenarios. Any questions before I drop?
+
+[2.8 second pause]
+
+MARCUS: No I think that was clear. Good demo.
+
+TOM: Yeah. Good.
+
+DEV: Awesome. I'll send the use case doc over. Jamie, back to you.
+
+[00:34:11] — DEV PATEL LEAVES
+
+[00:34:28]
+JAMIE: Great. So before we wrap — renewal is August 2026, obviously a ways out, but I want to make sure we have the right conversations in place heading into Q1. Can we plan to reconnect in January?
+
+MARCUS: Yeah, January works.
+
+JAMIE: Should I send a hold for the 14th? That's a Wednesday.
+
+MARCUS: Sure, send it over. I'll let you know if there's a conflict.
+
+JAMIE: Perfect. And if there's anything you need from us before then — enablement, office hours, anything — just shoot me a message.
+
+MARCUS: Will do.
+
+PRIYA: Same, thanks Jamie.
+
+[00:36:02]
+JAMIE: Alright, I'll let everyone get back to it. Great to see you all as always.
+
+MARCUS: You too. [pause] Take care.
+
+[call ends 00:36:19 — 47:22 actual duration vs 60 min scheduled]
+
+---
+POST-CALL NOTE — Jamie Reyes — Nov 12, 2025
+
+Wrote this up while it was fresh.
+
+The call went fine on the surface. Marcus was pleasant, engaged, no complaints. But something felt different and I want to name it before I talk myself out of it.
+
+Q3 QBR: Marcus cited a specific win unprompted. Asked two strategic questions during the demo. Brought up the Export API himself. Ran 5 minutes over because people had more to say.
+
+This call: Marcus couldn't name a specific win without me prompting him. He said "the team uses it when we use it." The dev demo got polite nods and zero follow-up questions about implementation. We ended 13 minutes early because nobody had anything else.
+
+The content was the same. The energy was completely different.
+
+I don't know if this is just Q4 busy-ness or something else. But I'm flagging it. Going to reach out to confirm the January hold and see if he engages.
+
+Risk: monitoring. Not escalating yet.

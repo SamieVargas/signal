@@ -1,0 +1,68 @@
+VERIDIAN INTERNAL SLACK EXPORT
+Channel: #csm-accounts-west
+Export range: January 15, 2026 — February 3, 2026
+Account filter: Decker & Lowe (VRD-00312)
+========================================================
+
+[Jan 15, 2026 — 11:24 AM]
+nadia.okonkwo: heads up on decker & lowe — just pulled their usage and something's off
+nadia.okonkwo: bernard and wren are basically carrying the whole account. francesca too but to a lesser degree
+nadia.okonkwo: 3 people = like 78% of all sessions. the other 6 seats are basically ghosts
+nadia.okonkwo: renewal isn't until august so we have time but if any one of those three leaves or goes quiet, we have a problem
+
+[Jan 15, 2026 — 11:31 AM]
+jordan.kim: how long has this been the pattern or is this new?
+nadia.okonkwo: pulled back to november, same picture. probably since they onboarded honestly — we never really expanded beyond the core team
+nadia.okonkwo: clara volkov was supposed to get trained up but that fell through
+
+[Jan 15, 2026 — 11:44 AM]
+jordan.kim: have you done an EBR with them?
+nadia.okonkwo: nope. we've done QBRs with wren and bernard but never gotten to exec level. sasha tamura is technically the vp sponsor but i've never talked to her. she has a seat she's never used lol
+nadia.okonkwo: honestly if we could get 30 min with sasha that would change the whole picture for renewal
+
+[Jan 15, 2026 — 11:49 AM]
+jordan.kim: might be worth asking wren to make the intro? if she's the internal champion she probably has access
+nadia.okonkwo: yeah. the timing is tricky though bc wren is stretched and i don't want to add to her plate
+
+[Jan 20, 2026 — 3:12 PM]
+nadia.okonkwo: okay so bernard is going on medical leave feb 1
+nadia.okonkwo: tyler flagged it from a support call — bernard's handing everything to wren
+nadia.okonkwo: i emailed bernard to set up a handoff call. he hasn't responded
+nadia.okonkwo: this is now a more urgent thing
+
+[Jan 20, 2026 — 3:28 PM]
+jordan.kim: how long is the leave?
+nadia.okonkwo: unclear, he didn't say
+nadia.okonkwo: so now we have: wren carrying dashboards AND bernard's recurring reports AND the api pipeline she's not familiar with
+nadia.okonkwo: francesca is good but she's only ever touched the export side
+nadia.okonkwo: if something breaks in the pipeline and wren can't fix it, they have nobody
+
+[Jan 21, 2026 — 9:05 AM]
+nadia.okonkwo: no response from bernard. gonna try wren directly
+nadia.okonkwo: also flagging this for team standup — i think we need a formal continuity plan for this account before feb 1
+
+[Jan 21, 2026 — 10:18 AM]
+wren.nakamura (external — tagged via CSM portal): Hi Nadia — saw your message. Yes, I'm aware of the situation with Bernard. I'm doing my best to get up to speed on his side of things but I'll be honest, the report delivery setup and the API pipeline are not my areas. Bernard was going to document things before he left but I don't think that happened fully. If there's something you can send me to help, that would be great. I'm a bit nervous about the next few weeks.
+
+[Jan 21, 2026 — 10:34 AM]
+nadia.okonkwo: ok wren responded — she's worried
+nadia.okonkwo: setting up an emergency enablement call for this week
+nadia.okonkwo: jordan can you cover with me? two of us might help
+
+[Jan 21, 2026 — 10:41 AM]
+jordan.kim: yes 100%. let me know when and i'll be there
+jordan.kim: also — i know timing is bad but this is exactly the argument for an EBR with sasha
+jordan.kim: "we proactively reached out when we saw a coverage gap" is a much better story than "things broke while bernard was out"
+
+[Jan 28, 2026 — 2:44 PM]
+nadia.okonkwo: enablement call with wren went okay. she's a quick study
+nadia.okonkwo: got her comfortable with the report delivery setup and the workaround tyler documented
+nadia.okonkwo: api pipeline is still a gap — rosa [note: should be francesca] knows some of it but not all
+nadia.okonkwo: still no word on bernard's timeline
+nadia.okonkwo: i'm going to ask wren about the sasha intro this week. we need to move on the EBR before q2
+
+[Feb 3, 2026 — 11:02 AM]
+nadia.okonkwo: update: wren said she'd ask sasha's EA about availability for an EBR
+nadia.okonkwo: no confirmed date yet
+nadia.okonkwo: still no update on bernard
+nadia.okonkwo: renewal is august — we have a window but this account is fragile right now. marking as watch list.

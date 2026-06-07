@@ -1,0 +1,93 @@
+VERIDIAN ONBOARDING NOTES — BLUEFRAME HEALTH
+Account ID: VRD-00388 | CSM: Jordan Kim
+Onboarding Start: June 2, 2025 | Contract Start: June 1, 2025
+ARR: $319,000 | Licensed Seats: 38 | Segment: Enterprise - Healthcare
+
+[these are working notes — not formatted for sharing externally — JK]
+
+==================================================
+SESSION 1 — June 4, 2025 // 90 min Zoom
+==================================================
+Attendees: Kofi Oyelaran (Director Clinical Analytics), Rosa Flores (Analytics Engineer), 2x Senior Analysts (names: Meera Singh + one other — didn't catch last name, will get from intro email)
+[UPDATE: other analyst = Taiwo Okonkwo's direct, name is David Eze per the welcome email — added to account contacts]
+
+Strong session. Rosa came in with the API key already generated, SSO config docs already pulled. She's clearly done this before. Kofi is the stakeholder — pleasant, clear about what he needs, not in the weeds technically.
+
+SUCCESS CRITERIA — locked with Kofi:
+  1. Core reporting workflow live within 30 days
+  2. Cohort module in production use by end of Q3
+  3. Snowflake integration live by September
+
+38 seats across 3 teams (Analytics, Ops, Clinical). Admins: Kofi + Rosa.
+
+Kofi mentioned prev tool had "terrible support" — they're excited to have a dedicated CSM. Good entry point for relationship building.
+
+Rosa flagged she wants to eventually explore Data Export API for a pipeline she's building. Filed for later.
+
+[session ran long — everyone engaged, good sign]
+
+==================================================
+SESSION 2 — June 11, 2025 // 60 min Zoom
+==================================================
+Attendees: Rosa Flores, Meera Singh
+
+Core reporting workflow setup. Rosa built the first dashboard live during the call — did it faster than I expected. Meera is the main day-to-day user for weekly reports, walked her through scheduled delivery setup. Both comfortable, no major questions.
+
+Did NOT get to cohort module. Rosa had a conflict come up ~40 min in, had to drop. Said she'd "definitely make session 3." Agreed to cover cohort then.
+
+[second time Rosa has had to step away early — probably just schedule stuff, not a pattern yet]
+
+==================================================
+SESSION 3 — June 25, 2025 // 45 min Zoom
+==================================================
+Attendees: Meera Singh
+[Kofi: OOO per calendar. Rosa: no-show, no notice. Apologized via Slack after the fact: "so sorry, got slammed, Meera can cover"]
+
+Ran the session with Meera only. Walked through cohort module basics.
+
+Here's the issue: Meera is not an analyst. She runs reports that Kofi or Rosa set up. Building cohorts from scratch is outside her current scope and she was honest about it: "I usually just run what's already set up. The cohort stuff is more Rosa's territory."
+
+We got through the conceptual overview but did not complete the hands-on build. Cohort module = not validated.
+
+Agreed to reschedule with Rosa.
+
+[this is the third time the cohort session has slipped. making a note to myself to be more direct about getting Rosa on a call. she keeps delegating down and the person she delegates to can't cover the material.]
+
+==================================================
+SESSION 4 — July 9, 2025 // 45 min scheduled / ~15 min productive
+==================================================
+Attendees: Rosa Flores (first 15 min only)
+
+Rosa joined on time — first 15 min were actually solid. She confirmed the Snowflake integration is live (built it herself, ahead of schedule — genuinely impressive, she did it without needing help). Confirmed core reporting running clean.
+
+Then her Slack lit up and she said she had to drop for an emergency. Said: "I'll be honest I don't really need the cohort walkthrough, I'll figure it out from the docs, I've done similar stuff before."
+
+Asked if she wanted me to send the doc links. She said "sure, yeah." 
+
+At her request, closed out the onboarding formally.
+
+SUCCESS CRITERIA STATUS at close:
+  [x] Core reporting workflow live — confirmed
+  [x] Snowflake integration live — confirmed (ahead of schedule)
+  [~] Cohort module in production — NOT VALIDATED. Marked complete because Rosa said she'd self-onboard. She is capable. But we never saw it.
+
+[internal note to myself: i'm marking this green but I'm not sure I should. Rosa said she'd handle it but I don't actually know if she ever did. should check at 90-day review. — JK]
+
+==================================================
+90-DAY CHECK-IN — September 3, 2025 // 30 min Zoom
+==================================================
+Attendees: Kofi Oyelaran
+
+Kofi says things are "going well." I pulled usage metrics before the call — looked strong as of August data (89% seat util, solid session counts). Felt good.
+
+Did NOT check feature-level usage stats specifically. Did NOT ask about cohort module. Did NOT ask about Rosa's adoption specifically.
+
+Kofi said "the team is using it regularly" and I took that at face value.
+
+Marked account green. Moved on.
+
+[only looking at this now (Feb 2026): cohort module usage has been declining since September. the self-onboard almost certainly never happened. i closed a success criteria as complete without verifying it.
+
+the 90-day check-in was a surface-level conversation and i let it be that.
+
+this is on me.]
