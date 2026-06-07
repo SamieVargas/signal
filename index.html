@@ -506,6 +506,33 @@
       .b-sec-title { font-size: 11px; }
     }
 
+    /* ── v4: source files, file viewer, demo note ── */
+    .demo-note { display: inline-block; margin-top: 8px; font-size: 12px; color: var(--accent-dark); background: var(--accent-light); border: 0.5px solid var(--accent-mid); border-radius: 20px; padding: 3px 10px; }
+    .file-list { display: flex; flex-direction: column; gap: 8px; }
+    .file-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 0.5px solid var(--border); border-radius: 10px; background: var(--surface); }
+    .file-icon { font-size: 18px; flex: 0 0 auto; }
+    .file-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+    .file-label { font-size: 13px; font-weight: 600; color: var(--ink); }
+    .file-ext { font-size: 11px; color: var(--muted); font-weight: 400; }
+    .file-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+    .view-file-btn { flex: 0 0 auto; font-size: 12px; font-weight: 600; color: var(--accent-dark); background: var(--accent-light); border: 0.5px solid var(--accent-mid); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+    .view-file-btn:hover { background: var(--accent-mid); }
+
+    .viewer-overlay { position: fixed; inset: 0; background: rgba(15,14,12,0.45); opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 1000; }
+    .viewer-overlay.open { opacity: 1; pointer-events: auto; }
+    .viewer-panel { position: absolute; top: 0; right: 0; height: 100%; width: 480px; max-width: 92vw; background: var(--paper); box-shadow: -8px 0 32px rgba(0,0,0,0.18); transform: translateX(100%); transition: transform .22s ease; display: flex; flex-direction: column; }
+    .viewer-overlay.open .viewer-panel { transform: translateX(0); }
+    .viewer-header { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 0.5px solid var(--border); font-weight: 600; font-size: 14px; }
+    .viewer-close { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--muted); }
+    .viewer-close:hover { color: var(--ink); }
+    .viewer-body { padding: 16px; overflow: auto; flex: 1; }
+    .viewer-pre { white-space: pre-wrap; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; line-height: 1.6; color: var(--ink); margin: 0; }
+    .viewer-img { width: 100%; border-radius: 8px; }
+    .viewer-iframe { width: 100%; height: 70vh; border: 0.5px solid var(--border); border-radius: 8px; }
+    .viewer-link { display: block; margin-top: 8px; font-size: 12px; color: var(--accent-dark); }
+    .viewer-loading, .viewer-err { font-size: 13px; color: var(--muted); }
+    @media (max-width: 480px) { .viewer-panel { width: 100vw; } }
+
     /* §4e print stylesheet */
     @media print {
       .no-print, .topbar, .add-more-zone, #focus-toggle, .analyze-btn,
@@ -561,9 +588,16 @@
       <div class="dd-hero">
         <div class="dd-name" id="dd-name"></div>
         <div class="dd-meta" id="dd-meta"></div>
+        <div class="demo-note hidden" id="dd-demo-note">&#9728; Example analysis — pre-loaded with demo data</div>
       </div>
 
       <div class="stats-row" id="dd-stats"></div>
+
+      <div id="dd-source-files" class="hidden">
+        <div class="section-label" style="margin-bottom:8px">Source files</div>
+        <div class="file-list" id="dd-file-list"></div>
+        <div class="divider"></div>
+      </div>
 
       <div id="dd-docs-loaded" class="hidden">
         <div class="section-label" style="margin-bottom:8px">Documents loaded</div>
@@ -645,6 +679,17 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ══ FILE VIEWER ══ -->
+  <div class="viewer-overlay" id="viewer-overlay" onclick="closeViewer()">
+    <div class="viewer-panel" onclick="event.stopPropagation()">
+      <div class="viewer-header">
+        <span id="viewer-title"></span>
+        <button class="viewer-close" onclick="closeViewer()" aria-label="Close">&#10005;</button>
+      </div>
+      <div class="viewer-body" id="viewer-body"></div>
     </div>
   </div>
 
@@ -747,6 +792,31 @@
     const FOCUS_LABELS = { full: 'Full Brief', revenue: 'Revenue Risk', relationship: 'Relationship Read', precall: 'Pre-Call' };
     let focusMode = 'full';
 
+    // Demo assets are fetched at runtime. Relative path = same-origin on GitHub
+    // Pages (no CORS). Switch to a raw.githubusercontent URL if assets move.
+    const ASSET_BASE = '';
+    function assetUrl(path) { return ASSET_BASE + path; }
+
+    function blobToBase64(blob) {
+      return new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onloadend = () => resolve(String(r.result).split(',')[1]);
+        r.onerror = reject;
+        r.readAsDataURL(blob);
+      });
+    }
+
+    // Fetch a demo account's source files. Text/CSV -> text; PNG/PDF -> base64.
+    async function loadDemoAccountFiles(account) {
+      return Promise.all((account.files || []).map(async (file) => {
+        const res = await fetch(assetUrl(file.path));
+        if (!res.ok) throw new Error(`${file.name} (${res.status})`);
+        if (file.type === 'image/png') return { file, content: await blobToBase64(await res.blob()), contentType: 'image' };
+        if (file.type === 'application/pdf') return { file, content: await blobToBase64(await res.blob()), contentType: 'pdf' };
+        return { file, content: await res.text(), contentType: 'text' };
+      }));
+    }
+
     // POST to the Worker. Surfaces the real API error message instead of a bare
     // status code, and retries once on 429 (rate limit) with a short backoff.
     async function postToWorker(payload, { retries = 1 } = {}) {
@@ -778,27 +848,39 @@
     }
 
     // ── Demo accounts ──
+    // Demo accounts are backed by real source files in /assets (fetched at runtime).
     const DEMO_ACCOUNTS = [
-      {id:'korova',name:'Korova Media',arr:180000,renewal:47,risk:'high',riskType:'Champion loss',
-       flag:'VP Analytics left 3 weeks ago. New stakeholder unknown.',
-       seats:42,seatsUsed:38,healthScore:52,lastContact:21,isDemo:true,
-       contacts:[{name:'Jamie Osei',title:'VP Analytics (departed)',style:'Data-driven, fast, async Slack preferred'}],
-       demoData:`Account: Korova Media | ARR: $180K | Renewal: 47 days\nSeats: 42 licensed, 38 active\nHealth score: 52/100 (was 74 six weeks ago)\nChampion: Jamie Osei, VP Analytics — gave notice 3 weeks ago, last login 19 days ago\nNew VP not identified. IT contact (Marcus Webb) is point of contact but not a product user.\nLast QBR: 90 days ago — Jamie flagged dashboard feature as transformational\nNo renewal conversation started.`,docs:[]},
-      {id:'blueframe',name:'Blueframe Health',arr:320000,renewal:112,risk:'high',riskType:'Silent decay',
-       flag:'Seat utilization 89% → 41% in 60 days. No tickets. No signal.',
-       seats:80,seatsUsed:33,healthScore:38,lastContact:14,isDemo:true,
-       contacts:[{name:'Priya Nair',title:'Director of Data Strategy',style:'Formal, email preferred, risk-averse, needs data before decisions'}],
-       demoData:`Account: Blueframe Health | ARR: $320K | Renewal: 112 days\nSeats: 80 licensed, 33 active (was 71 active / 89% 60 days ago)\nHealth score: 38/100 (was 81)\nMain contact: Priya Nair. Last active: 18 days ago.\nSupport tickets: 0. Dashboard views down 67%. Export feature stopped 45 days ago.\nLast call: Priya said things are good, just busy season.`,docs:[]},
-      {id:'ironclad',name:'Ironclad Logistics',arr:540000,renewal:38,risk:'high',riskType:'Frustrated — not gone',
-       flag:'4 support tickets in 30 days, same feature. Renewal in 38 days.',
-       seats:95,seatsUsed:91,healthScore:71,lastContact:5,isDemo:true,
-       contacts:[{name:'Sandra Mwangi',title:'VP Operations',style:'Direct, numbers-first, low patience for ambiguity'}],
-       demoData:`Account: Ironclad Logistics | ARR: $540K | Renewal: 38 days\nSeats: 95 licensed, 91 active\nHealth score: 71/100\nTickets last 30 days: 4 — all export + API rate limits. Opened by Dev Patel (tech lead), tone increasingly terse.\nVP Sandra Mwangi: called 5 days ago to discuss platform direction. Did not mention tickets.\nUsage strong: sessions up 12% MoM. SLA breach: avg ticket response 3.4 days vs 2 day SLA.`,docs:[]},
-      {id:'solace',name:'Solace Partners',arr:265000,renewal:44,risk:'high',riskType:'Vibe risk',
-       flag:'Everything looks fine. CSM gut says otherwise.',
-       seats:55,seatsUsed:53,healthScore:81,lastContact:7,isDemo:true,
-       contacts:[{name:'Dominique Leroy',title:'VP Customer Experience',style:'Warm, relationship-driven, hard to read when something is wrong'}],
-       demoData:`Account: Solace Partners | ARR: $265K | Renewal: 44 days\nSeats: 55, 53 active\nHealth score: 81/100. Usage strong.\nLast contact: 7 days ago — warm call, Dominique slightly shorter than usual. Didn't ask roadmap questions (usually asks 2-3).\nSupport tickets: 0. No commercial conversation started.`,docs:[]},
+      {id:'apex',name:'Apex Consulting',arr:214000,renewal:61,risk:'high',riskType:'Vibe Risk',
+       flag:'Champion went silent 43 days ago. Dashboard looks amber. The transcripts tell a different story.',
+       seats:null,seatsUsed:null,healthScore:null,lastContact:null,isDemo:true,is_featured:true,contacts:[],docs:[],
+       files:[
+         {name:'apex_gainsight_dashboard.png',type:'image/png',label:'Gainsight Dashboard',icon:'🖼',description:'Account health dashboard — health score 74, NPS 8, open cases 0. Looks amber-at-worst on the surface.',path:'assets/apex_gainsight_dashboard.png'},
+         {name:'apex_qbr_notes.txt',type:'text/plain',label:'QBR Notes (Q3 + Q4)',icon:'📝',description:'Working notes from two consecutive QBRs. Energy and specificity drop sharply between them.',path:'assets/apex_qbr_notes.txt'},
+         {name:'apex_usage_export.csv',type:'text/csv',label:'Usage Export',icon:'📊',description:'Per-user login and feature activity. Champion seat going dark, feature breadth shrinking.',path:'assets/apex_usage_export.csv'},
+         {name:'apex_champion_email_thread.txt',type:'text/plain',label:'Champion Email Thread',icon:'✉️',description:'6-email thread spanning Aug–Jan. Response latency goes from same-day to 43 days of silence.',path:'assets/apex_champion_email_thread.txt'},
+         {name:'apex_zoom_mbr_external.txt',type:'text/plain',label:'Zoom MBR Transcript (External)',icon:'🎙',description:'Full call transcript, Nov 12. Champion cannot name a specific win unprompted. Demo gets polite nods, no follow-up questions.',path:'assets/apex_zoom_mbr_external.txt'},
+         {name:'apex_internal_mbr_slack.txt',type:'text/plain',label:'Internal Slack Thread',icon:'💬',description:'CSM internal Slack thread tracking the soft signals — response latency, language change, what is not being said.',path:'assets/apex_internal_mbr_slack.txt'}
+       ]},
+      {id:'blueframe',name:'Blueframe Health',arr:319000,renewal:118,risk:'high',riskType:'Silent Decay',
+       flag:'Seat utilization 89% to 39% over 22 weeks. Zero support tickets. Cohort module abandoned. Nobody noticed.',
+       seats:null,seatsUsed:null,healthScore:null,lastContact:null,isDemo:true,is_featured:false,contacts:[],docs:[],
+       files:[
+         {name:'blueframe_usage_seats.csv',type:'text/csv',label:'Weekly Seat Utilization',icon:'📊',description:'24-week export, week by week. The drop is in the data.',path:'assets/blueframe_usage_seats.csv'},
+         {name:'blueframe_sfdc_dashboard.png',type:'image/png',label:'Salesforce Account View',icon:'🖼',description:'SFDC record — health score 78, open cases 0, NPS 7.25. System says healthy.',path:'assets/blueframe_sfdc_dashboard.png'},
+         {name:'blueframe_onboarding_notes.txt',type:'text/plain',label:'Onboarding Notes',icon:'📝',description:'4-session onboarding record. Cohort module was closed without validation. CSM retrospective is in the notes.',path:'assets/blueframe_onboarding_notes.txt'},
+         {name:'blueframe_nps_responses.csv',type:'text/csv',label:'NPS Responses',icon:'📊',description:'4 verbatims. One respondent mentions evaluating the tool stack. It was not flagged at the time.',path:'assets/blueframe_nps_responses.csv'},
+         {name:'blueframe_renewal_brief.pdf',type:'application/pdf',label:'Renewal Brief (Internal PDF)',icon:'📋',description:'CSM-written renewal prep doc. Optimistic framing, a data discrepancy, and a placeholder section left incomplete.',path:'assets/blueframe_renewal_brief.pdf'},
+         {name:'blueframe_zoom_qbr_external.txt',type:'text/plain',label:'Zoom QBR Transcript (External)',icon:'🎙',description:'Q4 QBR transcript. Champion uses passive language, deflects tool stack question, asks zero questions about the product.',path:'assets/blueframe_zoom_qbr_external.txt'},
+         {name:'blueframe_internal_mbr_notes.txt',type:'text/plain',label:'Internal MBR Notes',icon:'📝',description:'CSM and manager working through what went wrong. Honest about the misses. Dev Snowflake angle changes the story.',path:'assets/blueframe_internal_mbr_notes.txt'}
+       ]},
+      {id:'decker',name:'Decker & Lowe',arr:95000,renewal:201,risk:'medium',riskType:'Power User Concentration',
+       flag:'3 people drive 78% of all sessions. One just went on medical leave. No handoff completed.',
+       seats:null,seatsUsed:null,healthScore:null,lastContact:null,isDemo:true,is_featured:false,contacts:[],docs:[],
+       files:[
+         {name:'decker_user_activity.csv',type:'text/csv',label:'Per-User Activity Export',icon:'📊',description:'9 seats. The concentration is obvious when you look at the per-user breakdown.',path:'assets/decker_user_activity.csv'},
+         {name:'decker_support_transcript.txt',type:'text/plain',label:'Support Call Transcript',icon:'🎙',description:'Call from the power user now on leave. He named the handoff risk himself, two weeks before going out.',path:'assets/decker_support_transcript.txt'},
+         {name:'decker_slack_export.txt',type:'text/plain',label:'Internal Slack Export',icon:'💬',description:'CS team Slack thread. Internal awareness of the fragility is there. EBR still not scheduled.',path:'assets/decker_slack_export.txt'}
+       ]}
     ];
 
     let ACCOUNTS = DEMO_ACCOUNTS.map(a => ({...a, docs: []}));
@@ -1048,6 +1130,54 @@
     // §4e — export the brief via the browser's print-to-PDF
     function exportBrief() { window.print(); }
 
+    // ── Source files (demo accounts) + file viewer ──
+    function renderSourceFiles() {
+      const files = (currentAccount && currentAccount.files) || [];
+      const wrap = document.getElementById('dd-source-files');
+      if (!files.length) { wrap.classList.add('hidden'); return; }
+      wrap.classList.remove('hidden');
+      document.getElementById('dd-file-list').innerHTML = files.map((f, i) => `
+        <div class="file-row">
+          <span class="file-icon">${f.icon || '📄'}</span>
+          <div class="file-info">
+            <span class="file-label">${esc(f.label)} <span class="file-ext">.${esc(f.name.split('.').pop())}</span></span>
+            <span class="file-desc">${esc(f.description || '')}</span>
+          </div>
+          <button class="view-file-btn no-print" onclick="openViewer('${currentAccount.id}',${i})">View file</button>
+        </div>`).join('');
+    }
+
+    async function openViewer(acctId, idx) {
+      const acct = ACCOUNTS.find(a => a.id === acctId);
+      if (!acct || !acct.files[idx]) return;
+      const f = acct.files[idx];
+      document.getElementById('viewer-title').textContent = `${f.icon || ''} ${f.label}`.trim();
+      const body = document.getElementById('viewer-body');
+      document.getElementById('viewer-overlay').classList.add('open');
+      const url = assetUrl(f.path);
+      if (f.type === 'image/png') {
+        body.innerHTML = `<img class="viewer-img" src="${url}" alt="${esc(f.label)}">`;
+      } else if (f.type === 'application/pdf') {
+        body.innerHTML = `<iframe class="viewer-iframe" src="${url}" title="${esc(f.label)}"></iframe>` +
+          `<a class="viewer-link" href="${url}" target="_blank" rel="noreferrer">Open in new tab →</a>`;
+      } else {
+        body.innerHTML = '<div class="viewer-loading">Loading…</div>';
+        try {
+          const res = await fetch(url);
+          if (!res.ok) throw new Error(res.status);
+          body.innerHTML = `<pre class="viewer-pre">${esc(await res.text())}</pre>`;
+        } catch (e) {
+          body.innerHTML = `<div class="viewer-err">Couldn't load file (${esc(e.message)}). ` +
+            `<a href="${url}" target="_blank" rel="noreferrer">Open directly →</a></div>`;
+        }
+      }
+    }
+
+    function closeViewer() {
+      document.getElementById('viewer-overlay').classList.remove('open');
+      document.getElementById('viewer-body').innerHTML = '';
+    }
+
     // ── Portfolio ──
     function buildPortfolio() {
       const sorted = [...ACCOUNTS].sort((a,b) => riskOrder(a.risk) - riskOrder(b.risk));
@@ -1140,11 +1270,20 @@
       document.getElementById('dd-meta').textContent = metaParts.join(' · ') || 'New account — no data yet';
 
       const util = currentAccount.seats ? Math.round((currentAccount.seatsUsed / currentAccount.seats) * 100) : null;
-      document.getElementById('dd-stats').innerHTML = `
-        <div class="stat"><div class="stat-label">Seat utilization</div><div class="stat-val ${util !== null && util < 60 ? 'danger' : util !== null && util < 75 ? 'warn' : ''}">${util !== null ? util + '%' : '—'}</div></div>
-        <div class="stat"><div class="stat-label">Health score</div><div class="stat-val ${currentAccount.healthScore !== null && currentAccount.healthScore < 50 ? 'danger' : currentAccount.healthScore !== null && currentAccount.healthScore < 70 ? 'warn' : ''}">${currentAccount.healthScore !== null ? currentAccount.healthScore + '/100' : '—'}</div></div>
-        <div class="stat"><div class="stat-label">Last contact</div><div class="stat-val ${currentAccount.lastContact !== null && currentAccount.lastContact > 30 ? 'danger' : currentAccount.lastContact !== null && currentAccount.lastContact > 14 ? 'warn' : ''}">${currentAccount.lastContact !== null ? currentAccount.lastContact + 'd ago' : '—'}</div></div>`;
+      const statsEl = document.getElementById('dd-stats');
+      const hasStats = currentAccount.seats !== null || currentAccount.healthScore !== null || currentAccount.lastContact !== null;
+      if (hasStats) {
+        statsEl.style.display = '';
+        statsEl.innerHTML = `
+          <div class="stat"><div class="stat-label">Seat utilization</div><div class="stat-val ${util !== null && util < 60 ? 'danger' : util !== null && util < 75 ? 'warn' : ''}">${util !== null ? util + '%' : '—'}</div></div>
+          <div class="stat"><div class="stat-label">Health score</div><div class="stat-val ${currentAccount.healthScore !== null && currentAccount.healthScore < 50 ? 'danger' : currentAccount.healthScore !== null && currentAccount.healthScore < 70 ? 'warn' : ''}">${currentAccount.healthScore !== null ? currentAccount.healthScore + '/100' : '—'}</div></div>
+          <div class="stat"><div class="stat-label">Last contact</div><div class="stat-val ${currentAccount.lastContact !== null && currentAccount.lastContact > 30 ? 'danger' : currentAccount.lastContact !== null && currentAccount.lastContact > 14 ? 'warn' : ''}">${currentAccount.lastContact !== null ? currentAccount.lastContact + 'd ago' : '—'}</div></div>`;
+      } else {
+        statsEl.style.display = 'none';
+      }
 
+      renderSourceFiles();
+      document.getElementById('dd-demo-note').classList.toggle('hidden', !(currentAccount.files && currentAccount.files.length));
       renderLoadedDocs();
       updateUploadSubtext();
       showEmpty(true);
@@ -1154,7 +1293,7 @@
       document.querySelectorAll('#focus-toggle .focus-pill')
         .forEach(p => p.classList.toggle('active', p.dataset.mode === 'full'));
 
-      const hasSources = (currentAccount.docs || []).length > 0 || !!currentAccount.demoData;
+      const hasSources = (currentAccount.docs || []).length > 0 || !!currentAccount.demoData || (currentAccount.files || []).length > 0;
       const ab = document.getElementById('analyze-btn');
       ab.disabled = !hasSources;
       ab.classList.remove('dim', 'analyzing');
@@ -1258,7 +1397,8 @@ ${content}`
     // but adding/changing a doc is a miss. Rough, not cryptographic.
     function getCacheKey(allDocs) {
       const docPart = allDocs.map(d => `${d.name}:${(d.content || '').length}`).join('|');
-      return `${currentAccount.name}::${focusMode}::${(currentAccount.demoData || '').length}::${docPart}`;
+      const filePart = (currentAccount.files || []).map(f => f.name).join('|');
+      return `${currentAccount.name}::${focusMode}::${(currentAccount.demoData || '').length}::${filePart}::${docPart}`;
     }
 
     // Compact brief for chat system context — ~150 tok vs ~800 for the full
@@ -1308,8 +1448,32 @@ Priorities: ${(b.leverage_points || []).map(l => l.what).join(' | ')}`.trim();
       btn.innerHTML = spinner + ' Summarizing sources…';
       showSkeleton(); // §4d
 
-      // Pass 1: summarize each doc with Haiku, then build context from summaries.
-      const context = await buildSummarizedContext(allDocs);
+      // Demo accounts carry real source files: fetch them. Text/CSV go through
+      // the Haiku summary pass; PNG/PDF are attached to the Sonnet call as
+      // image/document blocks (multimodal).
+      let media = [];
+      let textDocs = allDocs;
+      if (currentAccount.files && currentAccount.files.length) {
+        try {
+          const loaded = await loadDemoAccountFiles(currentAccount);
+          const demoText = [];
+          loaded.forEach(({ file, content, contentType }) => {
+            if (contentType === 'text') demoText.push({ name: file.name, type: file.label, content });
+            else if (contentType === 'image') media.push({ type: 'image', source: { type: 'base64', media_type: 'image/png', data: content } });
+            else if (contentType === 'pdf') media.push({ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: content } });
+          });
+          textDocs = [...demoText, ...allDocs];
+        } catch (e) {
+          showToast('Could not load source files: ' + e.message);
+          if (!briefData) document.getElementById('brief').classList.add('hidden');
+          btn.disabled = false; btn.classList.remove('analyzing');
+          btn.innerHTML = 'Analyze this account &#8594;';
+          return;
+        }
+      }
+
+      // Pass 1: summarize each text doc with Haiku, then build context.
+      const context = await buildSummarizedContext(textDocs);
       btn.innerHTML = spinner + ' Analyzing…';
       const contactsText = (currentAccount.contacts || [])
         .map(c => `${c.name}${c.title ? ' (' + c.title + ')' : ''}${c.style ? ': ' + c.style : ''}`)
@@ -1367,10 +1531,11 @@ Return exactly this JSON (respect the FOCUS instruction — leave non-focused se
 }`;
 
       try {
+        const analysisContent = media.length ? [{ type: 'text', text: prompt }, ...media] : prompt;
         const data = await postToWorker({
           model: MODELS.analysis,
           max_tokens: FOCUS_MAX_TOKENS[focusMode] || 4000,
-          messages: [{ role: 'user', content: prompt }]
+          messages: [{ role: 'user', content: analysisContent }]
         });
         const raw = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
         // If the model hit the output cap, the JSON is truncated — say so clearly
@@ -1617,6 +1782,12 @@ ${chatContext}`;
     }
 
     buildPortfolio();
+
+    // §6 — featured hero: open the featured account and analyze it on load.
+    (function autoFeatured() {
+      const featured = ACCOUNTS.find(a => a.is_featured);
+      if (featured) { openAccount(featured.id); runAnalysis(); }
+    })();
   </script>
 </body>
 </html>
