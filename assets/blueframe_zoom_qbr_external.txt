@@ -1,0 +1,121 @@
+ZOOM CALL TRANSCRIPT — AUTO-GENERATED + LIGHTLY EDITED
+Meeting: Blueframe Health // Veridian Q4 QBR
+Date: January 14, 2026
+Duration: 31:44 (scheduled 45 min)
+Attendees:
+  Blueframe: Kofi Oyelaran (Director Clinical Analytics), Meera Singh (Senior Data Analyst)
+  Veridian: Jordan Kim (CSM)
+Recording: Consent confirmed
+Transcript confidence: HIGH
+
+Note: Taiwo Okonkwo (VP Operations) was invited but did not attend. No notice given.
+---
+
+[00:00:22]
+JORDAN: Great, looks like we're all here. Kofi, Meera — good to see you both. Taiwo isn't able to make it?
+
+KOFI: Yeah, she had something come up. She sends her regards. [small laugh]
+
+JORDAN: No worries at all. Okay, I'll send her a follow-up summary. So I wanted to do a quick Q4 review and start thinking about where we want to focus in the first half of this year. I pulled some usage data I'll share — Kofi, does it make sense to screenshare or would you rather I just walk through the numbers?
+
+KOFI: Either way, whatever's easier for you.
+
+JORDAN: I'll just share my screen, takes two seconds. [pause] Okay, so — seat utilization. We're sitting at about 44% active seats right now. [NOTE: actual pull showed 39.5% — used rounded Nov figure by mistake — JK] That's come down from where we were in August. I wanted to get your read on that.
+
+KOFI: [pause] Yeah. Honestly, it's probably just that we've had a really busy quarter clinically. A lot of the teams that were using it regularly kind of dropped off when things got hectic.
+
+JORDAN: That makes total sense. Is there a sense of when things will normalize? Like, is Q1 typically lighter for your team?
+
+KOFI: It should be, yeah. [pause] I think people will start using it more again. It's still there, it's just — when things are busy, it's one of those things that gets deprioritized I guess.
+
+[note from Jordan: "it's still there" is a weird way to describe a tool you champion. like — yes, it's still there. but the framing is passive. it's not "we'll pick it back up" it's "it exists and is available." — JK]
+
+[00:06:12]
+JORDAN: Totally hear you. One thing I wanted to flag — the cohort module specifically has been pretty quiet. Like, almost zero sessions in the last six weeks. Is that team aware it's there, or...?
+
+KOFI: [pause] Rosa set that up, I think. I know she was going to get into it. I should check in with her on that.
+
+JORDAN: Yeah, if there's a use case she's been meaning to explore, I'd love to do a quick session with her. We could get it running in like 30 minutes.
+
+KOFI: I'll mention it to her.
+
+[pause]
+
+JORDAN: Cool. I'll send a note in the calendar invite.
+
+[00:09:04]
+JORDAN: On the NPS side — we sent a survey in October and got four responses. The average came in at 7.25, which is in the passive-to-promoter range. Mostly positive. I did notice one respondent mentioned evaluating the tool stack. Just wanted to flag that — was there a broader evaluation happening?
+
+KOFI: [3.1 second pause] I'm not sure what that's referring to specifically. Taiwo does some of that strategic planning and I'm not always looped in. [pause] I wouldn't read too much into it, I think it was probably just general language.
+
+JORDAN: Totally. And if there's ever context on that side of things I should be aware of, I'm always happy to be a resource. We have a lot of clients going through tool consolidations right now and there are usually good answers for how Veridian fits.
+
+KOFI: Sure. I'll keep that in mind.
+
+[pause]
+
+[note from Jordan: he didn't say "we're not evaluating anything" or "no, that's not a concern." he said he didn't know and Taiwo handles it. that's not a no. — JK]
+
+[00:14:38]
+JORDAN: Any asks for us heading into Q1? Anything you wish we did better or differently?
+
+KOFI: [pause] Honestly, no. Things are working well for the stuff we're using it for. I guess if Rosa ends up doing more with the cohort piece there might be some enablement questions but nothing off the top of my head.
+
+MEERA: [first time speaking] Yeah, same. I just use the reports, I don't really have anything.
+
+JORDAN: That's good to hear. If things come up, you know where I am.
+
+KOFI: Definitely.
+
+[00:17:02]
+JORDAN: So looking ahead — contract renewal is June 1. I know that feels far out but I like to start conversations early so it's never a scramble. Can we plan for a touch point around March to review the state of things?
+
+KOFI: March, yeah. Should be fine.
+
+JORDAN: Do you want Taiwo looped into that one? Given the renewal side of it.
+
+KOFI: [pause] Yeah, probably. I can check with her.
+
+JORDAN: That'd be great. I'll send a placeholder — you can move it whenever.
+
+KOFI: Sounds good.
+
+[00:19:22]
+JORDAN: Okay, I don't want to take up all your time. One last thing — is there anything you want from us in the next few weeks? Office hours, training, any new features on your radar?
+
+KOFI: [pause] Not right now. Things are pretty quiet on our end. We'll just keep using it and reach out if anything comes up.
+
+JORDAN: Perfect. That's what I'm here for.
+
+KOFI: Thanks Jordan.
+
+MEERA: Thanks.
+
+JORDAN: Great to see you both. I'll send over a summary and the placeholder for March.
+
+[call ends 00:31:44 — 31:44 actual vs 45 min scheduled]
+
+---
+POST-CALL NOTE — Jordan Kim — Jan 14, 2026
+
+I've been trying to figure out what's bothering me about this call.
+
+Kofi was perfectly pleasant. No friction, no complaints. But I'm going back through my notes from the onboarding and the September check-in and comparing them to today, and the difference is stark.
+
+September: "things are going well," and when I asked what he was using it for, he mentioned two specific workflows. Today: "things are working well for the stuff we're using it for." That's technically the same sentence but it isn't.
+
+The questions he didn't ask:
+- No questions about the product roadmap
+- No questions about the Snowflake integration (which he was excited about at onboarding)
+- No "is there a better way to do X" — the kind of question you ask when you're actively using something and want to get more out of it
+- No "what's new" — usually customers at least ask
+
+The cohort module situation: I brought it up and he said "Rosa set that up." That's delegation language. That's "I've handed this to someone else and I'm not tracking it." The original success criteria at onboarding was "cohort module in production use by end of Q3." I marked it complete. It's clearly not in production use.
+
+Taiwo not showing up is also a thing. I invited her because this was a renewal-adjacent QBR. She didn't come and Kofi's explanation was "she had something come up." No reschedule offer. No "I'll catch her up."
+
+The NPS comment about tool stack evaluation: Kofi's response was "I'm not sure, Taiwo handles that." That's not a reassurance. That's an honest answer that could mean anything.
+
+I don't know if this is mid-contract disengagement or something more serious. But I'm moving this from "watch" to "at risk" internally and I'm going to make sure the March touch point includes Taiwo or I'm going to ask Kofi to facilitate an intro before then.
+
+This account needs more than a pleasant CSM.

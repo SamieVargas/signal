@@ -1,0 +1,95 @@
+VERIDIAN INTERNAL SLACK EXPORT
+Channel: #csm-west-accounts
+Export range: November 12 — December 15, 2025
+Account filter: Apex Consulting (VRD-00441)
+Exported by: Jordan Kim (CS Ops)
+
+[All messages are internal Veridian team only]
+========================================================
+
+[Nov 12, 2025 — 4:44 PM]
+jamie.reyes: okay finished the apex MBR. need to process this somewhere
+jamie.reyes: on paper it was totally fine. pleasantly fine. they were nice, engaged, no complaints, no issues
+jamie.reyes: but i left feeling weird about it and i can't shake it
+jamie.reyes: marcus used to be the kind of guy who had specific things to say. like in Q3 he cited a specific deliverable where they used veridian and saved 6 hours. today i asked about wins and he said "the team uses it when we use it"
+jamie.reyes: that's... not the same thing
+
+[Nov 12, 2025 — 4:51 PM]
+nadia.okonkwo: oof. "when we use it" is doing a lot of work in that sentence
+jamie.reyes: exactly
+jamie.reyes: and dev did the attribution v2 demo and it was good! like genuinely a strong demo. and they were all just... polite about it. nobody asked "can we try this" or "how do we set this up." just "good demo, thanks"
+jamie.reyes: in q3 marcus was asking whether it worked retroactively on historical cohorts. that's an engaged question. today he asked what the export format was. that's a different person
+nadia.okonkwo: what's your read on priya
+jamie.reyes: she was almost completely silent during the dev section. she's always been the operator not the buyer so that's not totally surprising but she also didn't add anything when marcus was talking either
+jamie.reyes: like she'd confirm things he said ("yeah we've been heads down") but no original contributions
+
+[Nov 12, 2025 — 5:02 PM]
+jordan.kim: has marcus's role at apex changed at all? did he mention anything about the org?
+jamie.reyes: no. he mentioned they finished a big deliverable for a banking client and the team was "coming up for air." sounded normal
+jamie.reyes: but you're making me think i should check linkedin
+jamie.reyes: [5 min gap]
+jamie.reyes: checked. nothing obvious. same title, same company. no recent activity on the feed
+jordan.kim: probably nothing then. might just be q4
+
+[Nov 12, 2025 — 5:09 PM]
+jamie.reyes: yeah maybe. i'm going to send the january hold and see if he engages
+jamie.reyes: if it takes more than 3 days to confirm i'll know something's off
+
+[Nov 19, 2025 — 11:22 AM]
+jamie.reyes: okay so the jan hold
+jamie.reyes: sent it nov 13. marcus replied nov 14, one line: "looks good" and accepted
+jamie.reyes: which... is fine? but he didn't add anything. no "looking forward to it" or "by then i'll have the export api answer" or anything
+jamie.reyes: in october when i scheduled the november hold he wrote back two paragraphs lol
+nadia.okonkwo: reply time was fast though, 1 day
+jamie.reyes: yeah. fast but minimal
+nadia.okonkwo: could just be busy
+jamie.reyes: could be
+
+[Nov 20, 2025 — 9:48 AM]
+jamie.reyes: sent the attribution v2 use case doc to tom per dev's promise
+jamie.reyes: tom responded same day: "thanks"
+jamie.reyes: two letters
+nadia.okonkwo: 😬
+jamie.reyes: i know
+jamie.reyes: i wrote back and asked if he wanted to set up a quick 20 min to walk through it together
+jamie.reyes: [waiting]
+
+[Nov 26, 2025 — 2:14 PM]
+jamie.reyes: tom never responded to the 20-min offer
+jamie.reyes: it's been 6 days including the holiday so i'm going to give it until end of month
+nadia.okonkwo: flagging for myself — if tom doesn't respond do you loop priya or go back to marcus?
+jamie.reyes: good question. probably marcus directly. tom's not the economic buyer, just want to make sure the adoption piece is moving
+jamie.reyes: will update
+
+[Dec 2, 2025 — 10:33 AM]
+jamie.reyes: sent marcus a year-end check in
+jamie.reyes: covered: looker beta (still not engaged), attribution v2 (tom hasn't touched it), export api (still open), and confirmed january qbr
+jamie.reyes: kept it light. no pressure. just staying visible
+jamie.reyes: [waiting]
+
+[Dec 8, 2025 — 3:17 PM]
+jamie.reyes: marcus has not responded to the dec 2 email
+jamie.reyes: it has been 6 days
+jamie.reyes: in october/september he was same-day or next-day on everything
+nadia.okonkwo: how many business days is that
+jamie.reyes: 4 business days
+nadia.okonkwo: still within normal range but yeah the baseline changed
+jamie.reyes: this is the thing i don't know how to write in a health note. "response latency increased" is technically true but the number (4 days) sounds fine. it's the pattern that doesn't sound fine
+nadia.okonkwo: can you put a note in the account that says "response time trending longer, baseline was same-day in Q3"?
+jamie.reyes: yes. doing that now
+jamie.reyes: i hate when the signal is this soft
+
+[Dec 15, 2025 — 1:05 PM]
+jamie.reyes: marcus responded to the dec 2 email today. 13 days later
+jamie.reyes: he said: "Hey Jamie — sorry for the delay, things have been hectic. See you in January. —M"
+jamie.reyes: that's it
+nadia.okonkwo: no content
+jamie.reyes: no content
+jamie.reyes: and he signed it "M" not "Marcus" which is somehow the detail that's bothering me most
+jamie.reyes: like. a year ago he was writing "really excited about the looker connector, let me know when dev is ready" 
+jamie.reyes: now it's "see you in january. M."
+nadia.okonkwo: i believe you that something is different. i just don't know what it is yet
+jamie.reyes: me either
+jamie.reyes: pulling the account up now to update the health note. officially calling this a relationship watch. not red. but watching.
+========================================================
+END OF EXPORT

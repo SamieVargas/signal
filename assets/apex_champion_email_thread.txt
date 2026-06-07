@@ -1,0 +1,107 @@
+EXPORTED EMAIL THREAD — APEX CONSULTING // MARCUS WEBB
+Export source: Veridian CRM (Salesforce integration)
+Account ID: VRD-00441 | Export date: Feb 3, 2026
+========================================================
+
+--- EMAIL 1 ---
+From: Jamie Reyes <j.reyes@veridian.io>
+To: Marcus Webb <m.webb@apexconsulting.com>
+Date: October 14, 2025 — 10:02 AM
+Subject: Attribution v2 + Looker beta — next steps from QBR
+
+Hi Marcus,
+
+Really great session last week — your team is one of the sharpest groups we work with, and the board deck callout was genuinely exciting to hear.
+
+Two quick follow-ups:
+1. Dev is adding you to the Looker connector beta cohort now. You'll get a direct ping from him with access timeline.
+2. Attaching the Attribution v2 use case doc we discussed. Tom should be able to get a session or two in before end of month — happy to schedule a quick enablement call if useful.
+
+On the Data Export API — totally understand if the timing isn't right for Q4. Worth a 20-min call in November to see if the math works for your team?
+
+Marcus Webb <m.webb@apexconsulting.com>
+October 14, 2025 — 10:47 AM
+
+Jamie — great recap. Yes to all of this. Let me know when Dev's ping comes through. On the Export API — November works, maybe week of the 17th? I can check availability. Attribution doc received, forwarding to Tom and Priya now.
+
+— Marcus
+
+--- EMAIL 2 ---
+From: Jamie Reyes <j.reyes@veridian.io>
+To: Marcus Webb <m.webb@apexconsulting.com>
+Date: November 4, 2025 — 9:18 AM
+Subject: RE: Data Export API — week of Nov 17?
+
+Marcus,
+
+Week of the 17th is perfect — does Tuesday the 18th at 2pm CT work?
+
+Also, would love to get your read on the Attribution v2 rollout once Tom has had a chance to dig in. Any early impressions?
+
+Marcus Webb <m.webb@apexconsulting.com>
+November 7, 2025 — 3:34 PM
+
+Tuesday the 18th works. Cal invite welcome.
+
+Tom mentioned he's been slammed but plans to get to it. I'll nudge him.
+
+--- EMAIL 3 ---
+From: Jamie Reyes <j.reyes@veridian.io>
+To: Marcus Webb <m.webb@apexconsulting.com>
+Date: November 17, 2025 — 8:45 AM
+Subject: RE: Data Export API — confirming tomorrow 2pm CT
+
+Hi Marcus — just confirming our call tomorrow at 2pm. Sending the agenda now, should be a light 20 min.
+
+[No reply received]
+
+--- EMAIL 4 ---
+From: Jamie Reyes <j.reyes@veridian.io>
+To: Marcus Webb <m.webb@apexconsulting.com>
+Date: November 19, 2025 — 2:12 PM
+Subject: RE: Data Export API — missed you today, easy to reschedule
+
+Hi Marcus,
+
+No worries at all on today — know Q4 is always packed. Easy to reschedule, just reply with a week that works and I'll find a slot.
+
+[No reply received]
+
+--- EMAIL 5 ---
+From: Jamie Reyes <j.reyes@veridian.io>
+To: Marcus Webb <m.webb@apexconsulting.com>
+Date: December 2, 2025 — 10:30 AM
+Subject: Checking in — Apex account / any questions heading into year-end
+
+Marcus,
+
+Wanted to do a quick check-in as we head into year-end. A few things on my radar:
+- Looker beta access — Dev confirms your account is provisioned and ready whenever you want to kick the tires
+- Attribution v2 — happy to set up an enablement session with Tom at any point
+- Export API — still here if the timing ever makes sense
+
+No urgency on any of this, just wanted to make sure you had everything you need. Also want to confirm the right person to loop for the Q4 QBR — happy to schedule whenever works for your team.
+
+[No reply received]
+
+--- EMAIL 6 ---
+From: Jamie Reyes <j.reyes@veridian.io>
+To: Marcus Webb <m.webb@apexconsulting.com>
+Date: January 22, 2026 — 9:55 AM
+Subject: Apex — Q1 check-in and renewal preview
+
+Hi Marcus,
+
+Hope the new year is off to a good start. I know Priya covered for you at the Q4 QBR — hope things have settled down a bit since then.
+
+Wanted to reconnect directly before we get too deep into Q1. I have a few things I'd love your input on, including some early renewal framing for August. Would a 20-minute call in the next two weeks work?
+
+[No reply received as of February 3, 2026]
+
+========================================================
+CRM NOTE — Jamie Reyes — Feb 3, 2026
+LinkedIn profile check: Marcus Webb added "Head of Analytics, Thornfield Group" on approx. Jan 6, 2026. Apex Consulting listed as concurrent/present. Unknown if this is a full departure, dual role, or consulting arrangement.
+
+No internal champion replacement identified at Apex. No introduction made by Marcus to any successor. Priya is operational but is not the economic buyer and has not shown awareness of renewal timeline.
+
+This is a relationship gap dressed as a champion loss. The account is structurally exposed.

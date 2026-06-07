@@ -1,0 +1,52 @@
+VERIDIAN SUPPORT — CALL TRANSCRIPT
+Ticket ID: SUP-29441
+Date: January 20, 2026
+Duration: 28 minutes
+Agent: Tyler Wren (Tier 2 Support)
+Customer: Bernard Osei, Senior Analyst — Decker & Lowe
+Account ID: VRD-00312 | CSM: Nadia Okonkwo
+Issue category: Data export / Recurring report failure
+Resolution status: Resolved (workaround provided)
+
+========================================================
+[TRANSCRIPT — partial, condensed from call recording]
+========================================================
+
+TYLER: Thanks for calling in, Bernard. I can see you submitted a ticket earlier today about the recurring report export. Can you walk me through what you're seeing?
+
+BERNARD: Yeah, so the weekly delivery that's supposed to go out every Monday morning — it's been failing silently for three weeks. I only realized because a colleague asked me about the numbers and I went to check and the report just… wasn't there. No email, no error message, nothing in the notification log.
+
+TYLER: Got it. And this is the Monday morning delivery to the client distribution list?
+
+BERNARD: Yeah. It's the one that goes to three external emails — it's a client-facing export, so this is kind of a big deal. I had to manually pull and send it twice already.
+
+TYLER: Understood. I'm looking at your account settings now. It looks like the scheduled delivery task is still configured correctly on our end, but I'm seeing a couple of failed delivery attempts logged in the background — it just wasn't surfacing an error in the UI. This is a known issue with our email delivery integration when the recipient domain has strict DMARC policies. I'll flag it for our deliverability team.
+
+BERNARD: Okay but — can I just say something? This kind of thing is why I've been a little frustrated lately. This isn't the first time something's failed silently. The API rate limit thing in November was the same deal — we just suddenly stopped getting data in a pipeline and had no idea until we checked manually. For a tool that's supposed to be our source of truth, we really can't have things failing with no alert.
+
+TYLER: That's completely fair feedback, and I hear you. I'll make sure both of those are documented as product feedback for the team.
+
+BERNARD: I appreciate that. I just want to flag — I'm going out on leave in about two weeks and Wren's going to be picking up all my reports. She's already stretched. If there are any other landmines like this I should know about before I go, I'd really like to surface them now.
+
+TYLER: That's a really good point. Is Wren familiar with the recurring report setup?
+
+BERNARD: She built most of the dashboards, so she knows the tool better than anyone. But the recurring deliveries and the API pipeline are more my domain. I haven't had time to fully brief her.
+
+TYLER: Okay. What I can do right now is walk you through the workaround — we can add a CC address to your account email so you get a delivery receipt whenever the report fires. That way if it fails again, you'll know immediately. For the longer term, I'd recommend looping your CSM to make sure there's a handoff plan with Wren before you go out.
+
+BERNARD: Yeah, that makes sense. Can you send me the steps on the workaround in writing? I want to document it for Wren.
+
+TYLER: Absolutely, I'll send that to your email right after the call.
+
+BERNARD: Thanks. And honestly, I hope this feedback makes it to someone who can prioritize the alerting piece. It's the kind of thing that sounds minor until it's not.
+
+TYLER: Noted, and agreed. I'll flag it as a high-priority product feedback item. Is there anything else I can help with today?
+
+BERNARD: No, that's it. Appreciate you.
+
+========================================================
+POST-CALL NOTE — Tyler Wren — Jan 20, 2026
+Email sent with workaround documentation. Flagged feedback on silent failures to product team. Tagged CSM Nadia Okonkwo on account for handoff awareness.
+
+CSM NOTE — Nadia Okonkwo — Jan 22, 2026
+Saw Tyler's flag. Emailed Bernard to set up a 30-min knowledge transfer call before his leave. No response received as of Feb 3. Bernard's out-of-office is now active as of Feb 1.

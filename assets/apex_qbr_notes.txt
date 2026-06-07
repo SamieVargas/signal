@@ -1,0 +1,103 @@
+VERIDIAN — CUSTOMER SUCCESS
+QBR NOTES // APEX CONSULTING
+Account Owner: Jamie Reyes | CSM
+Segment: Enterprise | ARR: $214,000 | Contract End: Aug 14, 2026
+
+[NOTE: these are working notes, not cleaned up — JR]
+
+=============================================================
+Q3 QBR — October 9, 2025
+Attendees (Apex): Marcus Webb (VP Strategy & Analytics), Priya Nair (Director, Research Operations), Tom Gillis (Senior Analyst)
+Attendees (Veridian): Jamie Reyes (CSM), Dev Patel (Solutions Engineer)
+Format: Zoom, 60 min scheduled / ran ~65 min
+=============================================================
+
+PREP
+Marcus is our guy. Has quoted Veridian internally to his CPO — "finally gave us a single source of truth" (his words, from the intro call). Priya runs day-to-day. Tom does most of the dashboard work. All three should be on. Dev joining to cover Attribution v2 rollout.
+
+--- meeting notes ---
+
+Started 2 min late, Marcus was already in the room waiting. Good sign.
+
+Marcus opened immediately — said his team used Veridian in a board prep deck last quarter and it "landed really well." Specific callout: cohort analysis module saved ~6 hours per reporting cycle. Unprompted. That's the kind of thing you want to hear.
+
+Dev did a live demo of Attribution v2 — Marcus and Tom both asked several questions (Marcus: "does this work retroactively on historical cohorts?" Dev: yes with caveats — Marcus nodded, seemed satisfied. Tom: "can I export this layer to our BI tool?" — noted for follow up). Energy in the room was good throughout.
+
+Priya flagged she wants to onboard 2 new analysts in Q4 pending headcount approval. Took note.
+
+Raised the Data Export API add-on ($18K/yr). Marcus said he'd "take it to the team" — didn't shut it down, felt genuine. Body language / tone: interested but noncommittal, which is normal at this stage.
+
+Renewal: didn't raise explicitly, Aug 2026 is far out. Flagged internally as low risk. Will revisit Q2.
+
+Action items:
+- Dev: add Marcus to Looker connector beta list ✓ (done same day)
+- Jamie: send Attribution v2 feature guide
+- Jamie: f/u on Export API in ~4 weeks
+- Priya: send headcount / seat count for Q4 onboarding
+
+RISK: None. Greenfield. Marcus is locked in.
+
+post-call note to self: this is what a good account looks like. remember this for the Q4 notes lol
+
+=============================================================
+Q4 QBR — January 14, 2026
+Attendees (Apex): Priya Nair (Director, Research Operations), Tom Gillis (Senior Analyst)
+Attendees (Veridian): Jamie Reyes (CSM)
+Format: Zoom, 45 min scheduled
+=============================================================
+
+PREP
+Marcus declined — EA said conflict, will reschedule. Priya stepping in to cover. Data Export API still open (no response to Dec 2 f/u). Usage pull from Dec 15 shows seat util at 71%, down from 87%. No onboarding request for Q4. Tried Dev re: Looker beta — Marcus is on the list but hasn't engaged. Going into this one with some questions.
+
+--- meeting notes ---
+
+Priya joined 8 min late, apologized, said she "got pulled into something." Tom had camera off. Didn't ask him to turn it on.
+
+[note to self: camera off thing is probably nothing but worth noting — Q3 everyone was cameras on the whole time]
+
+Ran through Q4 usage metrics. Priya acknowledged the seat drop — "we had a busy quarter, some people weren't logging in as much." Tone was flat, not defensive, just... matter-of-fact. She didn't ask any follow-up questions about which users dropped off or why. Q3 Marcus would have asked.
+
+Asked about Looker connector. Priya: "I'm not sure where that stands on our end, I can check with Marcus." No indication she knew he was already on the beta list. Something is off about the internal communication here.
+
+Attribution v2 adoption: only 2 of 9 active users have touched it per usage data. Raised this. Tom said he'd "been meaning to explore it but hadn't gotten to it." Priya didn't add anything. Asked if there was a timeline — Tom: "not really, just when I get a chance." 
+
+[I didn't push. should have pushed.]
+
+Export API: did not reopen it. Priya said budget conversations "are happening right now" and it wasn't the right time. I nodded and moved on.
+
+Renewal: mentioned casually toward the end. Priya: "August is a ways off, we'll cross that when we get there." Neutral tone. Not warm. Not the energy from Q3 at all.
+
+Closed out by asking if there was anything they needed from us. Priya: "not right now, things are fine." 
+
+Wrapped up about 12 min early. No one suggested rescheduling or mentioned anything for the next touchpoint.
+
+Action items:
+- Jamie: f/u with Marcus directly re: Looker beta
+- Jamie: schedule Attribution v2 enablement with Tom
+- Jamie: send renewal timeline doc to Priya
+  [internal note: do NOT loop Marcus until I know what's going on with his status]
+
+RISK: Medium. Flagging. Champion absent, no warmth from Priya, usage still soft, no expansion movement. Will try Marcus directly.
+
+=============================================================
+INTERNAL NOTE — Jamie Reyes — Feb 3, 2026
+=============================================================
+
+Tried Marcus directly:
+- LinkedIn message Jan 28 → no reply
+- Email Jan 22 → no reply
+- EA responded to Dec meeting reschedule confirmation, then went quiet
+
+Checked LinkedIn today. Marcus Webb has a new role listed: "Head of Analytics, Thornfield Group" — added ~Jan 6. Apex still listed as present but the new role came first in the layout. He may already be out or in transition. No introduction made. No handoff.
+
+Don't know who (if anyone) picked up his remit at Apex. Priya hasn't mentioned it.
+
+Current state as of Feb 3:
+- Health score: 68 (amber)
+- Seat util: 69% (Feb 1 pull)
+- Attribution v2 adoption: 2/9
+- Tom: no response to enablement session outreach (sent Jan 20)
+- Economic buyer: unknown / unreachable
+- Renewal: Aug 14, 61 days
+
+This account is not fine.

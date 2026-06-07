@@ -1,0 +1,10 @@
+export_date,user_email,user_name,department,role,seat_type,account_start_date,last_login,sessions_30d,sessions_60d,sessions_90d,features_used_30d,features_used_60d,features_used_90d,dashboards_built,reports_run_30d,api_calls_30d,notes
+2026-02-03,w.nakamura@decker-lowe.com,Wren Nakamura,Strategy & Planning,Principal Analyst,Full,2023-11-01,2026-02-02,48,94,141,8,9,9,22,61,840,PRIMARY POWER USER — builds all shared dashboards; trainer for rest of team
+2026-02-03,b.osei@decker-lowe.com,Bernard Osei,Strategy & Planning,Senior Analyst,Full,2023-11-01,2026-02-02,34,67,99,7,8,9,8,44,210,CO-POWER USER — runs all recurring reports; went on medical leave Feb 1
+2026-02-03,f.marchetti@decker-lowe.com,Francesca Marchetti,Research Operations,Analyst,Full,2024-01-15,2026-01-28,29,54,80,6,7,8,4,31,120,CO-POWER USER — primary for client-facing exports; sole user of Export API
+2026-02-03,d.kim@decker-lowe.com,Daniel Kim,Research Operations,Associate Analyst,Full,2024-06-01,2026-01-04,4,9,18,2,3,4,0,5,0,Occasional user — runs pre-built reports only
+2026-02-03,a.yusuf@decker-lowe.com,Amara Yusuf,Client Services,Associate Analyst,Full,2024-06-01,2025-12-14,1,3,7,1,2,3,0,1,0,Light user — logged in for one report in last 30 days
+2026-02-03,p.grant@decker-lowe.com,Petra Grant,Client Services,Associate Analyst,Full,2024-06-01,2025-11-30,0,1,4,0,1,2,0,0,0,Dormant — hasn't logged in in 65 days
+2026-02-03,s.tamura@decker-lowe.com,Sasha Tamura,Executive Office,VP Strategy,Full,2023-11-01,2025-12-22,0,0,2,0,0,1,0,0,0,Exec seat — never active; receives automated weekly summary only
+2026-02-03,r.bishop@decker-lowe.com,Roland Bishop,Finance,Finance Director,Full,2024-03-01,2025-11-08,0,0,1,0,0,1,0,0,0,Finance observer — provisioned for budget review access only
+2026-02-03,c.volkov@decker-lowe.com,Clara Volkov,Strategy & Planning,Junior Analyst,Full,2025-03-15,2025-10-19,0,0,0,0,0,0,0,0,0,Never fully onboarded — Wren was supposed to train; didn't happen before Clara's role changed

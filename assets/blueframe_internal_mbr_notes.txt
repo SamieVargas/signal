@@ -1,0 +1,84 @@
+VERIDIAN INTERNAL MBR NOTES
+Account: Blueframe Health (VRD-00388)
+CSM: Jordan Kim
+MBR Date: January 21, 2026
+Format: Internal team review, no customer present
+Attendees: Jordan Kim (CSM), Sam Morales (CS Manager), Dev Patel (Solutions Eng — 10 min)
+
+[working notes — not polished — JK]
+========================================================
+
+ACCOUNT SUMMARY GOING IN
+
+- ARR: $319K, renewal June 1
+- Seat util: 39.5% (most recent pull Jan 19) — was 89% in August
+- Cohort module: basically dead. 2-3 sessions/week, was 40+/week in August
+- Open cases: 0
+- NPS: 7.25 (Oct, 4 responses) — one verbatim mentioned "evaluating tool stack"
+- Last exec contact: Taiwo Okonkwo = never. She's the VP/buyer and I have never spoken to her.
+- Health score in system: 61 Red, but CRM still shows "Healthy" in the highlights bar bc I haven't updated it yet [note to self: fix this today — JK]
+
+=====
+
+SAM'S QUESTIONS / MY ANSWERS
+
+Sam: When did you first notice the usage drop?
+
+JK: Honestly — the data goes back to early September but I didn't pull a feature-level breakdown until November. The 90-day check-in in September was a surface-level call. Kofi said "going well," I didn't dig deeper. I marked it green. That was a miss.
+
+Sam: Why didn't you catch the cohort module gap at onboarding?
+
+JK: Rosa said she'd self-onboard. She's technically capable. I took her at her word and closed the success criteria without validating it. At the time it felt reasonable — she's a strong engineer. Looking back: shouldn't have closed it without a verification step. 
+
+Sam: Is the "tool stack evaluation" comment from NPS something to escalate?
+
+JK: I raised it at the QBR with Kofi and he said he wasn't sure what it was referring to, Taiwo handles that. He didn't say "we're not evaluating" — just that he wasn't in the loop. That's... not the same thing.
+
+Sam: What does Kofi actually think of the tool?
+
+JK: [pause] I think he likes it. I don't think he's actively planning to leave. But I also think it's become furniture. Like — it's there, they use it for the reports, and it's not causing problems, so it doesn't get thought about. That's the danger. We didn't become essential. We became ambient.
+
+Sam: What's your biggest fear for this account?
+
+JK: That Taiwo does a tool stack review, looks at usage data, and makes a budget decision based on what she actually sees — 39% utilization, one module in active use, nobody advocating loudly for renewal. And we never got in front of her.
+
+=====
+
+DEV PATEL — JOINED FOR 10 MIN
+
+Dev reviewed API usage data. Rosa's Snowflake integration is actually still running cleanly — 180-200 API calls per week, consistent. Which means Rosa is getting value through the pipeline even though she's not logging in to the UI. Her value realization looks different from a logins perspective.
+
+Dev flagged: "if you're evaluating whether to keep Veridian, the Snowflake integration is probably the stickiest thing we have with this account. if they renew and eventually expand, that's the thread to pull."
+
+[this changes the conversation with Rosa — she's not disengaged, she's using it differently. need to reframe her as an advocate, not a gap. — JK]
+
+Dev left at ~10 min.
+
+=====
+
+AGREED ACTIONS
+
+1. Jordan: Update health score in CRM from "Healthy" to "At Risk" today
+2. Jordan: Reach out to Kofi to request a direct intro to Taiwo before March
+   - Frame: "We want to make sure you have exec-level support as we approach renewal"
+   - Do not mention tool stack evaluation conversation — keep light
+3. Jordan: Reach out to Rosa separately about the Snowflake integration
+   - Frame: "Saw the API is running great — would love to understand how it's become part of your workflow and whether there's more we can do"
+   - Goal: get a quote or use case we can use in the renewal conversation
+4. Jordan: Request March QBR include Taiwo — non-negotiable
+5. Sam: Flag this account for CS leadership review in Q1 pipeline call
+
+RISK RATING: HIGH (internal). Renewal at risk if Taiwo engagement doesn't happen in 60 days.
+
+=====
+
+SAM POST-MEETING NOTE (added to shared doc):
+
+Jordan — good work surfacing this. The "ambient tool" framing is exactly right and worth writing up somewhere. The silence isn't health. The account isn't about to churn loudly — it's about to churn quietly, by a VP deciding the ROI isn't there during a budget review we never got invited to.
+
+The Rosa angle Dev flagged is interesting. If she's getting real value through the API and would say so, that's a different renewal story than "usage is low." Worth developing before March.
+
+Let's revisit in 2 weeks.
+— SM
+========================================================
+END OF NOTES
