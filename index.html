@@ -459,6 +459,26 @@
     .data-gap-list { margin: 0; padding-left: 18px; }
     .data-gap-list li { font-size: 13px; color: var(--ink); margin-bottom: 4px; }
 
+    /* W1 — live latency. The wait is the demonstration, so the number
+       has to be a real measurement rather than a ramp. */
+    .w1 { margin-bottom: 18px; }
+    .w1__head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 11px; }
+    .w1__label { font: 400 10px ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+    .w1__elapsed { font: 500 13px ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--accent); font-variant-numeric: tabular-nums; }
+    .w1__bars { display: flex; flex-direction: column; gap: 7px; }
+    .w1__bar {
+      height: 9px; border-radius: 2px;
+      background: linear-gradient(90deg, #f4f1e8 0%, #e6e1d1 50%, #f4f1e8 100%);
+      background-size: 260px 100%;
+      animation: w1shimmer 1.1s linear infinite;
+    }
+    .w1__bar:nth-child(1) { width: 100%; animation-delay: 0s; }
+    .w1__bar:nth-child(2) { width: 86%; animation-delay: .15s; }
+    .w1__bar:nth-child(3) { width: 64%; animation-delay: .3s; }
+    @keyframes w1shimmer { from { background-position: -260px 0; } to { background-position: 260px 0; } }
+    .w1__stage { margin-top: 11px; font: 400 10px ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--muted); }
+    @media (prefers-reduced-motion: reduce) { .w1__bar { animation: none; } }
+
     /* §4d skeleton loader */
     .skeleton { display: flex; flex-direction: column; gap: 14px; }
     .skel-row { display: flex; gap: 14px; }
@@ -1447,6 +1467,11 @@ Priorities: ${(b.leverage_points || []).map(l => l.what).join(' | ')}`.trim();
       const spinner = '<span class="dots"><span></span><span></span><span></span></span>';
       btn.innerHTML = spinner + ' Summarizing sources…';
       showSkeleton(); // §4d
+      w1Begin();
+      // A count we actually have at request time, rather than a token
+      // estimate we would be inventing.
+      const srcCount = (currentAccount.files || []).length + allDocs.length;
+      w1Stage(`sending ${srcCount} source${srcCount === 1 ? '' : 's'}`);
 
       // Demo accounts carry real source files: fetch them. Text/CSV go through
       // the Haiku summary pass; PNG/PDF are attached to the Sonnet call as
@@ -1475,6 +1500,7 @@ Priorities: ${(b.leverage_points || []).map(l => l.what).join(' | ')}`.trim();
       // Pass 1: summarize each text doc with Haiku, then build context.
       const context = await buildSummarizedContext(textDocs);
       btn.innerHTML = spinner + ' Analyzing…';
+      w1Stage('model responding');
       const contactsText = (currentAccount.contacts || [])
         .map(c => `${c.name}${c.title ? ' (' + c.title + ')' : ''}${c.style ? ': ' + c.style : ''}`)
         .join('\n') || 'Not specified';
@@ -1543,6 +1569,7 @@ Return exactly this JSON (respect the FOCUS instruction — leave non-focused se
         if (data.stop_reason === 'max_tokens') {
           throw new Error('the analysis response was cut off at the token limit — too much source content. Remove a document or trim pasted text, then re-analyze.');
         }
+        w1Stage('writing the read');
         const clean = raw.replace(/```json|```/g, '').trim();
         let brief;
         try {
@@ -1552,9 +1579,13 @@ Return exactly this JSON (respect the FOCUS instruction — leave non-focused se
         }
         brief._context = context;            // full summaries, kept for reference
         analysisCache[cacheKey] = brief;     // cache for re-analysis this session
+        const took = w1End();
         applyBrief(brief);
+        const stamp = document.getElementById('b-last-analyzed');
+        if (stamp) stamp.textContent += ' · took ' + took.toFixed(1) + 's';
       } catch(e) {
-        showToast('Analysis failed: ' + e.message);
+        const took = w1End();
+        showToast('Analysis failed after ' + took.toFixed(1) + 's: ' + e.message);
         if (!briefData) document.getElementById('brief').classList.add('hidden'); // clear skeleton
         btn.disabled = false;
         btn.classList.remove('analyzing');
@@ -1599,6 +1630,40 @@ Return exactly this JSON (respect the FOCUS instruction — leave non-focused se
       }).catch(() => showToast('Copy failed — browser blocked clipboard access.'));
     }
 
+    // ── W1 ── The elapsed figure is a real measurement taken from
+    // performance.now() at request start and ticked every 60ms, never a
+    // scripted ramp. The stage line advances on the run's actual phase
+    // changes rather than on time thresholds, because the code already
+    // knows which pass it is in and a guess would be worse.
+    let w1Start = 0;
+    let w1Timer = null;
+
+    function w1Begin() {
+      w1Start = performance.now();
+      clearInterval(w1Timer);
+      w1Timer = setInterval(() => {
+        const el = document.getElementById('w1-elapsed');
+        if (el) el.textContent = w1Elapsed().toFixed(1) + 's';
+      }, 60);
+    }
+
+    function w1Elapsed() {
+      return w1Start ? (performance.now() - w1Start) / 1000 : 0;
+    }
+
+    function w1Stage(text) {
+      const el = document.getElementById('w1-stage');
+      if (el) el.textContent = text;
+    }
+
+    // Returns the final figure so the caller can keep it on screen: a
+    // number that stops meaning anything the moment the panel forgets it.
+    function w1End() {
+      clearInterval(w1Timer);
+      w1Timer = null;
+      return w1Elapsed();
+    }
+
     // §4d — skeleton placeholder shown while analysis runs.
     function showSkeleton() {
       const brief = document.getElementById('brief');
@@ -1608,6 +1673,14 @@ Return exactly this JSON (respect the FOCUS instruction — leave non-focused se
       document.getElementById('brief-sources').innerHTML = '';
       document.querySelector('#brief .chat-section').style.display = 'none';
       document.getElementById('brief-sections').innerHTML = `
+        <div class="w1">
+          <div class="w1__head">
+            <span class="w1__label">Signal</span>
+            <span class="w1__elapsed" id="w1-elapsed">0.0s</span>
+          </div>
+          <div class="w1__bars"><div class="w1__bar"></div><div class="w1__bar"></div><div class="w1__bar"></div></div>
+          <p class="w1__stage" id="w1-stage"></p>
+        </div>
         <div class="skeleton">
           <div class="skel-block skel-wide"></div>
           <div class="skel-row"><div class="skel-block skel-half"></div><div class="skel-block skel-half"></div></div>
