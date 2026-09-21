@@ -77,6 +77,12 @@ async function handleRequest(request) {
   if (typeof body.system === 'string') {
     payload.system = body.system
   }
+  // Native structured outputs: forward only output_config.format, and only a
+  // json_schema format. Anything else in output_config is dropped.
+  const fmt = body.output_config && body.output_config.format
+  if (fmt && fmt.type === 'json_schema' && fmt.schema && typeof fmt.schema === 'object') {
+    payload.output_config = { format: { type: 'json_schema', schema: fmt.schema } }
+  }
 
   // Forward to Anthropic
   const anthropicResp = await fetch('https://api.anthropic.com/v1/messages', {
