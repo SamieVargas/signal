@@ -57,7 +57,10 @@ FOCUS_INSTRUCTIONS = {
         "return one leverage point. Keep situation to two sentences."
     ),
 }
-FOCUS_MAX_TOKENS = {"full": 1500, "revenue": 900, "relationship": 1100, "precall": 900}
+# Output budgets per mode, mirrored from the browser app. The full brief
+# with section_sources, secondary_contacts, and data_gaps runs 2,000-3,000
+# tokens of JSON; 1,500 truncates it mid-object on every account.
+FOCUS_MAX_TOKENS = {"full": 4000, "revenue": 2200, "relationship": 2600, "precall": 2000}
 
 # ── Prompt 1: per-doc summarization ──
 SUMMARIZE_PROMPT = """You are analyzing one document from a customer account file.
