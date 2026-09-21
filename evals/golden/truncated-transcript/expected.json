@@ -1,0 +1,12 @@
+{
+  "risk_types": [
+    "Reduced footprint",
+    "Adoption failure"
+  ],
+  "economic_buyer": "Hannah Lee",
+  "must_cite_sources": [
+    "Call transcript"
+  ],
+  "data_gaps_expected": true,
+  "notes": "The transcript runs long past the truncation cap. Everything that matters is in the last two minutes: the team shrank from twelve to four, two of four use it, and the buyer wants the starter tier. Front/back truncation keeps that; a middle-only read would miss it."
+}

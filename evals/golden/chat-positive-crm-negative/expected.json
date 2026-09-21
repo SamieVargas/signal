@@ -1,0 +1,12 @@
+{
+  "risk_types": [
+    "Sentiment mismatch"
+  ],
+  "economic_buyer": "Dana Whitlock",
+  "must_cite_sources": [
+    "CRM notes",
+    "Slack thread"
+  ],
+  "data_gaps_expected": true,
+  "notes": "The Slack channel is glowing. The AE's CRM notes record the CFO asking for termination terms and procurement issuing an RFP that names a competitor. A read that only sees the chat says Healthy; the primary source says otherwise."
+}

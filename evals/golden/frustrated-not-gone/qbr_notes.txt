@@ -1,0 +1,7 @@
+Redfern Publishing — Q3 2026 QBR (2026-08-05)
+Attendees: Leon Baptiste (CTO, budget owner), Maya Singh (Managing Editor), CSM, AE
+- Two-year renewal signed 2026-07-28. Leon: "The product is the right product. The support is not."
+- Usage: 44 of 45 seats active. Editors use it daily.
+- Open issue: scheduled export corruption (ticket 4471). Leon wants root cause.
+- Maya: "When it works it's the best part of our stack."
+- Leon asked for a named technical contact. AE to arrange.

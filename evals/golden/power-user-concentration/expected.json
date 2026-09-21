@@ -1,0 +1,12 @@
+{
+  "risk_types": [
+    "Power user concentration"
+  ],
+  "economic_buyer": "Astrid Halvorsen",
+  "must_cite_sources": [
+    "CSV data",
+    "Internal notes"
+  ],
+  "data_gaps_expected": true,
+  "notes": "Total usage looks healthy in aggregate. One user, Dayo Okafor, is 212 of 243 logins, and he starts parental leave in October. The account is one person deep."
+}

@@ -1,0 +1,11 @@
+{
+  "risk_types": [
+    "Silent decay"
+  ],
+  "economic_buyer": "Ibrahim Hassan",
+  "must_cite_sources": [
+    "CSV data"
+  ],
+  "data_gaps_expected": true,
+  "notes": "No tickets, no complaints, no meetings declined. Weekly active users have fallen from 41 to 15 over twelve weeks (chart and CSV agree). The absence of noise is the signal."
+}

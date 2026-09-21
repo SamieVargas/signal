@@ -1,0 +1,7 @@
+Meridian Retail — August 2026 MBR (held 2026-08-12, before Sam's news)
+Attendees: Sam Ortiz (Director, Store Ops — champion), Grace Okonkwo (SVP Operations — budget owner, attended for the first 15 minutes), CSM
+- Usage: 210 store managers active weekly of 240 licensed.
+- Grace: "Sam has made this work. Keep doing what you're doing." Left for another meeting.
+- Sam walked through the shrink-alert thresholds he tuned by region; he owns the config personally.
+- Renewal 120 days out; Sam expected it to be "a formality."
+- No open escalations.

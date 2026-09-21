@@ -1,0 +1,3 @@
+CRM notes — Ashgrove Robotics
+2026-05-10  Reorg announced at Ashgrove; platform team reduced. Hannah Lee still owns the budget.
+2026-08-21  Monthly call held (transcript attached). Hannah raised a tier downgrade at the end. Raj Patel (Staff Engineer) confirmed only two active users.
