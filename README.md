@@ -107,18 +107,98 @@ python signal_cli.py --account "Koala" --docs ./tests/mock_docs/ --no-chat
 ## Project layout
 
 ```
-signal_cli.py     # CLI entry — argparse, orchestration, rich output, --dry-run
-ingest.py         # file reading, type detection, smart truncation
+signal_cli.py     # CLI entry — argparse, orchestration, rich output, --dry-run, --contract
+ingest.py         # file reading, type detection, smart truncation, PNG/PDF -> content blocks
 summarize.py      # Call 1: per-doc summarization
-analyze.py        # Call 2: synthesis -> structured JSON brief
+analyze.py        # Call 2: synthesis -> structured JSON brief, prompt or native contract
+schema.py         # the brief as a JSON Schema, built from the prompt's constants
+dryrun.py         # token estimates shared by the CLI and the eval runner
 chat.py           # interactive follow-up loop
-prompts.py        # all prompt templates
+prompts.py        # all prompt templates + the contract constants
 config.py         # model, token limits, client setup
 tests/            # mock_docs/ + offline pipeline test (no API key needed)
+evals/            # golden set, runner, results (see Evals below)
 ```
 
 ## Tests
 
 ```bash
-python tests/test_pipeline.py     # offline, uses a stub client
+python tests/test_pipeline.py     # offline, uses a stub client: pipeline, both contracts, parse paths
+python evals/test_run.py          # offline: scoring functions and one stubbed golden case
+```
+
+## Evals
+
+The stub-client test checks plumbing. This measures output quality.
+
+**Golden set.** `evals/golden/` holds thirteen synthetic accounts, each with
+its documents in the formats the app accepts (three include a PNG chart or a
+PDF deck) and a hand-written `expected.json`: the risk types from the
+taxonomy, the economic buyer's name, the source labels the brief must cite,
+and whether data gaps are expected. The labels were written before any
+pipeline run on these files, so they are not anchored on the model's output.
+The set was built to include the cases that separate a good read from a
+plausible one: the most-mentioned contact is not the buyer, chat is positive
+while the CRM notes are not, no real risk at all, and a transcript long
+enough to truncate with the signal at the end.
+
+**Runner.** `evals/run.py` reuses the CLI's ingest, summarize, and analyze
+functions, so a score is a score for the real pipeline.
+
+```bash
+python evals/run.py --dry-run                      # token estimate per case, no API calls
+python evals/run.py                                # full mode, prompt contract, weighted prompt
+python evals/run.py --contract native              # same set, native structured outputs
+python evals/run.py --arm unweighted --runs 20     # one arm of the ablation
+python evals/run.py --mode revenue                 # any focus mode
+```
+
+Per case it scores risk-type recall (the primary metric) and precision,
+economic-buyer accuracy (the labeled name inside the brief's primary
+contact, whitespace and case normalized), attribution coverage (every
+required source label appears somewhere in `section_sources`), data gaps
+present when expected, the parse path (`native`, `recovered_by_parser`, or
+`failed`), and tokens and latency for the analysis call. Results go to
+`evals/results/<date>-<mode>-<contract>-<arm>.md` with the raw briefs beside
+them as JSON. A failed parse, or an empty brief on a case with expected
+risks, is a hard fail and exits 1.
+
+**Two contracts.** `--contract prompt` is the original: the JSON shape is
+described in the prompt and a tolerant parser strips fences and prose.
+`--contract native` sends the same shape as a JSON Schema through the API's
+structured outputs (`output_config.format`, no beta header), with the schema
+built from the same constants as the prompt so they cannot drift. The parser
+stays as the fallback under both contracts because a constrained response
+still has ways to disappoint: the model can hit `max_tokens` mid-object, a
+proxy between the app and the API can drop the parameter, and an older
+model in the allowlist may not honour it. Recording which path handled each
+reply is how the two contracts are compared, and how a silent regression
+would show up.
+
+**Ablation.** `--arm unweighted` removes the source-weighting block from the
+analysis prompt (no ranking of decks and CRM notes over chat, no
+economic-buyer-over-most-mentioned rule) and changes nothing else. Twenty
+runs per arm on the same set. The case built to separate the arms is
+`most-mentioned-not-buyer`; if it does not, that is the finding.
+
+**Results.** Not yet run. The runs below need an `ANTHROPIC_API_KEY`; from
+the dry-run figures, one full pass is roughly 15k Haiku input tokens for the
+summaries plus at most 30k Sonnet input tokens and around 20k output tokens
+for the analyses, on the order of half a dollar. The two contract passes and
+the forty ablation passes together are in the low tens of dollars.
+
+| Run | Risk recall | Risk precision | Buyer accuracy | Attribution | Parse native / recovered / failed |
+| --- | --- | --- | --- | --- | --- |
+| prompt contract, weighted | pending | pending | pending | pending | pending |
+| native contract, weighted | pending | pending | pending | pending | pending |
+| ablation arm A, weighted, 20 runs | pending | pending | pending | pending | pending |
+| ablation arm B, unweighted, 20 runs | pending | pending | pending | pending | pending |
+
+Fill the table from the four results files:
+
+```bash
+python evals/run.py --contract prompt
+python evals/run.py --contract native
+python evals/run.py --contract native --arm weighted --runs 20
+python evals/run.py --contract native --arm unweighted --runs 20
 ```
