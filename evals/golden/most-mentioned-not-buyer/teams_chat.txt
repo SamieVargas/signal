@@ -1,0 +1,18 @@
+[Teams · #lumen-signal-support · Aug 2026]
+Priya Nair 09:02  morning! the Monday export ran clean, thanks for the fix on Friday
+Priya Nair 09:14  q: can I bulk-edit the carrier tags or is that one at a time still?
+CSM 09:20  one at a time today, bulk edit is on the roadmap for Q4
+Priya Nair 09:21  ok noted, I'll script it on my side for now
+Priya Nair 11:40  another one: the lane report is off by one day for anything after DST. screenshot attached
+CSM 11:52  got it, filing now
+Priya Nair 14:03  ty!! honestly the tool has made my mornings so much easier
+Priya Nair 14:04  also I showed the dashboard to two of the dispatchers and they want logins
+CSM 14:10  great, send me their emails and I'll provision
+Priya Nair 16:30  sent. also heads up I'm out next week, Tomas is covering the exports
+Priya Nair 16:31  he has never used it so be gentle lol
+Tomas Reyes 16:45  hi, I'm the backup
+Priya Nair 16:46  ^ he's great
+Priya Nair (Thu) 08:55  small thing: the invoice PDF has our old logo
+Priya Nair (Thu) 08:56  not urgent
+Priya Nair (Fri) 10:12  weekly numbers look right this time, sending to Marcus's team now
+Priya Nair (Fri) 10:13  he never replies but I send them anyway

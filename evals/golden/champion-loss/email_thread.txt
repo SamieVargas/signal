@@ -1,0 +1,22 @@
+Subject: Some news
+From: Sam Ortiz
+To: CSM
+Date: 2026-08-18
+
+Wanted you to hear it from me: I've accepted a role at another company and my last day is September 5. Grace knows. She hasn't decided who takes over the store ops tooling yet; it might be Jordan from the regional team, or she might fold it into Ines's group.
+
+I'll do a handover doc. Honestly the thing I worry about is that nobody else here knows why we set the alert thresholds the way we did.
+
+Thanks for everything on this. It's been a good two years.
+
+Sam
+
+-----
+From: CSM
+Date: 2026-08-18
+Sam — congratulations, and thank you for telling me directly. Can we get 30 minutes with Grace before you go so the handover isn't just a doc?
+
+-----
+From: Sam Ortiz
+Date: 2026-08-19
+I'll ask. Her calendar is brutal until the earnings call.

@@ -1,0 +1,7 @@
+#oakhurst-shared · Aug 2026
+kevin.tran: hey, the portfolio view is showing last quarter's benchmark, is that expected?
+csm: not expected, checking
+kevin.tran: no rush, I just paste it into the deck anyway
+kevin.tran: also is there a way to export to the format Miriam's EA uses? she keeps asking me to reformat
+csm: send me an example and I'll see
+kevin.tran: will do. she doesn't log in herself fyi, I just send her screenshots

@@ -1,0 +1,20 @@
+Subject: RE: RE: RE: Export corruption — third time
+From: Leon Baptiste
+To: CSM; Support
+Date: 2026-08-24
+
+This is the third time in five weeks the scheduled export has produced a corrupted file, and the second time your support team has told me to "clear the cache." I run engineering here. I know what a cache is.
+
+We just signed a two-year renewal on the strength of your roadmap. I am not walking away from that. But I need a named engineer on this, a root cause in writing, and a date. Not a ticket number.
+
+Leon
+
+-----
+From: Support
+Date: 2026-08-23
+Hi Leon, sorry to hear that. Could you try clearing your browser cache and re-running the export?
+
+-----
+From: Leon Baptiste
+Date: 2026-08-22
+Corrupted again. Attached. This is getting embarrassing when my editors ask.

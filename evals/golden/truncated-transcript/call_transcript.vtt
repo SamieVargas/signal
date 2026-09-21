@@ -1,0 +1,202 @@
+WEBVTT
+
+00:00:01.000 --> 00:00:09.000
+Hannah Lee: Thanks for making time. We have a lot on the list today, so let's move through it.
+
+00:00:09.000 --> 00:00:15.000
+CSM: Sounds good. I have the roadmap items and the usage review at the end.
+
+00:00:15.000 --> 00:00:23.000
+Hannah Lee: Next up is the new SSO rollout and which identity provider the security team prefers. Where are we on that?
+
+00:00:23.000 --> 00:00:31.000
+CSM: On the new SSO rollout, the short version is it is in progress and I will send the details after the call.
+
+00:00:31.000 --> 00:00:39.000
+Raj Patel: From the engineering side, the new SSO rollout is fine as long as it does not change the integration.
+
+00:00:39.000 --> 00:00:47.000
+Hannah Lee: Okay. Let's keep moving.
+
+00:00:47.000 --> 00:00:55.000
+CSM: Noted, I will put it in the follow-up.
+
+00:00:55.000 --> 00:01:03.000
+Hannah Lee: Next up is whether the weekly digest email should go out Monday or Tuesday. Where are we on that?
+
+00:01:03.000 --> 00:01:11.000
+CSM: On whether the weekly digest email should go out Monday or Tuesday, the short version is it is in progress and I will send the details after the call.
+
+00:01:11.000 --> 00:01:19.000
+Raj Patel: From the engineering side, whether the weekly digest email should go out Monday or Tuesday is fine as long as it does not change the integration.
+
+00:01:19.000 --> 00:01:27.000
+Hannah Lee: Okay. Let's keep moving.
+
+00:01:27.000 --> 00:01:35.000
+CSM: Noted, I will put it in the follow-up.
+
+00:01:35.000 --> 00:01:43.000
+Hannah Lee: Next up is the colour of the status badges, which two engineers found hard to tell apart. Where are we on that?
+
+00:01:43.000 --> 00:01:51.000
+CSM: On the colour of the status badges, which two engineers found hard to tell apart, the short version is it is in progress and I will send the details after the call.
+
+00:01:51.000 --> 00:01:59.000
+Raj Patel: From the engineering side, the colour of the status badges, which two engineers found hard to tell apart is fine as long as it does not change the integration.
+
+00:01:59.000 --> 00:02:07.000
+Hannah Lee: Okay. Let's keep moving.
+
+00:02:07.000 --> 00:02:15.000
+CSM: Noted, I will put it in the follow-up.
+
+00:02:15.000 --> 00:02:23.000
+Hannah Lee: Next up is how the API rate limit interacts with their nightly batch job. Where are we on that?
+
+00:02:23.000 --> 00:02:31.000
+CSM: On how the API rate limit interacts with their nightly batch job, the short version is it is in progress and I will send the details after the call.
+
+00:02:31.000 --> 00:02:39.000
+Raj Patel: From the engineering side, how the API rate limit interacts with their nightly batch job is fine as long as it does not change the integration.
+
+00:02:39.000 --> 00:02:47.000
+Hannah Lee: Okay. Let's keep moving.
+
+00:02:47.000 --> 00:02:55.000
+CSM: Noted, I will put it in the follow-up.
+
+00:02:55.000 --> 00:03:03.000
+Hannah Lee: Next up is the upcoming holiday schedule and who covers on-call. Where are we on that?
+
+00:03:03.000 --> 00:03:11.000
+CSM: On the upcoming holiday schedule, the short version is it is in progress and I will send the details after the call.
+
+00:03:11.000 --> 00:03:19.000
+Raj Patel: From the engineering side, the upcoming holiday schedule is fine as long as it does not change the integration.
+
+00:03:19.000 --> 00:03:27.000
+Hannah Lee: Okay. Let's keep moving.
+
+00:03:27.000 --> 00:03:35.000
+CSM: Noted, I will put it in the follow-up.
+
+00:03:35.000 --> 00:03:43.000
+Hannah Lee: Next up is a comparison of the CSV export against their old spreadsheet columns. Where are we on that?
+
+00:03:43.000 --> 00:03:51.000
+CSM: On a comparison of the CSV export against their old spreadsheet columns, the short version is it is in progress and I will send the details after the call.
+
+00:03:51.000 --> 00:03:59.000
+Raj Patel: From the engineering side, a comparison of the CSV export against their old spreadsheet columns is fine as long as it does not change the integration.
+
+00:03:59.000 --> 00:04:07.000
+Hannah Lee: Okay. Let's keep moving.
+
+00:04:07.000 --> 00:04:15.000
+CSM: Noted, I will put it in the follow-up.
+
+00:04:15.000 --> 00:04:23.000
+Hannah Lee: Next up is a request to rename 'workspace' to 'project' in the UI. Where are we on that?
+
+00:04:23.000 --> 00:04:31.000
+CSM: On a request to rename 'workspace' to 'project' in the UI, the short version is it is in progress and I will send the details after the call.
+
+00:04:31.000 --> 00:04:39.000
+Raj Patel: From the engineering side, a request to rename 'workspace' to 'project' in the UI is fine as long as it does not change the integration.
+
+00:04:39.000 --> 00:04:47.000
+Hannah Lee: Okay. Let's keep moving.
+
+00:04:47.000 --> 00:04:55.000
+CSM: Noted, I will put it in the follow-up.
+
+00:04:55.000 --> 00:05:03.000
+Hannah Lee: Next up is the audit log retention period and whether 90 days is enough for compliance. Where are we on that?
+
+00:05:03.000 --> 00:05:11.000
+CSM: On the audit log retention period, the short version is it is in progress and I will send the details after the call.
+
+00:05:11.000 --> 00:05:19.000
+Raj Patel: From the engineering side, the audit log retention period is fine as long as it does not change the integration.
+
+00:05:19.000 --> 00:05:27.000
+Hannah Lee: Okay. Let's keep moving.
+
+00:05:27.000 --> 00:05:35.000
+CSM: Noted, I will put it in the follow-up.
+
+00:05:35.000 --> 00:05:43.000
+Hannah Lee: Next up is whether the mobile view is worth enabling for the field technicians. Where are we on that?
+
+00:05:43.000 --> 00:05:51.000
+CSM: On whether the mobile view is worth enabling for the field technicians, the short version is it is in progress and I will send the details after the call.
+
+00:05:51.000 --> 00:05:59.000
+Raj Patel: From the engineering side, whether the mobile view is worth enabling for the field technicians is fine as long as it does not change the integration.
+
+00:05:59.000 --> 00:06:07.000
+Hannah Lee: Okay. Let's keep moving.
+
+00:06:07.000 --> 00:06:15.000
+CSM: Noted, I will put it in the follow-up.
+
+00:06:15.000 --> 00:06:23.000
+Hannah Lee: Next up is a walkthrough of the new alert threshold settings. Where are we on that?
+
+00:06:23.000 --> 00:06:31.000
+CSM: On a walkthrough of the new alert threshold settings, the short version is it is in progress and I will send the details after the call.
+
+00:06:31.000 --> 00:06:39.000
+Raj Patel: From the engineering side, a walkthrough of the new alert threshold settings is fine as long as it does not change the integration.
+
+00:06:39.000 --> 00:06:47.000
+Hannah Lee: Okay. Let's keep moving.
+
+00:06:47.000 --> 00:06:55.000
+CSM: Noted, I will put it in the follow-up.
+
+00:06:55.000 --> 00:07:03.000
+Hannah Lee: Next up is the timeline for the webhook feature and which events it would cover. Where are we on that?
+
+00:07:03.000 --> 00:07:11.000
+CSM: On the timeline for the webhook feature, the short version is it is in progress and I will send the details after the call.
+
+00:07:11.000 --> 00:07:19.000
+Raj Patel: From the engineering side, the timeline for the webhook feature is fine as long as it does not change the integration.
+
+00:07:19.000 --> 00:07:27.000
+Hannah Lee: Okay. Let's keep moving.
+
+00:07:27.000 --> 00:07:35.000
+CSM: Noted, I will put it in the follow-up.
+
+00:07:35.000 --> 00:07:43.000
+Hannah Lee: Next up is whether their Slack integration should post to one channel or many. Where are we on that?
+
+00:07:43.000 --> 00:07:51.000
+CSM: On whether their Slack integration should post to one channel or many, the short version is it is in progress and I will send the details after the call.
+
+00:07:51.000 --> 00:07:59.000
+Raj Patel: From the engineering side, whether their Slack integration should post to one channel or many is fine as long as it does not change the integration.
+
+00:07:59.000 --> 00:08:07.000
+Hannah Lee: Okay. Let's keep moving.
+
+00:08:07.000 --> 00:08:15.000
+CSM: Noted, I will put it in the follow-up.
+
+00:08:15.000 --> 00:08:25.000
+Hannah Lee: Before we close, I want to be straight with you about something. When we bought this we had twelve engineers on the platform team. After the reorg it is four. Two of them use the product daily. The other two went back to spreadsheets and I have not had the energy to fight it.
+
+00:08:25.000 --> 00:08:33.000
+CSM: I appreciate you telling me. What would make it worth fighting for?
+
+00:08:33.000 --> 00:08:45.000
+Hannah Lee: Honestly, I am not sure it is a fight I want to have this year. I would like to talk about moving to the starter tier at renewal. Fewer seats, fewer features, and we keep the two people who actually use it. I own the budget line, so this is my call, but I want to do it cleanly rather than just letting it lapse.
+
+00:08:45.000 --> 00:08:51.000
+Raj Patel: For the record, the two of us who use it would keep using it. It is the onboarding that never happened for the others.
+
+00:08:51.000 --> 00:08:57.000
+CSM: Understood. I will come back with a starter-tier proposal and an onboarding plan for the other two, and you can choose.

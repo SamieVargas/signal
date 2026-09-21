@@ -801,6 +801,30 @@
     // Risk taxonomy — defined once, referenced in the analysis prompt.
     const RISK_TYPES = 'Champion loss, Silent decay, Power user concentration, Frustrated not gone, Stalled expansion, Adoption failure, Sentiment mismatch, Relationship gap, Reduced footprint, Vibe risk, Healthy, Unknown';
 
+    // The brief as a JSON Schema, built from the same RISK_TYPES string the
+    // prompt uses, so the two cannot drift. Mirrors schema.py in the CLI.
+    function analysisSchema() {
+      const str = { type: 'string' };
+      const strList = { type: 'array', items: { type: 'string' } };
+      const obj = (props) => ({ type: 'object', properties: props, required: Object.keys(props), additionalProperties: false });
+      const riskTypes = RISK_TYPES.split(',').map(s => s.trim()).filter(Boolean);
+      return obj({
+        situation: str,
+        risk_type: { type: 'string', enum: riskTypes },
+        risk_severity: { type: 'string', enum: ['high', 'medium', 'low', 'unknown'] },
+        data_sources_detected: strList,
+        leverage_points: { type: 'array', items: obj({ rank: { type: 'integer' }, what: str, why: str, timeline: str }) },
+        do_this_today: str,
+        contact_persona: obj({ primary_contact: str, comm_style: str, decision_style: str, what_they_say_vs_mean: str, approach_recommendation: str }),
+        secondary_contacts: { type: 'array', items: obj({ name_title: str, note: str }) },
+        section_sources: obj({ situation: strList, contact_read: strList, where_to_press: strList, do_this_today: strList }),
+        data_gaps: strList,
+        confidence: { type: 'string', enum: ['high', 'medium', 'low'] },
+        confidence_note: str,
+        suggested_questions: strList,
+      });
+    }
+
     // Analysis focus modes — constrain what the model generates (and cut tokens).
     const FOCUS_INSTRUCTIONS = {
       full:         'Generate the complete account brief — fill every section.',
@@ -811,6 +835,10 @@
     const FOCUS_MAX_TOKENS = { full: 4000, revenue: 2200, relationship: 2600, precall: 2000 };
     const FOCUS_LABELS = { full: 'Full Brief', revenue: 'Revenue Risk', relationship: 'Relationship Read', precall: 'Pre-Call' };
     let focusMode = 'full';
+    // How the analysis JSON shape is enforced: 'prompt' (described in the
+    // prompt, tolerant parser) or 'native' (JSON Schema via output_config,
+    // tolerant parser kept as the fallback). Flag: ?contract=native
+    const CONTRACT = new URLSearchParams(location.search).get('contract') === 'native' ? 'native' : 'prompt';
 
     // Demo assets are fetched at runtime. Relative path = same-origin on GitHub
     // Pages (no CORS). Switch to a raw.githubusercontent URL if assets move.
@@ -1561,7 +1589,8 @@ Return exactly this JSON (respect the FOCUS instruction — leave non-focused se
         const data = await postToWorker({
           model: MODELS.analysis,
           max_tokens: FOCUS_MAX_TOKENS[focusMode] || 4000,
-          messages: [{ role: 'user', content: analysisContent }]
+          messages: [{ role: 'user', content: analysisContent }],
+          ...(CONTRACT === 'native' ? { output_config: { format: { type: 'json_schema', schema: analysisSchema() } } } : {})
         });
         const raw = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
         // If the model hit the output cap, the JSON is truncated — say so clearly
@@ -1570,13 +1599,27 @@ Return exactly this JSON (respect the FOCUS instruction — leave non-focused se
           throw new Error('the analysis response was cut off at the token limit — too much source content. Remove a document or trim pasted text, then re-analyze.');
         }
         w1Stage('writing the read');
-        const clean = raw.replace(/```json|```/g, '').trim();
-        let brief;
+        // Two parse paths, and we record which one handled the reply: 'native'
+        // when the raw text is JSON as-is, 'recovered_by_parser' when fences
+        // or prose had to be stripped. Under the native contract the second
+        // path should never fire; if it does, that is worth knowing.
+        let brief, parsePath = 'native';
         try {
-          brief = JSON.parse(clean);
-        } catch (pe) {
-          throw new Error('the model returned incomplete JSON (likely cut off). Try fewer or shorter documents.');
+          brief = JSON.parse(raw);
+        } catch (first) {
+          parsePath = 'recovered_by_parser';
+          const clean = raw.replace(/```json|```/g, '').trim();
+          const start = clean.indexOf('{'), end = clean.lastIndexOf('}');
+          try {
+            brief = JSON.parse(start !== -1 && end > start ? clean.slice(start, end + 1) : clean);
+          } catch (pe) {
+            console.warn('[signal] parse failed', { contract: CONTRACT, parsePath: 'failed', raw: raw.slice(0, 200) });
+            throw new Error('the model returned incomplete JSON (likely cut off). Try fewer or shorter documents.');
+          }
         }
+        console.info('[signal] analysis parsed', { contract: CONTRACT, parsePath, stop_reason: data.stop_reason, usage: data.usage });
+        if (CONTRACT === 'native' && parsePath !== 'native') showToast('Native contract reply needed the fallback parser.');
+        brief._parse = { contract: CONTRACT, path: parsePath };
         brief._context = context;            // full summaries, kept for reference
         analysisCache[cacheKey] = brief;     // cache for re-analysis this session
         const took = w1End();

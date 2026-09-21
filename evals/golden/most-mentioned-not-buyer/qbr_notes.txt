@@ -1,0 +1,18 @@
+Lumen Freight — Q2 2026 QBR notes (12 June 2026)
+Attendees: CSM, AE, Priya Nair (Platform Admin), Derek Malone (Ops Analyst, standing in for Marcus Chen)
+Absent: Marcus Chen, VP Operations (economic buyer, contract signatory) — second consecutive QBR missed; calendar conflict cited
+
+Agenda
+1. Usage: 18 of 25 seats active weekly. Dispatcher adoption up since April.
+2. Value: Priya estimates 6 hours/week saved on manual lane reconciliation.
+3. Roadmap: bulk edit, DST fix, carrier scorecards.
+4. Renewal: 71 days out at time of writing. Derek: "Marcus is looking at all vendor lines for the FY27 budget. I don't know where we land."
+
+Discussion
+- Derek did not have authority to discuss the renewal and said so.
+- Priya asked for two more dispatcher seats. Derek said to hold until Marcus reviews the budget.
+- Derek mentioned in passing that Marcus has been "asking what the platform actually replaces" and that the weekly report Priya sends "goes into a folder."
+
+Actions
+- CSM to request a 30-minute call with Marcus directly (third attempt). Owner: CSM.
+- AE to prepare a one-page value summary aimed at Marcus, not at Priya.
