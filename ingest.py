@@ -1,9 +1,13 @@
 """Document ingestion: read files, detect type, smart-truncate.
 
 Ported from the JS `detectType()` logic, with front/back truncation added.
+PNG and PDF files are not read as text; `read_media` turns them into the
+image and document content blocks the analysis call attaches alongside the
+summaries, the same way the browser app does.
 """
 from __future__ import annotations
 
+import base64
 from pathlib import Path
 
 from config import MAX_DOC_TOKENS, CHARS_PER_TOKEN
@@ -32,6 +36,14 @@ EXTENSION_LABELS = {
     ".tsv": "CSV data",
     ".json": "JSON data",
     ".vtt": "Call transcript",
+}
+
+# Binary files the analysis call can take as content blocks.
+MEDIA_TYPES = {
+    ".png": ("image", "image/png"),
+    ".jpg": ("image", "image/jpeg"),
+    ".jpeg": ("image", "image/jpeg"),
+    ".pdf": ("document", "application/pdf"),
 }
 
 # Extensions we'll attempt to read as text. Files with any other non-empty
@@ -130,3 +142,36 @@ def make_doc(name: str, content: str) -> dict:
         "raw": content,
         "content": smart_truncate(content),
     }
+
+
+def read_media(docs_dir: str) -> list[dict]:
+    """Read PNG/JPEG/PDF files in a directory into Messages API content blocks.
+
+    Returns [{"type": "image"|"document", "source": {...base64...}}, ...] in
+    filename order, plus a `_name` key the CLI and the eval runner use for
+    display; strip it before sending if the client rejects unknown keys.
+    """
+    path = Path(docs_dir)
+    blocks: list[dict] = []
+    if not path.is_dir():
+        return blocks
+    for fp in sorted(path.iterdir()):
+        kind = MEDIA_TYPES.get(fp.suffix.lower())
+        if not fp.is_file() or not kind:
+            continue
+        block_type, media_type = kind
+        data = base64.b64encode(fp.read_bytes()).decode("ascii")
+        blocks.append({
+            "type": block_type,
+            "source": {"type": "base64", "media_type": media_type, "data": data},
+        })
+    return blocks
+
+
+def media_names(docs_dir: str) -> list[str]:
+    """Filenames `read_media` would attach, for display and dry runs."""
+    path = Path(docs_dir)
+    if not path.is_dir():
+        return []
+    return [fp.name for fp in sorted(path.iterdir())
+            if fp.is_file() and fp.suffix.lower() in MEDIA_TYPES]

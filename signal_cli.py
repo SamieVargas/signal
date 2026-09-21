@@ -27,10 +27,11 @@ from rich.panel import Panel
 from rich.table import Table
 
 import config
-from ingest import read_docs, make_doc, estimate_tokens
-from prompts import SUMMARIZE_PROMPT
+from ingest import read_docs, make_doc, read_media, media_names
 from summarize import summarize_all
-from analyze import build_analysis_prompt, analyze
+from analyze import build_analysis_prompt, analyze_brief, ParseFailure, CONTRACTS
+from prompts import FOCUS_INSTRUCTIONS
+import dryrun
 from chat import chat_loop
 
 console = Console()
@@ -53,64 +54,40 @@ def gather_docs(args) -> list[dict]:
 
 def dry_run(docs, args) -> None:
     """Show what would be sent to the API — no calls made."""
+    est = dryrun.estimate(docs, args.account, args.contact, args.renewal, args.arr,
+                          mode=args.mode)
     table = Table(title="Call 1 — summarize each document")
     table.add_column("Document", style="bold")
     table.add_column("Type")
     table.add_column("Raw tok", justify="right")
     table.add_column("Truncated tok", justify="right")
     table.add_column("Prompt tok", justify="right")
-
-    call1_total = 0
-    naive_total = 0
-    for d in docs:
-        prompt = SUMMARIZE_PROMPT.format(
-            doc_type=d["type"], doc_name=d["name"], content=d["content"]
-        )
-        ptok = estimate_tokens(prompt)
-        call1_total += ptok
-        naive_total += estimate_tokens(d["raw"])
-        table.add_row(
-            d["name"], d["type"],
-            str(estimate_tokens(d["raw"])),
-            str(estimate_tokens(d["content"])),
-            str(ptok),
-        )
+    for r in est["rows"]:
+        table.add_row(r["name"], r["type"], str(r["raw_tokens"]),
+                      str(r["truncated_tokens"]), str(r["prompt_tokens"]))
     console.print(table)
 
-    # Ceiling for Call 2: summaries are bounded by MAX_SUMMARY_TOKENS each,
-    # regardless of how large the raw docs are. That bound is the whole point.
-    summary_cap = config.MAX_SUMMARY_TOKENS * len(docs)
-    placeholder = "x" * (config.MAX_SUMMARY_TOKENS * config.CHARS_PER_TOKEN)
-    call2_ceiling = estimate_tokens(build_analysis_prompt(
-        args.account, args.contact, args.renewal, args.arr,
-        [{"type": d["type"], "name": d["name"], "summary": placeholder} for d in docs],
-    ))
-
-    # Apples-to-apples "naive" baseline: the same analysis prompt, but with the
-    # full raw docs inlined instead of summaries (what the JS version did).
-    naive_prompt = estimate_tokens(build_analysis_prompt(
-        args.account, args.contact, args.renewal, args.arr,
-        [{"type": d["type"], "name": d["name"], "summary": d["raw"]} for d in docs],
-    ))
+    media = media_names(args.docs) if args.docs else []
+    if media:
+        console.print(f"[dim]Attached to Call 2 as image/document blocks: {', '.join(media)}[/]")
 
     console.print(
-        f"\n[bold]Call 1[/] (summarize) input ≈ [cyan]{call1_total}[/] tok "
+        f"\n[bold]Call 1[/] (summarize) input ≈ [cyan]{est['call1_total']}[/] tok "
         f"across {len(docs)} call(s)"
     )
     console.print(
-        f"[bold]Call 2[/] (analyze) input ≤ [cyan]{call2_ceiling}[/] tok "
-        f"— bounded by ≤{config.MAX_SUMMARY_TOKENS} tok/summary ({summary_cap} tok max total)"
+        f"[bold]Call 2[/] (analyze, {args.contract} contract) input ≤ [cyan]{est['call2_ceiling']}[/] tok "
+        f"— bounded by ≤{config.MAX_SUMMARY_TOKENS} tok/summary ({est['summary_cap']} tok max total)"
     )
     console.print(
         f"\n[bold]Naive single-prompt analysis[/] would inline all raw docs ≈ "
-        f"[yellow]{naive_prompt}[/] tok into the analysis call."
+        f"[yellow]{est['naive_prompt']}[/] tok into the analysis call."
     )
-
-    if naive_prompt > call2_ceiling:
-        pct = (naive_prompt - call2_ceiling) / naive_prompt * 100
+    if est["naive_prompt"] > est["call2_ceiling"]:
+        pct = (est["naive_prompt"] - est["call2_ceiling"]) / est["naive_prompt"] * 100
         console.print(
             f"[green]→ Two-call caps the analysis call ~{pct:.0f}% smaller[/] "
-            f"({naive_prompt} → ≤{call2_ceiling} tok), and the gap grows with doc size."
+            f"({est['naive_prompt']} → ≤{est['call2_ceiling']} tok), and the gap grows with doc size."
         )
     else:
         console.print(
@@ -123,7 +100,7 @@ def dry_run(docs, args) -> None:
 
 
 def render_brief(brief: dict, account: str, renewal_days) -> None:
-    sources = " · ".join(brief.get("data_sources_used") or [])
+    sources = " · ".join(brief.get("data_sources_detected") or brief.get("data_sources_used") or [])
     header = f"[bold]SIGNAL[/]  ·  {account}"
     if renewal_days is not None:
         header += f"  ·  {renewal_days} days to renewal"
@@ -167,6 +144,12 @@ def render_brief(brief: dict, account: str, renewal_days) -> None:
     console.print("\n[bold]DO THIS TODAY[/]")
     console.print(brief.get("do_this_today", "—"))
 
+    gaps = brief.get("data_gaps") or []
+    if gaps:
+        console.print("\n[bold]DATA GAPS[/]")
+        for g in gaps:
+            console.print(f"  • {g}")
+
     qs = brief.get("suggested_questions") or []
     if qs:
         console.print("\n[bold]SUGGESTED QUESTIONS[/]")
@@ -200,6 +183,11 @@ def parse_args(argv=None):
                    help="show what would be sent to the API without calling it")
     p.add_argument("--no-chat", action="store_true",
                    help="skip the interactive chat loop")
+    p.add_argument("--mode", choices=list(FOCUS_INSTRUCTIONS), default="full",
+                   help="analysis focus (default: full)")
+    p.add_argument("--contract", choices=list(CONTRACTS), default="prompt",
+                   help="how the JSON shape is enforced: described in the prompt, "
+                        "or sent as a JSON Schema via the API's structured outputs")
     return p.parse_args(argv)
 
 
@@ -232,12 +220,23 @@ def main(argv=None) -> None:
         summaries = summarize_all(client, docs, on_progress=progress)
         console.print("[dim]Analyzing summaries…[/]")
         prompt = build_analysis_prompt(
-            args.account, args.contact, args.renewal, args.arr, summaries
+            args.account, args.contact, args.renewal, args.arr, summaries, mode=args.mode
         )
-        brief = analyze(client, prompt)
+        media = read_media(args.docs) if args.docs else []
+        if media:
+            console.print(f"[dim]Attaching {len(media)} image/document block(s) to the analysis call[/]")
+        brief, meta = analyze_brief(client, prompt, contract=args.contract, media=media, mode=args.mode)
+    except ParseFailure as e:
+        console.print(f"\n[red]The model's reply was not JSON on either path.[/] First 300 chars:\n{e.raw[:300]}")
+        sys.exit(1)
     except Exception as e:
         console.print(f"\n[red]API call failed:[/] {type(e).__name__}: {e}")
         sys.exit(1)
+
+    console.print(
+        f"[dim]{meta['contract']} contract · parsed via {meta['parse_path']} · "
+        f"{meta['input_tokens']} in / {meta['output_tokens']} out · {meta['latency_ms']} ms[/]"
+    )
 
     console.print("")
     render_brief(brief, args.account, args.renewal)
