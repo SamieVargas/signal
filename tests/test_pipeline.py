@@ -15,7 +15,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import MODELS
 from ingest import read_docs, make_doc, smart_truncate, detect_type
 from summarize import summarize_all
-from analyze import build_analysis_prompt, analyze, extract_json
+from analyze import build_analysis_prompt, analyze, analyze_brief, extract_json, parse_brief, ParseFailure
+from prompts import RISK_TYPES, SOURCE_WEIGHTING
+import schema
 from chat import chat_loop
 
 MOCK_DIR = os.path.join(os.path.dirname(__file__), "mock_docs")
@@ -51,23 +53,27 @@ def _msg(text):
 
 
 class FakeMessages:
-    def __init__(self):
+    def __init__(self, analysis_reply=None):
         self.calls = []
+        # What Call 2 returns; tests swap this to exercise the parse paths.
+        self.analysis_reply = analysis_reply or ("```json\n" + json.dumps(SAMPLE_BRIEF) + "\n```")
 
-    def create(self, model, max_tokens, messages, system=None):
+    def create(self, model, max_tokens, messages, system=None, **kwargs):
         self.calls.append({"model": model, "max_tokens": max_tokens,
-                           "system": system, "messages": messages})
-        user_text = messages[-1]["content"]
+                           "system": system, "messages": messages, **kwargs})
+        content = messages[-1]["content"]
+        # Media requests carry a list of blocks; the prompt is the first text block.
+        user_text = content if isinstance(content, str) else next(b["text"] for b in content if b.get("type") == "text")
         if user_text.lstrip().startswith("You are Signal, an expert CS strategist. Analyze"):
-            return _msg("```json\n" + json.dumps(SAMPLE_BRIEF) + "\n```")  # Call 2 (fenced on purpose)
+            return _msg(self.analysis_reply)                                 # Call 2
         if system is not None:
             return _msg("Here's my read on that.")                          # chat
         return _msg("Tight 3-sentence summary of the doc.")                 # Call 1
 
 
 class FakeClient:
-    def __init__(self):
-        self.messages = FakeMessages()
+    def __init__(self, analysis_reply=None):
+        self.messages = FakeMessages(analysis_reply)
 
 
 def check(name, cond):
@@ -113,6 +119,54 @@ def main():
     check("fenced JSON", extract_json('```json\n{"a": 1}\n```') == {"a": 1})
     check("JSON with surrounding prose",
           extract_json('Sure!\n{"a": 1}\nDone.') == {"a": 1})
+
+    print("contract")
+    check("analysis prompt carries the source-weighting block by default",
+          SOURCE_WEIGHTING.splitlines()[0] in prompt)
+    unweighted = build_analysis_prompt("Koala", "Sarah Chen, VP", 67, 180000, summaries, weighted=False)
+    check("weighted=False drops it and nothing else",
+          SOURCE_WEIGHTING.splitlines()[0] not in unweighted and "SOURCE ATTRIBUTION" in unweighted)
+    check("prompt lists every risk type", all(r in prompt for r in RISK_TYPES))
+    sch = schema.analysis_schema()
+    check("schema risk_type enum is the taxonomy constant", sch["properties"]["risk_type"]["enum"] == RISK_TYPES)
+    check("schema persona fields match the constant",
+          list(sch["properties"]["contact_persona"]["properties"]) == ["primary_contact", "comm_style", "decision_style", "what_they_say_vs_mean", "approach_recommendation"])
+    check("schema is strict at every level", sch["additionalProperties"] is False
+          and sch["properties"]["contact_persona"]["additionalProperties"] is False)
+
+    print("native contract request shape")
+    native_client = FakeClient(analysis_reply=json.dumps(SAMPLE_BRIEF))
+    brief_n, meta_n = analyze_brief(native_client, prompt, contract="native")
+    req = native_client.messages.calls[-1]
+    check("native sends output_config.format.type=json_schema",
+          req.get("output_config", {}).get("format", {}).get("type") == "json_schema")
+    check("native schema in the request is the one schema.py builds",
+          req["output_config"]["format"]["schema"] == sch)
+    check("native reply parsed on the native path", meta_n["parse_path"] == "native" and meta_n["contract"] == "native")
+    check("prompt contract sends no output_config", "output_config" not in client.messages.calls[len(docs)])
+
+    print("parse paths")
+    check("clean JSON -> native", parse_brief('{"a": 1}')[1] == "native")
+    check("fenced JSON -> recovered_by_parser", parse_brief('```json\n{"a": 1}\n```')[1] == "recovered_by_parser")
+    check("prose-wrapped JSON -> recovered_by_parser", parse_brief('Sure!\n{"a": 1}\nDone.')[1] == "recovered_by_parser")
+    fenced_client = FakeClient()  # default reply is fenced on purpose
+    _, meta_f = analyze_brief(fenced_client, prompt, contract="native")
+    check("fallback path is recorded when a native reply still needs recovery", meta_f["parse_path"] == "recovered_by_parser")
+    broken = FakeClient(analysis_reply="I could not produce a brief for this account.")
+    try:
+        analyze_brief(broken, prompt)
+        check("unparseable reply raises ParseFailure", False)
+    except ParseFailure as e:
+        check("unparseable reply raises ParseFailure", True)
+        check("ParseFailure carries meta with parse_path=failed", e.meta["parse_path"] == "failed")
+
+    print("media blocks")
+    media = [{"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": "AAAA"}}]
+    media_client = FakeClient(analysis_reply=json.dumps(SAMPLE_BRIEF))
+    analyze_brief(media_client, prompt, media=media)
+    content = media_client.messages.calls[-1]["messages"][0]["content"]
+    check("prompt becomes the first text block, media follow",
+          isinstance(content, list) and content[0]["type"] == "text" and content[1]["type"] == "image")
 
     print("chat loop (injected io)")
     replies = []
