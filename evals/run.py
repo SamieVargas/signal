@@ -24,6 +24,9 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8", errors="replace")
 sys.path.insert(0, str(ROOT))
 
 import config  # noqa: E402
@@ -49,8 +52,8 @@ def load_cases(golden: Path, only: list[str] | None = None) -> list[dict]:
             continue
         if only and d.name not in only:
             continue
-        expected = json.loads((d / "expected.json").read_text())
-        account = json.loads((d / "account.json").read_text()) if (d / "account.json").exists() else {}
+        expected = json.loads((d / "expected.json").read_text(encoding="utf-8"))
+        account = json.loads((d / "account.json").read_text(encoding="utf-8")) if (d / "account.json").exists() else {}
         unknown = [r for r in expected.get("risk_types", []) if r not in RISK_TYPES]
         if unknown:
             raise ValueError(f"{d.name}: expected.json names risk types outside the taxonomy: {unknown}")
@@ -284,13 +287,14 @@ def main(argv=None, client=None) -> int:
 
     out = Path(args.out); out.mkdir(parents=True, exist_ok=True)
     stem = f"{date.today().isoformat()}-{args.mode}-{args.contract}-{args.arm}"
-    (out / f"{stem}.md").write_text(table)
+    # Explicit UTF-8: Windows defaults to cp1252, which cannot encode the table.
+    (out / f"{stem}.md").write_text(table, encoding="utf-8")
     (out / f"{stem}.json").write_text(json.dumps({
         "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "mode": args.mode, "contract": args.contract, "arm": args.arm, "runs": args.runs,
         "models": config.MODELS, "aggregate": agg,
         "results": [{k: v for k, v in r.items() if k != "brief"} | {"brief": r["brief"]} for r in results],
-    }, indent=2, default=str))
+    }, indent=2, default=str), encoding="utf-8")
     print(f"Wrote {out / (stem + '.md')} and .json")
     if agg["hard_fails"]:
         print(f"HARD FAIL: {agg['hard_fails']} case(s) failed to parse or returned an empty brief with expected risks.",
