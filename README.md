@@ -5,6 +5,10 @@ AI-powered account intelligence for CS teams.
 
 ---
 
+## What it does, and what it does not
+
+Signal is a multi-call pipeline on the Anthropic API with per-role model routing, prompt-contracted JSON output behind a tolerant parser, source-weighted prompting with per-section attribution and a data-gaps list, multimodal document input, a Cloudflare Worker that enforces a model allowlist, a token clamp, and a field whitelist while keeping the key server-side, token dry-runs and a fingerprint cache to control cost, and an offline stub-client test suite that checks the routing, the caps, the parsing, and the chat loop with no API key. The prompt ranks all-hands and CRM sources over chat and picks the economic buyer over the most-mentioned name, and four focus modes swap in different instruction blocks and output budgets so a focused run costs less. Account prep went from about an hour to one minute, validated with early users including a senior CS leader. There is no retrieval step and no scored eval set yet; documents go into the prompt after summarization, and the tests check plumbing rather than output quality.
+
 ## Architecture
 
 ```
