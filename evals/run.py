@@ -142,16 +142,17 @@ def run_case(client, case: dict, *, mode: str, contract: str, weighted: bool) ->
         acct.get("account"), acct.get("contact"), acct.get("renewal_days"), acct.get("arr"),
         summaries, mode=mode, weighted=weighted,
     )
-    brief, meta, error = None, None, None
+    brief, meta, error, raw_head = None, None, None, None
     try:
         brief, meta = analyze_brief(client, prompt, contract=contract, media=media, mode=mode)
     except ParseFailure as e:
         meta = getattr(e, "meta", {"parse_path": "failed"})
         error = str(e)
+        raw_head = (e.raw or "")[:800]  # kept in the JSON so a failure can be diagnosed
     total_ms = round((time.perf_counter() - t0) * 1000)
     scores = score_case(case["expected"], brief)
     return {
-        "case": case["id"], "brief": brief, "meta": meta, "error": error,
+        "case": case["id"], "brief": brief, "meta": meta, "error": error, "raw_head": raw_head,
         "scores": scores, "total_ms": total_ms, "docs": len(docs), "media": len(media),
         "hard_fail": (meta or {}).get("parse_path") == "failed"
                      or (scores["empty"] and bool(case["expected"].get("risk_types"))),

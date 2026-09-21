@@ -48,15 +48,16 @@ def _block(text):
     return SimpleNamespace(type="text", text=text)
 
 
-def _msg(text):
-    return SimpleNamespace(content=[_block(text)])
+def _msg(text, stop_reason="end_turn"):
+    return SimpleNamespace(content=[_block(text)], stop_reason=stop_reason)
 
 
 class FakeMessages:
-    def __init__(self, analysis_reply=None):
+    def __init__(self, analysis_reply=None, stop_reason="end_turn"):
         self.calls = []
         # What Call 2 returns; tests swap this to exercise the parse paths.
         self.analysis_reply = analysis_reply or ("```json\n" + json.dumps(SAMPLE_BRIEF) + "\n```")
+        self.stop_reason = stop_reason
 
     def create(self, model, max_tokens, messages, system=None, **kwargs):
         self.calls.append({"model": model, "max_tokens": max_tokens,
@@ -65,15 +66,15 @@ class FakeMessages:
         # Media requests carry a list of blocks; the prompt is the first text block.
         user_text = content if isinstance(content, str) else next(b["text"] for b in content if b.get("type") == "text")
         if user_text.lstrip().startswith("You are Signal, an expert CS strategist. Analyze"):
-            return _msg(self.analysis_reply)                                 # Call 2
+            return _msg(self.analysis_reply, self.stop_reason)               # Call 2
         if system is not None:
             return _msg("Here's my read on that.")                          # chat
         return _msg("Tight 3-sentence summary of the doc.")                 # Call 1
 
 
 class FakeClient:
-    def __init__(self, analysis_reply=None):
-        self.messages = FakeMessages(analysis_reply)
+    def __init__(self, analysis_reply=None, stop_reason="end_turn"):
+        self.messages = FakeMessages(analysis_reply, stop_reason)
 
 
 def check(name, cond):
@@ -159,6 +160,18 @@ def main():
     except ParseFailure as e:
         check("unparseable reply raises ParseFailure", True)
         check("ParseFailure carries meta with parse_path=failed", e.meta["parse_path"] == "failed")
+
+    print("token cap")
+    check("full mode asks for the browser's 4000-token budget",
+          client.messages.calls[len(docs)]["max_tokens"] == 4000)
+    cut = FakeClient(analysis_reply=json.dumps(SAMPLE_BRIEF)[:200], stop_reason="max_tokens")
+    try:
+        analyze_brief(cut, prompt)
+        check("a max_tokens reply raises ParseFailure", False)
+    except ParseFailure as e:
+        check("a max_tokens reply raises ParseFailure", True)
+        check("and names the token cap as the reason", e.reason == "max_tokens" and "max_tokens=4000" in str(e))
+        check("meta records stop_reason", e.meta["stop_reason"] == "max_tokens" and e.meta["parse_path"] == "failed")
 
     print("media blocks")
     media = [{"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": "AAAA"}}]

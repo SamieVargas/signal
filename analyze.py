@@ -26,9 +26,10 @@ PARSE_PATHS = ("native", "recovered_by_parser", "failed")
 class ParseFailure(ValueError):
     """The response could not be turned into a brief by any path."""
 
-    def __init__(self, raw: str, cause: Exception):
+    def __init__(self, raw: str, cause, *, reason: str = "parse"):
         super().__init__(f"could not parse analysis JSON: {cause}")
         self.raw = raw
+        self.reason = reason  # "parse" or "max_tokens"
 
 
 def format_summaries(summaries: list[dict]) -> str:
@@ -125,6 +126,12 @@ def analyze_brief(client, prompt: str, *, contract: str = "prompt", media=None,
         "output_tokens": _usage(resp, "output_tokens"),
         "latency_ms": latency_ms,
     }
+    # A reply cut off at the output cap is not a parsing problem, and it is
+    # worth naming as what it is, because raising max_tokens is the fix.
+    if meta["stop_reason"] == "max_tokens":
+        e = ParseFailure(raw, f"reply cut off at max_tokens={kwargs['max_tokens']}; raise the budget", reason="max_tokens")
+        e.meta = meta
+        raise e
     try:
         brief, path = parse_brief(raw)
     except ParseFailure as e:

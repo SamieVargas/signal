@@ -10,7 +10,7 @@ except Exception:
 # ── Token limits ──
 MAX_DOC_TOKENS = 1500       # per doc, before summarization
 MAX_SUMMARY_TOKENS = 300    # per-doc summary output
-MAX_ANALYSIS_TOKENS = 1500  # main analysis output
+MAX_ANALYSIS_TOKENS = 4000  # main analysis output (the full brief needs ~2-3k)
 MAX_CHAT_TOKENS = 600       # per chat response
 
 # Rough estimate used for truncation + dry-run token accounting (1 tok ~ 4 chars)
