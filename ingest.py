@@ -28,6 +28,8 @@ FILENAME_PATTERNS = [
     (("teams",), "Teams chat"),
     (("slack",), "Slack thread"),
     (("email",), "Email thread"),
+    (("crm",), "CRM notes"),
+    (("support", "ticket"), "Support tickets"),
     (("notes",), "Internal notes"),
 ]
 
