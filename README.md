@@ -7,7 +7,7 @@ AI-powered account intelligence for CS teams.
 
 ## What it does, and what it does not
 
-Signal is a multi-call pipeline on the Anthropic API with per-role model routing, prompt-contracted JSON output behind a tolerant parser, source-weighted prompting with per-section attribution and a data-gaps list, multimodal document input, a Cloudflare Worker that enforces a model allowlist, a token clamp, and a field whitelist while keeping the key server-side, token dry-runs and a fingerprint cache to control cost, and an offline stub-client test suite that checks the routing, the caps, the parsing, and the chat loop with no API key. The prompt ranks all-hands and CRM sources over chat and picks the economic buyer over the most-mentioned name, and four focus modes swap in different instruction blocks and output budgets so a focused run costs less. Account prep went from about an hour to one minute, validated with early users including a senior CS leader. There is no retrieval step and no scored eval set yet; documents go into the prompt after summarization, and the tests check plumbing rather than output quality.
+Signal is a multi-call pipeline on the Anthropic API with per-role model routing, prompt-contracted JSON output behind a tolerant parser, source-weighted prompting with per-section attribution and a data-gaps list, multimodal document input, a Cloudflare Worker that enforces a model allowlist, a token clamp, and a field whitelist while keeping the key server-side, token dry-runs and a fingerprint cache to control cost, and an offline stub-client test suite that checks the routing, the caps, the parsing, and the chat loop with no API key. The prompt ranks all-hands and CRM sources over chat and picks the economic buyer over the most-mentioned name, and four focus modes swap in different instruction blocks and output budgets so a focused run costs less. Account prep went from about an hour to one minute, validated with early users including a senior CS leader. There is no retrieval step; documents go into the prompt after summarization. The offline tests check plumbing, and the scored eval set with its ablation is further down.
 
 ## Architecture
 
@@ -186,43 +186,47 @@ economic-buyer-over-most-mentioned rule) and changes nothing else. Twenty
 runs per arm on the same set. The case built to separate the arms is
 `most-mentioned-not-buyer`; if it does not, that is the finding.
 
-**Results.** Two of the three runs are in `evals/results/`, measured on
-2026-09-21 with the models in `config.py`. The single native pass and the
-twenty-run arm A share a configuration, so one row covers both. Arm B
-started, reached eleven of its twenty passes, and stopped when the API credit
-ran out. The runner writes its files at the end of a run, so nothing from it
-is recorded, and the row stays pending until it runs again.
+**Results.** All three runs are in `evals/results/`, with the models in
+`config.py`: the single prompt-contract pass and arm A on 2026-09-21, arm B
+on 2026-09-22 after a first attempt stopped at eleven passes when the API
+credit ran out (the runner now writes a partial file when that happens; it
+did not then). The single native pass and the twenty-run arm A share a
+configuration, so one row covers both.
 
 | Run | Risk recall | Risk precision | Buyer accuracy | Attribution | Parse native / recovered / failed |
 | --- | --- | --- | --- | --- | --- |
 | prompt contract, weighted, 1 run | 96% | 100% | 92% | 92% | 5 / 8 / 0 |
 | native contract, weighted, 20 runs (ablation arm A) | 90% | 94% | 93% | 92% | 260 / 0 / 0 |
-| native contract, unweighted, 20 runs (ablation arm B) | pending | pending | pending | pending | pending |
+| native contract, unweighted, 20 runs (ablation arm B) | 90% | 93% | 69% | 95% | 260 / 0 / 0 |
 
-What the 260 native runs say, case by case:
+What the 520 native runs say, case by case:
 
-- `most-mentioned-not-buyer`, the case built to separate the arms, came back
-  right in 18 of 20 runs with the weighting block in place. The eleven
-  unrecorded arm B passes named the wrong buyer on it, and on
-  `adoption-failure` and `relationship-gap`, every time, which is the effect
-  the block exists to produce. That stays a preliminary reading until arm B
-  is rerun and written.
-- `vibe-risk` is the unstable case: right in 7 of 20 runs, otherwise read as
-  sentiment mismatch or silent decay. The fixture describes a mood rather
-  than an event, and the taxonomy has two neighbors for that.
+- The weighting block is worth 24 points of buyer accuracy, and all of it is
+  the three cases built around the most-mentioned name. With the block,
+  `most-mentioned-not-buyer`, `adoption-failure` and `relationship-gap` name
+  the economic buyer in 20 of 20 runs each; without it, 0 of 20 each. Every
+  other case names the buyer 20 of 20 in both arms, apart from
+  `champion-loss` below. That is the effect the block exists to produce, and
+  the ablation is the evidence it does.
+- Risk recall is 90% in both arms, but the misses move. Without the block,
+  `most-mentioned-not-buyer` is read right in 15 of 20 runs instead of 18,
+  `relationship-gap` in 17 instead of 20, and `chat-positive-crm-negative`
+  in 17 instead of 19. `vibe-risk` goes the other way, right in 14 of 20
+  without the block against 7 with it, otherwise read as sentiment mismatch
+  or silent decay; the fixture describes a mood rather than an event, the
+  taxonomy has two neighbors for that, and the ranking of sources seems to
+  pull the reading toward the CRM's neighbor. That is the one number the
+  block makes worse.
 - `truncated-transcript` expects two risks and the brief names one of them
-  every time, so it scores 50% on every run and holds recall below 100% on
-  its own.
-- `champion-loss` misses the economic buyer in 19 of 20 runs, and
-  `silent-decay` loses attribution coverage in 19 of 20 because the brief
-  never cites the CSV. Both are the same kind of miss: a source that was in
-  the packet and was not credited.
+  every time in both arms, so it scores 50% on every run and holds recall
+  below 100% on its own.
+- `champion-loss` misses the economic buyer in 19 of 20 runs with the block
+  and 20 of 20 without, and `silent-decay` cites the CSV in 1 of 20 with the
+  block and 7 of 20 without, which is where arm B's higher attribution
+  coverage comes from. Both are the same kind of miss: a source that was in
+  the packet and was not credited, and the block does not fix either.
 - The prompt contract recovered 8 of 13 replies through the parser; the
-  native contract needed it on none of 260. That is the row the parser
+  native contract needed it on none of 520. That is the row the parser
   section above is about.
-
-Arm B fills from:
-
-```bash
-python evals/run.py --contract native --arm unweighted --runs 20
-```
+- Arm B is also cheaper, 2,815 tokens in against 3,004, since the block is
+  about 190 tokens of prompt, and about a second and a half faster per call.
