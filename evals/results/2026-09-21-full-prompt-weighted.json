@@ -1,0 +1,1531 @@
+{
+  "generated": "2026-09-21T18:45:27+00:00",
+  "mode": "full",
+  "contract": "prompt",
+  "arm": "weighted",
+  "runs": 1,
+  "models": {
+    "analysis": "claude-sonnet-4-6",
+    "summary": "claude-haiku-4-5",
+    "chat": "claude-haiku-4-5"
+  },
+  "aggregate": {
+    "n": 13,
+    "risk_recall": 0.9615384615384616,
+    "risk_precision": 1.0,
+    "buyer_accuracy": 0.9230769230769231,
+    "attribution_coverage": 0.9230769230769231,
+    "gaps_ok": 1.0,
+    "parse_paths": {
+      "native": 5,
+      "recovered_by_parser": 8,
+      "failed": 0
+    },
+    "mean_input_tokens": 1752.5384615384614,
+    "mean_output_tokens": 1805.8461538461538,
+    "mean_latency_ms": 41358.53846153846,
+    "hard_fails": 0
+  },
+  "results": [
+    {
+      "case": "adoption-failure",
+      "meta": {
+        "contract": "prompt",
+        "parse_path": "recovered_by_parser",
+        "stop_reason": "end_turn",
+        "input_tokens": 4579,
+        "output_tokens": 1974,
+        "latency_ms": 47888
+      },
+      "error": null,
+      "raw_head": null,
+      "scores": {
+        "risk": {
+          "recall": 1.0,
+          "precision": 1.0,
+          "hit": true
+        },
+        "buyer": true,
+        "attribution": {
+          "coverage": 1.0,
+          "missing": []
+        },
+        "gaps_ok": true,
+        "empty": false
+      },
+      "total_ms": 53273,
+      "docs": 2,
+      "media": 1,
+      "hard_fail": false,
+      "run": 1,
+      "expected_risk": [
+        "Adoption failure"
+      ],
+      "brief": {
+        "situation": "Brightwater Health committed at kick-off to 120 seats across Clinical Ops and Revenue Cycle with an 80% weekly active rate by end of Q2, agreed personally with COO Dr. Elena Vasquez. Against those commitments, the account is critically off-track: only 11 of 120 seats are weekly active (9% vs. the 80% target), Phase 2 never launched due to a failed handoff to Revenue Cycle, training attendance has collapsed from 6 to 2, and both the executive sponsor (Dr. Vasquez) and project lead (Tom Reyes, AWOL since March citing EHR competition) have disengaged from MBRs. With 130 days to renewal and no identified decision-maker re-engaged in the process, this account is at acute churn risk driven by internal misalignment and a leadership vacuum rather than product dissatisfaction.",
+        "risk_type": "Adoption failure",
+        "risk_severity": "high",
+        "data_sources_detected": [
+          "kick-off deck",
+          "MBR notes",
+          "Teams chat logs"
+        ],
+        "leverage_points": [
+          {
+            "rank": 1,
+            "what": "Escalate directly to Dr. Elena Vasquez (COO, executive sponsor) with a concise gap-to-commitment brief: show the 9% active rate vs. the 80% success criterion she signed off on at kick-off, and request a 20-minute checkpoint to re-establish ownership and a recovery path",
+            "why": "Dr. Vasquez personally agreed to the success criteria in the kick-off deck \u2014 this is a primary-source commitment. She is the only stakeholder with the authority to unblock Reyes, mandate Revenue Cycle engagement, and make the renewal decision. Every other intervention is blocked until she is re-engaged. Waiting risks her interpreting silence as acceptable performance.",
+            "timeline": "this week"
+          },
+          {
+            "rank": 2,
+            "what": "Facilitate a structured Phase 2 handoff meeting that explicitly includes Revenue Cycle leadership \u2014 not just Jenna and Tom \u2014 with a written role-and-responsibility matrix and a revised go-live date for the 60 Revenue Cycle seats",
+            "why": "The MBR notes confirm Phase 2 stalled because Revenue Cycle was never properly informed \u2014 a process failure, not a product failure. The Teams chat shows Jenna had to chase Tom repeatedly just to get Phase 2 on an agenda, indicating no executive mandate exists at the director level. Without a formal handoff with named owners, Phase 2 will not launch before renewal.",
+            "timeline": "this month"
+          },
+          {
+            "rank": 3,
+            "what": "Build and present a 90-day recovery scorecard tied to the original kick-off success criteria (80% WAU, spreadsheet retirement), with monthly checkpoints anchored to the ops meeting cadence Dr. Vasquez committed to at kick-off",
+            "why": "The kick-off deck specified the executive dashboard should be reviewed at every monthly ops meeting \u2014 this cadence was agreed but has not been honored. Re-anchoring to Vasquez's own criteria reframes the renewal conversation from 'are you happy?' to 'here is what you said success looks like and here is the plan to get there,' giving the renewal a defensible business case rather than a relationship plea.",
+            "timeline": "this quarter"
+          }
+        ],
+        "do_this_today": "Draft and send a brief, data-grounded email to Dr. Elena Vasquez (not through Jenna) referencing her kick-off commitment to the 80% active-user target, stating the current 9% rate, and requesting a 20-minute call this week to jointly decide on a recovery plan before the renewal window closes \u2014 frame it as protecting her team's original investment, not as a vendor alarm.",
+        "contact_persona": {
+          "primary_contact": "Dr. Elena Vasquez, Chief Operating Officer",
+          "comm_style": "Insufficient direct evidence of her communication style since she has been absent from MBRs \u2014 but her role as COO and the fact that she personally agreed to measurable success criteria at kick-off suggests she is outcome-oriented and metrics-literate. Her absence is more likely a signal of competing organizational priority (EHR project) than disinterest.",
+          "decision_style": "Executive-level, criteria-based: she anchored the engagement to specific KPIs (80% WAU, spreadsheet retirement date) at kick-off, which indicates she makes decisions by benchmarking against stated outcomes. She will likely respond to data showing gap-to-commitment more than relationship appeals.",
+          "what_they_say_vs_mean": "Her absence from MBRs since March says: 'This initiative is not currently a priority for me.' The subtext is likely: 'Nobody has shown me this is failing badly enough to require my attention.' She has not formally withdrawn support \u2014 she has simply deprioritized. That is a window, not a door closed.",
+          "approach_recommendation": "Reach her directly, bypassing Jenna and Reyes, with a one-page brief that mirrors her own kick-off language and success criteria back to her. Do not lead with relationship or satisfaction \u2014 lead with the metric delta (9% vs. 80%) and a clear ask for a short meeting. Frame the recovery plan as protecting a decision she already made, not as selling her something new. Avoid blame for Reyes or the Revenue Cycle gap; focus on forward path."
+        },
+        "secondary_contacts": [
+          {
+            "name_title": "Tom Reyes, Director of Clinical Operations",
+            "note": "Named project lead in the kick-off deck but AWOL since March, citing competing EHR priority. He holds operational authority over Clinical Ops rollout and should be accountable for the Phase 2 handoff failure, but he cannot make the renewal decision and has demonstrated he will deprioritize this engagement without executive pressure from Vasquez."
+          },
+          {
+            "name_title": "Jenna Park, Systems Analyst",
+            "note": "Day-to-day admin and the vendor's primary operational contact. Highly engaged and proactively chasing internal stakeholders (evidenced in Teams chat), but has no budget authority or renewal decision power. Her persistent follow-up with Tom reveals she is a willing internal advocate without organizational leverage \u2014 over-reliance on her is a structural risk."
+          }
+        ],
+        "section_sources": {
+          "situation": [
+            "kick-off deck",
+            "MBR notes",
+            "Teams chat logs"
+          ],
+          "contact_read": [
+            "kick-off deck",
+            "MBR notes"
+          ],
+          "where_to_press": [
+            "kick-off deck",
+            "MBR notes",
+            "Teams chat logs"
+          ],
+          "do_this_today": [
+            "kick-off deck",
+            "MBR notes"
+          ]
+        },
+        "data_gaps": [
+          "No direct communication from Dr. Vasquez or Tom Reyes \u2014 their actual stated reasons for disengagement are inferred from absence, not confirmed",
+          "Unknown whether the EHR competing priority is a temporary distraction or a strategic pivot that repositions this platform as redundant",
+          "No data on whether the 11 active users are satisfied and vocal internally \u2014 a small but loud group of advocates could be a recovery lever",
+          "Revenue Cycle team's awareness and attitude toward the platform is entirely unknown \u2014 they may be resistant, or simply uninformed",
+          "No CRM notes or call recordings to surface any prior renewal signals or objections from any stakeholder"
+        ],
+        "confidence": "medium",
+        "confidence_note": "Primary sources (kick-off deck, MBR notes) are consistent and paint a clear risk picture, but the absence of any direct input from Dr. Vasquez or Tom Reyes means intent and recoverability are inferred. A single conversation with Vasquez would substantially change the confidence level and recovery strategy.",
+        "suggested_questions": [
+          "Has anyone on our team spoken directly with Dr. Vasquez or Tom Reyes \u2014 not through Jenna \u2014 in the last 60 days, and if so, what did they say about the platform's future?",
+          "What is the EHR project that Reyes cited as a competing priority \u2014 is it a system migration that would eventually integrate with or replace our platform?",
+          "Are any of the 11 active weekly users in a position to articulate business value internally, and have we identified or cultivated them as internal advocates?"
+        ]
+      }
+    },
+    {
+      "case": "champion-loss",
+      "meta": {
+        "contract": "prompt",
+        "parse_path": "native",
+        "stop_reason": "end_turn",
+        "input_tokens": 1332,
+        "output_tokens": 1939,
+        "latency_ms": 44774
+      },
+      "error": null,
+      "raw_head": null,
+      "scores": {
+        "risk": {
+          "recall": 1.0,
+          "precision": 1.0,
+          "hit": true
+        },
+        "buyer": false,
+        "attribution": {
+          "coverage": 1.0,
+          "missing": []
+        },
+        "gaps_ok": true,
+        "empty": false
+      },
+      "total_ms": 53109,
+      "docs": 3,
+      "media": 0,
+      "hard_fail": false,
+      "run": 1,
+      "expected_risk": [
+        "Champion loss"
+      ],
+      "brief": {
+        "situation": "Meridian Retail is 120 days from a $155K renewal with a critical champion departure (Sam Ortiz leaving Sept 5) and no confirmed successor \u2014 Grace, the budget owner, has not yet assigned ownership between Jordan or Ines. The MBR shows healthy usage (88%, 210/240 managers active) and Grace gave a soft endorsement, but her early departure from the MBR and vague 'keep doing what you're doing' signal shallow exec engagement rather than locked-in commitment. A documented knowledge gap (undocumented alert threshold logic) and an unresolved configuration discrepancy in the Southeast region compound the operational risk, leaving the account exposed to misconfiguration and stakeholder drift at exactly the moment a renewal decision needs to be driven.",
+        "risk_type": "Champion loss",
+        "risk_severity": "high",
+        "data_sources_detected": [
+          "Email thread",
+          "MBR notes",
+          "Teams chat"
+        ],
+        "leverage_points": [
+          {
+            "rank": 1,
+            "what": "Secure a 30-minute handover call with Sam, Grace, and the identified successor (Jordan or Ines) before Sept 5 \u2014 frame it as a 'continuity briefing' to protect Meridian's operational integrity, not a vendor check-in",
+            "why": "Sam's departure is the single highest-risk event in the account. The email thread confirms CSM already requested this but was blocked by Grace's calendar. Escalate the ask directly \u2014 the earnings call constraint has a known end date, so propose a specific slot immediately after. Waiting risks losing Sam's institutional knowledge entirely and entering renewal with no internal champion.",
+            "timeline": "this week"
+          },
+          {
+            "rank": 2,
+            "what": "Document and deliver a formal 'configuration health summary' covering alert threshold logic, the Southeast threshold variance, and current active configurations \u2014 hand it to Sam for sign-off and share it with Grace and the incoming owner",
+            "why": "The Teams chat confirms the Southeast discrepancy is unresolved with no owner and a vague 'after earnings' timeline. The email thread flags undocumented threshold logic as a specific churn risk. Creating this artifact transfers ownership cleanly, demonstrates proactive value, and gives the new stakeholder a reason to engage with you as a trusted partner rather than starting from zero.",
+            "timeline": "this month"
+          },
+          {
+            "rank": 3,
+            "what": "Schedule a formal exec business review with Grace and the confirmed successor 60 days before renewal, anchored to business outcomes (manager adoption rates, operational impact) rather than product features",
+            "why": "Grace's MBR attendance was brief and her endorsement was passive \u2014 'keep doing what you're going' is not a renewal commitment. Sam's confidence that renewal is 'a formality' is champion-dependent and will not survive his departure without an independent exec relationship. A structured review 60 days out builds that relationship on Grace's terms (outcomes, not tooling) and surfaces budget-year shifts before they become churn signals.",
+            "timeline": "this quarter"
+          }
+        ],
+        "do_this_today": "Email Grace directly \u2014 not through Sam \u2014 with a concise 3-line note: acknowledge Sam's upcoming transition, name the operational continuity risk (undocumented configurations), and propose two specific 20-minute calendar slots post-earnings for a handover call with her and the successor she designates. Keep it operational in framing, not commercial.",
+        "contact_persona": {
+          "primary_contact": "Grace [Last Name Unknown], budget owner and executive sponsor (title not specified in sources \u2014 likely VP or Director level given decision authority over vendor tooling and successor designation)",
+          "comm_style": "Sparse and signal-light \u2014 Grace attends MBRs briefly, gives minimal verbal direction ('keep doing what you're doing'), and defers scheduling decisions. She communicates through presence or absence more than explicit feedback. Her calendar is the clearest signal of her priorities.",
+          "decision_style": "Delegative and outcome-oriented \u2014 Grace trusts her operators (Sam) to manage tooling decisions and reserves her own judgment for budget-level calls. She is unlikely to engage on product details but will act on risk framing or team continuity concerns that reach her threshold.",
+          "what_they_say_vs_mean": "Surface: 'Keep doing what you're doing' = satisfaction. Subtext: low active engagement, which means the renewal is Sam's relationship, not Grace's \u2014 and with Sam leaving, there is no independently held conviction at the budget level. Her early MBR departure signals ops tooling is not a top-of-mind priority, which cuts both ways: low friction but also low protection if budget pressure arises.",
+          "approach_recommendation": "Do not pitch Grace on features or usage stats. Approach her purely on business risk and continuity: her team is mid-transition, there is a configuration knowledge gap, and you want to make sure the handover is clean so her ops don't skip a beat. Frame your ask as protecting her, not as defending the renewal. One short, direct email \u2014 no decks, no long threads \u2014 with two specific calendar options is the right move."
+        },
+        "secondary_contacts": [
+          {
+            "name_title": "Sam Ortiz, Director of Store Operations",
+            "note": "Technically the named primary contact and current champion, but departing Sept 5 \u2014 his influence on the renewal is time-bounded and diminishing. High product knowledge, positive relationship with CSM, but unable to own the renewal outcome past his departure date. Treat him as a knowledge transfer resource and internal bridge to Grace, not as a long-term stakeholder."
+          },
+          {
+            "name_title": "Jordan [Last Name Unknown], role unspecified",
+            "note": "One of two candidates Grace is considering to own store ops tooling post-Sam. Identity and title not confirmed in any source \u2014 high-priority gap to close before Sept 5."
+          },
+          {
+            "name_title": "Ines [Last Name Unknown], role unspecified",
+            "note": "Second candidate for successor ownership. Same gap as Jordan \u2014 no title, no direct relationship established with CSM. Engaging both before the successor decision is made reduces single-point-of-failure risk."
+          }
+        ],
+        "section_sources": {
+          "situation": [
+            "Email thread",
+            "MBR notes",
+            "Teams chat"
+          ],
+          "contact_read": [
+            "Email thread",
+            "MBR notes"
+          ],
+          "where_to_press": [
+            "Email thread",
+            "MBR notes",
+            "Teams chat"
+          ],
+          "do_this_today": [
+            "Email thread",
+            "MBR notes"
+          ]
+        },
+        "data_gaps": [
+          "Grace's full name, title, and direct contact information \u2014 she is the budget owner but is only referenced indirectly across all sources",
+          "Identity, title, and role of Jordan and Ines \u2014 successor designation is unresolved and neither has been engaged by CSM",
+          "Resolution status of the Southeast threshold variance \u2014 Teams chat confirms it is open but owned by no one with no firm timeline",
+          "Whether Grace has any awareness of the undocumented configuration risk \u2014 email thread suggests the CSM has not yet reached her directly on this",
+          "Meridian's budget cycle and whether ops tooling budget is locked or still in review for the coming year",
+          "Sam's exact last working day relative to the proposed handover call \u2014 'Sept 5' is cited but not confirmed as his final day versus notice date"
+        ],
+        "confidence": "medium",
+        "confidence_note": "Usage data and MBR signals are solid, but the account's renewal trajectory depends almost entirely on a stakeholder transition that is still unresolved. Confidence would increase significantly after the successor is named, a direct conversation with Grace is secured, and the configuration documentation gap is closed.",
+        "suggested_questions": [
+          "Grace, now that Sam is transitioning out \u2014 have you decided whether Jordan or Ines will own the store ops tooling going forward, and can we get them looped in before his last day?",
+          "Sam, can you walk us through the alert threshold logic you've built so we can document it properly and make sure whoever takes over doesn't have to start from scratch?",
+          "Grace, as you head into the next budget cycle, are there any shifts in how your team is prioritizing store operations investments that we should be planning around?"
+        ]
+      }
+    },
+    {
+      "case": "chat-positive-crm-negative",
+      "meta": {
+        "contract": "prompt",
+        "parse_path": "recovered_by_parser",
+        "stop_reason": "end_turn",
+        "input_tokens": 1343,
+        "output_tokens": 1837,
+        "latency_ms": 39499
+      },
+      "error": null,
+      "raw_head": null,
+      "scores": {
+        "risk": {
+          "recall": 1.0,
+          "precision": 1.0,
+          "hit": true
+        },
+        "buyer": true,
+        "attribution": {
+          "coverage": 1.0,
+          "missing": []
+        },
+        "gaps_ok": true,
+        "empty": false
+      },
+      "total_ms": 47102,
+      "docs": 3,
+      "media": 0,
+      "hard_fail": false,
+      "run": 1,
+      "expected_risk": [
+        "Sentiment mismatch"
+      ],
+      "brief": {
+        "situation": "Tidewater Insurance presents a dangerous buyer/user disconnect 58 days from a $210K renewal: CFO Dana Whitlock is quietly running a competitive RFP (Verity Systems) and investigating exit terms, while end-users led by Claims Lead Aisha Bennett are at peak satisfaction (4.7/5, 95% active seats, 39-40% claim queue time improvement) and actively requesting expansion to the Norfolk office. The MBR and Slack data reflect a healthy operational picture that procurement leadership is deliberately keeping separate from the vendor evaluation. Primary sources (CRM notes) make clear the competitive threat is real and time-sensitive, while secondary sources (MBR, Slack) confirm the user-layer firewall that could be activated as a retention lever if engaged immediately.",
+        "risk_type": "Sentiment mismatch",
+        "risk_severity": "high",
+        "data_sources_detected": [
+          "CRM notes",
+          "MBR notes",
+          "Slack thread"
+        ],
+        "leverage_points": [
+          {
+            "rank": 1,
+            "what": "Brief Aisha Bennett on the RFP process and arm her with switching cost data, usage metrics, and a concrete Norfolk expansion proposal to bring to Dana Whitlock before the 2026-09-05 RFP deadline.",
+            "why": "Aisha is the strongest internal advocate and is currently operating blind to the procurement evaluation. She has demonstrated emotional investment ('if they took this away I'd riot') and organizational credibility. Activating her as an informed champion before the RFP closes is the highest-probability intervention available. She cannot advocate for something she doesn't know is at risk.",
+            "timeline": "this week"
+          },
+          {
+            "rank": 2,
+            "what": "Prepare and deliver a CFO-targeted ROI brief to Dana Whitlock that quantifies the 39-40% claim queue time reduction in dollar terms, models switching costs (retraining, integration, productivity loss), and attaches the Norfolk expansion as a value-growth narrative rather than a cost line.",
+            "why": "Dana is running a financial evaluation and declined a value discussion \u2014 meaning she has not yet been given a financially rigorous case in her own language. The MBR data provides the operational proof points; they need to be translated into CFO-legible metrics (FTE hours saved, claims throughput, liability exposure reduction) before the RFP window closes. Switching cost visibility is explicitly flagged as a key missing element in the CRM notes.",
+            "timeline": "this month"
+          },
+          {
+            "rank": 3,
+            "what": "Convert the Norfolk office expansion request into a signed order amendment, structuring it as a multi-year renewal with the new seats included, locking in ARR growth and reducing churn risk through contractual inertia.",
+            "why": "The Norfolk access request (CRM, MBR, Slack all confirm) represents a legitimate expansion signal \u2014 +15 seats and organic growth confidence. Formalizing this as part of a renewal package shifts the conversation from 'should we renew' to 'what does our next chapter look like,' and creates a switching cost that is visible and concrete at the procurement level.",
+            "timeline": "this quarter"
+          }
+        ],
+        "do_this_today": "Call or message Aisha Bennett directly \u2014 not over email \u2014 to privately alert her that a competitive RFP is in motion and her advocacy matters. Ask her who else on the leadership team she trusts and whether she has any visibility into Dana's evaluation criteria. Do not wait for internal alignment before making this call; the RFP deadline window is actively closing.",
+        "contact_persona": {
+          "primary_contact": "Dana Whitlock, CFO",
+          "comm_style": "Terse and process-driven \u2014 she declined a value discussion, which signals she communicates through formal procurement structures rather than relationship channels when she has already moved into evaluation mode. She likely prefers written, structured submissions over calls when in RFP posture.",
+          "decision_style": "Top-down financial gatekeeper running a disciplined competitive process. She is not waiting for consensus \u2014 she has already isolated the procurement decision from the user layer, which indicates a command-and-control decision style driven by cost, risk, and vendor optionality rather than user satisfaction.",
+          "what_they_say_vs_mean": "Surface: 'We're running a standard RFP process.' Subtext: 'I have not been given a reason to stay that speaks my language, and I am already leaning toward switching.' Declining a value discussion is not neutrality \u2014 it is a signal that she has mentally pre-qualified an exit and does not want to be anchored by the incumbent's framing.",
+          "approach_recommendation": "Do not attempt to rebuild the relationship through warmth or usage stories \u2014 Dana will tune that out. Engage her exclusively through the RFP response with a CFO-grade financial brief: quantified ROI, switching cost model, and a multi-year commercial offer that makes the math of staying clearly superior to the math of switching. Request a single 20-minute meeting framed as 'clarifying questions on RFP scope' rather than a value pitch \u2014 give her a procedural reason to engage, not a relational one."
+        },
+        "secondary_contacts": [
+          {
+            "name_title": "Aisha Bennett, Claims Lead",
+            "note": "Day-to-day power user and the strongest internal advocate. She drives adoption, ran training, and is requesting expansion \u2014 but she has no budget authority and is currently unaware of the RFP. She is a critical champion lever, not the decision-maker. Her influence is indirect: she can pressure or inform Dana, but cannot block or approve the renewal herself."
+          }
+        ],
+        "section_sources": {
+          "situation": [
+            "CRM notes",
+            "MBR notes",
+            "Slack thread"
+          ],
+          "contact_read": [
+            "CRM notes",
+            "MBR notes"
+          ],
+          "where_to_press": [
+            "CRM notes",
+            "MBR notes",
+            "Slack thread"
+          ],
+          "do_this_today": [
+            "CRM notes",
+            "Slack thread"
+          ]
+        },
+        "data_gaps": [
+          "Dana Whitlock's specific RFP evaluation criteria and what Verity Systems is offering \u2014 without this, the RFP response is being written blind to the competitive comparison.",
+          "Whether Dana has an internal sponsor or ally on the leadership team who could be engaged separately from the procurement process.",
+          "The dollar value of the 39-40% queue time reduction \u2014 this metric exists operationally but has not been converted to CFO-legible financial impact.",
+          "Contract terms and exit clause details that Dana has reportedly been investigating \u2014 knowing what friction exists in exit terms would inform how hard to lean on switching costs.",
+          "Aisha Bennett's reporting line and whether she has any direct access to or influence over Dana Whitlock's decision-making process.",
+          "Timeline and format of the RFP \u2014 whether there is a written submission, a presentation slot, or an oral evaluation that could be requested."
+        ],
+        "confidence": "medium",
+        "confidence_note": "The CRM notes are the only primary source that captures the competitive threat and CFO behavior; MBR and Slack corroborate the user-layer health but have no visibility into the procurement process. Confidence would rise significantly with direct intel on Verity's offer, Dana's stated evaluation criteria, and any secondary source from someone who has spoken to Dana directly.",
+        "suggested_questions": [
+          "Has anyone on our team spoken directly to Dana Whitlock in the last 60 days, and if so, what was her stated reason for initiating the RFP?",
+          "Does Aisha Bennett have a reporting relationship or regular touchpoint with Dana Whitlock, and has she ever raised platform satisfaction at the leadership level?",
+          "What are the exit clause terms in the current contract, and has Dana's legal or procurement team formally requested them?"
+        ]
+      }
+    },
+    {
+      "case": "frustrated-not-gone",
+      "meta": {
+        "contract": "prompt",
+        "parse_path": "recovered_by_parser",
+        "stop_reason": "end_turn",
+        "input_tokens": 1333,
+        "output_tokens": 1820,
+        "latency_ms": 42081
+      },
+      "error": null,
+      "raw_head": null,
+      "scores": {
+        "risk": {
+          "recall": 1.0,
+          "precision": 1.0,
+          "hit": true
+        },
+        "buyer": true,
+        "attribution": {
+          "coverage": 1.0,
+          "missing": []
+        },
+        "gaps_ok": true,
+        "empty": false
+      },
+      "total_ms": 52967,
+      "docs": 3,
+      "media": 0,
+      "hard_fail": false,
+      "run": 1,
+      "expected_risk": [
+        "Frustrated not gone"
+      ],
+      "brief": {
+        "situation": "Redfern Publishing recently signed a two-year renewal (07-28), but the account is acutely at risk due to a recurring export corruption bug that has generated three escalating support tickets in five weeks with no confirmed resolution. Leon Baptiste, the CTO and budget owner, is technically sophisticated, visibly frustrated, and has been embarrassed in front of internal stakeholders by both the bug and dismissive support responses. Despite 98% seat utilization and strong product-market fit, Leon's renewal commitment is explicitly conditional on immediate resolution, meaning the contract signature does not neutralize churn risk at the next cycle.",
+        "risk_type": "Frustrated not gone",
+        "risk_severity": "high",
+        "data_sources_detected": [
+          "Email thread",
+          "QBR notes",
+          "Support tickets (CSV)"
+        ],
+        "leverage_points": [
+          {
+            "rank": 1,
+            "what": "Escalate ticket 4471 to engineering leadership today with a named technical owner, a written root cause analysis commitment, and a specific fix timeline communicated directly to Leon by a senior technical representative \u2014 not through standard support.",
+            "why": "All three sources converge on this: the same bug has recurred three times in five weeks, two tickets remain open, support responses have been dismissive ('clear cache'), and Leon is a CTO who can see through generic deflection. His stated renewal condition is resolution of this issue. Every day without a named owner and written RCA is a relationship deterioration event.",
+            "timeline": "This week"
+          },
+          {
+            "rank": 2,
+            "what": "Assign a dedicated technical POC to Redfern Publishing and schedule a 30-minute call with Leon specifically to walk through the RCA findings, confirm the fix is live, and acknowledge the support failure openly \u2014 without corporate hedging.",
+            "why": "The QBR notes explicitly flag the absence of a dedicated technical contact as a gap Leon raised. A CTO who reported a critical bug three times and received 'clear cache' as a response has lost trust in the support function specifically. A named human with technical credibility rebuilds that trust in a way that tickets and email threads cannot. This also repositions the CS relationship ahead of the next renewal cycle in 690 days.",
+            "timeline": "This month"
+          },
+          {
+            "rank": 3,
+            "what": "Conduct a structured health check QBR focused on support SLA commitments, proactive monitoring for export functionality, and a forward-looking roadmap conversation that reinforces the product investment Redfern is getting for their ARR.",
+            "why": "98% seat utilization and daily use signal genuine dependency, which is leverage for expansion \u2014 but only after trust is restored. The current frustration, if unaddressed at the relationship level, will calcify into a renewal negotiation where Leon uses the support failures as price reduction ammunition. A QBR that demonstrates systemic improvement (not just ticket closure) converts a risk moment into a expansion setup.",
+            "timeline": "This quarter"
+          }
+        ],
+        "do_this_today": "Send Leon Baptiste a direct, senior-authored email (CSM + Engineering lead co-signed) acknowledging the three-ticket pattern by name, stating that ticket 4471 has been escalated to a named engineer, and committing to a written root cause analysis within 48 hours \u2014 no boilerplate, no ticket numbers only, no 'we take this seriously' language without specifics.",
+        "contact_persona": {
+          "primary_contact": "Leon Baptiste, CTO",
+          "comm_style": "Direct, technically literate, and low-tolerance for ambiguity or deflection. Communicates grievances explicitly rather than passively \u2014 he named the support failure in the QBR and escalated via email, which means he is not the type to quietly churn. He expects peer-level technical dialogue, not account management pleasantries.",
+          "decision_style": "Evidence-driven and conditional. He signed a two-year renewal, which shows he is capable of long-term commitment when value is clear \u2014 but he explicitly tied that commitment to resolution, indicating he makes decisions against stated criteria and will revisit them if those criteria aren't met. He is unlikely to be swayed by relationship warmth alone; he needs demonstrated competence.",
+          "what_they_say_vs_mean": "He says 'I won't leave' \u2014 he means 'I won't leave yet, but I am watching closely and I will make noise internally and externally if this isn't fixed.' He says 'support is not right' \u2014 he means 'I am embarrassed in front of my team and I'm losing confidence in this vendor.' The renewal signature is not a signal of safety; it is a grace period with a visible expiration.",
+          "approach_recommendation": "Lead with technical credibility, not relationship management. Open every interaction with specifics: ticket numbers, engineer names, timeline dates. Do not send Leon anything that could read as a templated response. Acknowledge the internal embarrassment directly \u2014 a CTO who has had to explain a recurring bug to their team needs to see that the vendor understands the organizational cost, not just the technical one. Use peer-level seniority in communications (CSM + Engineering lead, not CSM alone)."
+        },
+        "secondary_contacts": [
+          {
+            "name_title": "Unknown \u2014 no secondary contacts identified in available data",
+            "note": "No day-to-day users, admins, or other named stakeholders appear in the source documents. This is itself a data gap \u2014 account influence map is limited to Leon only."
+          }
+        ],
+        "section_sources": {
+          "situation": [
+            "Email thread",
+            "QBR notes",
+            "Support tickets (CSV)"
+          ],
+          "contact_read": [
+            "Email thread",
+            "QBR notes"
+          ],
+          "where_to_press": [
+            "QBR notes",
+            "Support tickets (CSV)",
+            "Email thread"
+          ],
+          "do_this_today": [
+            "Email thread",
+            "Support tickets (CSV)",
+            "QBR notes"
+          ]
+        },
+        "data_gaps": [
+          "No secondary stakeholders or internal champions identified \u2014 if Leon leaves or deprioritizes the vendor relationship, there is no mapped fallback contact with influence over the renewal decision.",
+          "No visibility into what 'internal stakeholders' Leon was embarrassed in front of \u2014 understanding whether this reached C-suite or board level would clarify the political severity of the support failures.",
+          "No product usage data beyond seat utilization (98%) \u2014 which features are being used, and whether export functionality is core to daily workflows, would sharpen the urgency framing for the bug fix.",
+          "No information on competitive alternatives Leon may have evaluated or is currently evaluating \u2014 a frustrated CTO at renewal-minus-690-days may already be benchmarking.",
+          "No detail on what the export corruption bug actually corrupts or under what conditions it triggers \u2014 without this, it's unclear whether engineering has enough to reproduce and fix it, or whether the RCA will surface a deeper architectural issue."
+        ],
+        "confidence": "high",
+        "confidence_note": "All three sources are consistent in diagnosis \u2014 recurring bug, escalating frustration, conditional renewal, absent technical support structure. Primary sources (QBR notes, email thread) align with the support ticket data. Confidence would increase further with knowledge of secondary stakeholders and competitive landscape.",
+        "suggested_questions": [
+          "Leon, when you mentioned being in front of internal stakeholders during the export failures \u2014 can you help us understand who was in the room and what the impact was for your team's workflow that day?",
+          "Outside of the export issue, are there other areas where you feel the product or our support model isn't meeting the standard you need for a two-year relationship?",
+          "Who else on your team is relying on the export functionality day-to-day \u2014 is there someone technical we should loop in directly so they can work alongside our engineering team on testing the fix?"
+        ]
+      }
+    },
+    {
+      "case": "healthy",
+      "meta": {
+        "contract": "prompt",
+        "parse_path": "recovered_by_parser",
+        "stop_reason": "end_turn",
+        "input_tokens": 1310,
+        "output_tokens": 1639,
+        "latency_ms": 35635
+      },
+      "error": null,
+      "raw_head": null,
+      "scores": {
+        "risk": {
+          "recall": 1.0,
+          "precision": 1.0,
+          "hit": true
+        },
+        "buyer": true,
+        "attribution": {
+          "coverage": 1.0,
+          "missing": []
+        },
+        "gaps_ok": true,
+        "empty": false
+      },
+      "total_ms": 43620,
+      "docs": 3,
+      "media": 0,
+      "hard_fail": false,
+      "run": 1,
+      "expected_risk": [],
+      "brief": {
+        "situation": "Pinecrest Schools is a high-momentum, low-risk account with 300 days to renewal. Rosa Delgado (CAO) has already evangelized the product at board level, driven an early 2-year renewal, and committed to a January expansion of +14 seats (35% growth, from 38 to 52 seats), with Ben identified as the operational owner on a December deadline. Usage is at 95% capacity with logins growing 12% over 8 weeks, and zero support friction has been recorded. The primary near-term risk is not churn but execution: if the January implementation slips or is under-resourced, the expansion momentum and district-wide rollout narrative could stall before the larger footprint is contractually locked in.",
+        "risk_type": "Healthy",
+        "risk_severity": "low",
+        "data_sources_detected": [
+          "Email thread",
+          "MBR notes",
+          "CSV usage data"
+        ],
+        "leverage_points": [
+          {
+            "rank": 1,
+            "what": "Confirm Ben's December roster submission deadline and send a structured implementation checklist (roster format, training schedule, seat provisioning steps) directly to both Ben and Rosa before end of this week",
+            "why": "The MBR notes name Ben as the owner of the January expansion with a December deadline. The email thread confirms rosters and training are active next steps. Any slip in Ben's execution creates a gap between Rosa's board-level commitment and on-the-ground delivery \u2014 protecting this handoff protects the expansion ARR.",
+            "timeline": "this week"
+          },
+          {
+            "rank": 2,
+            "what": "Schedule a 30-minute January implementation kickoff with Rosa and Ben to align on success metrics for the expanded cohort and identify any campus-level stakeholders who will be new to the product",
+            "why": "Rosa is the executive evangelist driving district-wide demand, but 14 new seats likely means new buildings, new admins, or new teachers who have no existing relationship with the product. Getting ahead of their onboarding prevents adoption drag that could undermine Rosa's narrative at the next board review.",
+            "timeline": "this month"
+          },
+          {
+            "rank": 3,
+            "what": "Prepare a district-wide expansion business case \u2014 using Rosa's board presentation as the proof point \u2014 and present it to Rosa in Q1 as a formal pathway to scale beyond the current campus footprint",
+            "why": "The MBR notes explicitly flag organic demand for district-wide rollout generated by Rosa's board evangelism. The 2-year renewal and near-capacity usage create a natural window to propose a district agreement before the expanded 52-seat contract matures. Moving this from informal interest to a structured proposal locks in the largest possible footprint.",
+            "timeline": "this quarter"
+          }
+        ],
+        "do_this_today": "Email Ben directly (CC Rosa) with a concrete December roster deadline confirmation and attach a one-page seat provisioning and training request template \u2014 make it frictionless for him to execute so the January go-live stays on schedule.",
+        "contact_persona": {
+          "primary_contact": "Rosa Delgado, Chief Academic Officer",
+          "comm_style": "Strategic and results-oriented \u2014 she communicates upward to the board and frames vendor tools in terms of academic outcomes and institutional credibility. Professional tone, low maintenance (MBR notes: 'first vendor in a decade I have not had to chase'), and responsive when value is clear.",
+          "decision_style": "Evidence-driven and politically aware. She moves decisively once she has board alignment \u2014 the early 2-year renewal and board presentation signal she builds internal consensus before committing, then acts fast. She delegates operational execution (to Ben) but owns the strategic narrative.",
+          "what_they_say_vs_mean": "When she presents to the board and requests district-wide expansion, she is signaling that this product is part of her professional brand and academic leadership identity \u2014 not just a vendor tool. Her enthusiasm ('first vendor in a decade') means she has been burned before; she is telling you she values reliability as much as features.",
+          "approach_recommendation": "Lead with outcomes and board-ready language, not feature updates. Treat her as a strategic partner by briefing her on the January implementation plan proactively \u2014 she should never have to ask. When the time comes for district expansion, frame it as completing the vision she already sold to the board, not as an upsell. Keep her informed at a cadence that respects her seniority: monthly strategic touchpoints, not weekly operational check-ins."
+        },
+        "secondary_contacts": [
+          {
+            "name_title": "Ben (last name unknown) \u2014 likely Coordinator or Operations Lead",
+            "note": "Named in MBR notes as the operational owner responsible for roster submission by December and execution of the January +14 seat expansion. He is the day-to-day implementation contact and the critical dependency for the expansion going live on time, but he does not hold budget or strategic decision-making authority."
+          }
+        ],
+        "section_sources": {
+          "situation": [
+            "MBR notes",
+            "Email thread",
+            "CSV usage data"
+          ],
+          "contact_read": [
+            "MBR notes",
+            "Email thread"
+          ],
+          "where_to_press": [
+            "MBR notes",
+            "Email thread",
+            "CSV usage data"
+          ],
+          "do_this_today": [
+            "MBR notes",
+            "Email thread"
+          ]
+        },
+        "data_gaps": [
+          "Ben's full name, title, and direct contact information \u2014 he is the execution owner for the January expansion and is currently underidentified",
+          "Details of the board presentation content \u2014 understanding what Rosa committed to publicly would sharpen the district-wide expansion pitch",
+          "Number and names of additional campuses in scope for district-wide rollout \u2014 needed to size the opportunity and identify future stakeholders",
+          "Which specific features or use cases are driving the 95% seat utilization and login growth \u2014 required to build a compelling renewal and expansion narrative grounded in actual workflow impact",
+          "Whether the 2-year renewal contract includes expansion pricing protections or district-wide licensing clauses that could accelerate the larger deal"
+        ],
+        "confidence": "high",
+        "confidence_note": "All three source types (primary MBR notes, email thread, and usage CSV) are consistent and reinforcing with no contradictions. Confidence would increase marginally with Ben's full profile and campus-level rollout details.",
+        "suggested_questions": [
+          "Rosa, when you presented to the board, what outcome or metric did they respond to most strongly \u2014 that's what we want to make sure the January cohort can demonstrate too?",
+          "Ben, do you have a sense of which campuses or grade levels are likely to be in scope for the broader district rollout Rosa mentioned \u2014 so we can think about training and onboarding ahead of time?",
+          "As we look at the expanded footprint, is there a budget cycle or board approval timeline we should be aware of for a district-wide agreement \u2014 we want to make sure we're supporting your process, not creating extra work?"
+        ]
+      }
+    },
+    {
+      "case": "most-mentioned-not-buyer",
+      "meta": {
+        "contract": "prompt",
+        "parse_path": "recovered_by_parser",
+        "stop_reason": "end_turn",
+        "input_tokens": 1401,
+        "output_tokens": 2008,
+        "latency_ms": 45192
+      },
+      "error": null,
+      "raw_head": null,
+      "scores": {
+        "risk": {
+          "recall": 1.0,
+          "precision": 1.0,
+          "hit": true
+        },
+        "buyer": true,
+        "attribution": {
+          "coverage": 1.0,
+          "missing": []
+        },
+        "gaps_ok": true,
+        "empty": false
+      },
+      "total_ms": 53582,
+      "docs": 3,
+      "media": 0,
+      "hard_fail": false,
+      "run": 1,
+      "expected_risk": [
+        "Relationship gap"
+      ],
+      "brief": {
+        "situation": "Lumen Freight is 71 days from renewal at $142K ARR with a dangerous split dynamic: the economic buyer (Marcus Chen) has gone silent since March, skipped two consecutive QBRs, is actively reviewing alternative vendors for FY27, and is questioning the platform's ROI \u2014 while the day-to-day champion (Priya Nair) is deeply engaged, driving adoption, and generating documented 6 hrs/week in savings. The value story is real but is not reaching the decision-maker; Marcus has explicitly said reports 'go into a folder,' meaning the CSM's communication strategy is working for the wrong audience. Without direct economic buyer alignment in the next 30 days, strong product adoption will not save this renewal.",
+        "risk_type": "Relationship gap",
+        "risk_severity": "high",
+        "data_sources_detected": [
+          "CRM notes",
+          "QBR notes",
+          "Teams chat logs"
+        ],
+        "leverage_points": [
+          {
+            "rank": 1,
+            "what": "Escalate internally and send a VP-to-VP or executive-to-executive outreach to Marcus Chen \u2014 not another CSM email. Frame it as a brief 20-minute business value review, not a check-in. Anchor the ask to the documented 6 hrs/week dispatcher savings and tie it to a dollar figure Marcus can own.",
+            "why": "CRM notes and QBR notes both confirm CSM outreach has failed three times. Marcus is not ignoring the product \u2014 he's ignoring the channel. Peer-level executive contact breaks the pattern and signals Lumen Freight is a priority account, not a managed renewal. The March call was warm, meaning Marcus has relationship history to reactivate.",
+            "timeline": "this week"
+          },
+          {
+            "rank": 2,
+            "what": "Build a one-page executive value brief \u2014 not a QBR deck \u2014 that converts the 6 hrs/week savings into annualized FTE cost savings, maps platform usage to Lumen Freight's freight operational outcomes, and answers Marcus's explicit question: 'what does it actually replace?' Deliver it through Priya with a request that she forward it to Marcus directly, and separately send it via the executive channel.",
+            "why": "Marcus's stated concern ('what does it actually replace?') is a buying signal disguised as skepticism \u2014 he needs a replacement narrative, not a feature list. Priya cannot answer this question for him because she lacks budget authority context. The brief needs to land in Marcus's inbox as a document he can use in his own vendor review, not a report that goes in a folder.",
+            "timeline": "this month"
+          },
+          {
+            "rank": 3,
+            "what": "Formalize Priya's champion role by proposing a structured internal success story or case study she can present upward to Marcus's team, and simultaneously onboard the two new dispatchers she has already recruited to deepen platform stickiness across the org before renewal closes.",
+            "why": "Priya is the strongest asset in this account but is currently load-bearing alone. Expanding active users (dispatchers already in progress per Teams chat) raises switching cost and gives Marcus a harder organizational argument to unwind. A Priya-led internal success story also gives her political cover and visibility with Marcus that the CSM cannot manufacture externally.",
+            "timeline": "this quarter"
+          }
+        ],
+        "do_this_today": "Identify the appropriate executive or VP on your side who had or could credibly claim a relationship with Marcus Chen, and draft a direct, brief email from that person to Marcus requesting a 20-minute business review \u2014 subject line tied to FY27 planning, not 'renewal' or 'check-in.' Get that email approved and sent before end of day. Do not send another CSM-level outreach.",
+        "contact_persona": {
+          "primary_contact": "Marcus Chen, Decision-Maker / Economic Buyer (title not specified in sources, but confirmed budget owner per CRM notes)",
+          "comm_style": "Marcus communicates through absence \u2014 his silence is a message. When he does engage (March call), he is direct and warm, suggesting he responds to peer-level relationships and clear business framing, not vendor management cadence. He is not reading reports; he is asking sharp ROI questions, which indicates a financially oriented, executive communication style.",
+          "decision_style": "Financially driven and comparative \u2014 he is actively running a vendor review for FY27, which means he is evaluating alternatives in parallel, not waiting for renewal conversations to begin. He makes decisions by benchmarking value against alternatives, not by loyalty or relationship alone. The 'what does it actually replace?' question signals he needs a displacement narrative, not a feature defense.",
+          "what_they_say_vs_mean": "Surface: 'What does it actually replace?' Subtext: I don't have a clear story to justify this spend to myself or my leadership, and if I can't build that story, the easiest path is not to renew. His absence from QBRs is not passive \u2014 it is an active signal that the current engagement model is not worth his time, and that he may already be leaning toward a switch.",
+          "approach_recommendation": "Do not send Marcus another CSM email or QBR invite. He has already filtered those out. The only move that has a chance of breaking through is a peer-level executive reach-out that is short, commercially framed, and respects his time. When you do get him on a call, lead with the displacement story \u2014 concrete dollar value of what the platform replaces in FTE time or operational cost \u2014 and let him ask questions. Do not present a deck. Let him drive."
+        },
+        "secondary_contacts": [
+          {
+            "name_title": "Priya Nair, Platform Admin",
+            "note": "Priya is the day-to-day champion and power user \u2014 deeply engaged, driving adoption, onboarding dispatchers, and maintaining institutional knowledge. She is invaluable as an internal advocate but has no budget authority and cannot close or save this renewal on her own. Her high activity level in Teams chat over-represents her in the data relative to her actual decision-making power. Treat her as the internal amplifier, not the renewal owner."
+          },
+          {
+            "name_title": "Tomas (last name unknown), Backup User",
+            "note": "Mentioned in Teams chat as being briefed by Priya for knowledge transfer. Role is operational continuity, not influence. Insufficient data to assess further."
+          }
+        ],
+        "section_sources": {
+          "situation": [
+            "CRM notes",
+            "QBR notes",
+            "Teams chat logs"
+          ],
+          "contact_read": [
+            "CRM notes",
+            "QBR notes"
+          ],
+          "where_to_press": [
+            "CRM notes",
+            "QBR notes",
+            "Teams chat logs"
+          ],
+          "do_this_today": [
+            "CRM notes",
+            "QBR notes"
+          ]
+        },
+        "data_gaps": [
+          "Marcus Chen's exact title and organizational reporting structure \u2014 knowing whether he reports to a CFO or COO would sharpen the ROI framing needed to reach him",
+          "What specific vendors Marcus is evaluating in his FY27 review \u2014 competitive intelligence would allow precise displacement positioning",
+          "Whether there has been any leadership-level relationship between the vendor's executive team and Marcus, or if all prior contact has been CSM-level",
+          "The content and delivery format of the QBR reports that Marcus said 'go into a folder' \u2014 understanding why they aren't landing would help redesign the value communication approach",
+          "Priya's relationship with Marcus \u2014 whether she has direct access and political capital to introduce an executive conversation, or whether she is too operational to bridge that gap"
+        ],
+        "confidence": "medium",
+        "confidence_note": "The three sources are consistent and triangulate well \u2014 CRM and QBR notes (primary) align on Marcus's disengagement and competitive review, and Teams chat (secondary) confirms Priya's engagement without contradicting the primary read. Confidence would rise to high with direct knowledge of what Marcus is benchmarking against, his exact title/reporting line, and whether any executive relationship exists on the vendor side that could be activated.",
+        "suggested_questions": [
+          "Has anyone at the VP or executive level on our side ever spoken with Marcus directly, or has all contact been CSM-managed?",
+          "Do we know which vendors Marcus is reviewing for FY27, and do we have any competitive intel on how they are positioning against us?",
+          "Can Priya give us a read on Marcus's current internal pressures \u2014 is the vendor review budget-driven, performance-driven, or politically driven from above him?"
+        ]
+      }
+    },
+    {
+      "case": "power-user-concentration",
+      "meta": {
+        "contract": "prompt",
+        "parse_path": "native",
+        "stop_reason": "end_turn",
+        "input_tokens": 1722,
+        "output_tokens": 1960,
+        "latency_ms": 48184
+      },
+      "error": null,
+      "raw_head": null,
+      "scores": {
+        "risk": {
+          "recall": 1.0,
+          "precision": 1.0,
+          "hit": true
+        },
+        "buyer": true,
+        "attribution": {
+          "coverage": 1.0,
+          "missing": []
+        },
+        "gaps_ok": true,
+        "empty": false
+      },
+      "total_ms": 55625,
+      "docs": 3,
+      "media": 1,
+      "hard_fail": false,
+      "run": 1,
+      "expected_risk": [
+        "Power user concentration"
+      ],
+      "brief": {
+        "situation": "Halvorsen Logistics is a $120K ARR account 140 days from renewal where platform value is almost entirely concentrated in one power user, Dayo Okafor, who accounts for 212 of roughly 241 total logins in August 2026. Dayo is taking four-month parental leave starting October 2026 with no documented handoff plan, meaning the account will likely go functionally dark precisely as the renewal window tightens. Budget authority Astrid Halvorsen (COO) is minimally engaged (1 login in August, absent from meetings since the 2025 review) and has given vague, non-committal answers about Q4 scope, suggesting she does not perceive the platform as organizationally embedded \u2014 only as Dayo's tool. While MBR notes show 6% MoM login growth and internal enthusiasm from Freya, these positive signals are a false floor built entirely on one person's activity and will not survive his absence.",
+        "risk_type": "Power user concentration",
+        "risk_severity": "high",
+        "data_sources_detected": [
+          "Internal notes",
+          "CSV data",
+          "MBR notes",
+          "Login chart (visual data)"
+        ],
+        "leverage_points": [
+          {
+            "rank": 1,
+            "what": "Schedule an executive-to-executive call between your leadership and Astrid Halvorsen within the next 5 business days, framing it around Q4 operational continuity planning \u2014 not renewal",
+            "why": "Astrid has not attended a meeting since the 2025 review and renewal is 140 days out. She currently perceives the platform as Dayo-dependent. A peer-level outreach reframes the conversation around business risk she owns (operational continuity during Dayo's leave) rather than a vendor asking for a signature. This is the only lever that gets her personally engaged before the renewal window closes.",
+            "timeline": "this week"
+          },
+          {
+            "rank": 2,
+            "what": "Co-build and execute a formal knowledge transfer plan with Dayo before his October leave: document all saved views, reports, and admin configurations, identify and onboard a backup admin, and run at least two live training sessions with that person",
+            "why": "The internal notes confirm no handoff plan exists and Dayo's manager has deferred planning. If Dayo goes on leave and the account goes dark, Astrid's renewal calculus becomes simple: the platform stopped delivering value. Proactive knowledge transfer is both a retention action and proof of partnership that can be presented to Astrid directly.",
+            "timeline": "this month"
+          },
+          {
+            "rank": 3,
+            "what": "Build a multi-stakeholder success narrative for Astrid that quantifies operational value delivered \u2014 pulling from Dayo's custom reports and Freya's internal advocacy \u2014 and present it in a formal QBR before renewal",
+            "why": "Astrid's decision style appears financially driven and low-engagement; she logs in only for renewal approvals. She currently has no independent evidence of platform ROI beyond Dayo's existence. A QBR with quantified outcomes (time saved, reporting coverage, operational metrics) and a named secondary admin gives her a business case for renewal that does not depend on one employee.",
+            "timeline": "this quarter"
+          }
+        ],
+        "do_this_today": "Draft and send a direct, brief email to Astrid Halvorsen today \u2014 from a senior person on your side \u2014 acknowledging Dayo's upcoming leave, positioning your team as proactively managing continuity on her behalf, and requesting 20 minutes to align on Q4 operational coverage before the window tightens. Do not mention renewal. Make it about her operational risk, not your contract.",
+        "contact_persona": {
+          "primary_contact": "Astrid Halvorsen, COO",
+          "comm_style": "Minimal and transactional based on all available evidence \u2014 she attends renewal meetings but not working sessions, logs in once in August, and her Q4 response ('cross that bridge') signals she communicates in short, deferring phrases rather than structured updates. She is not a platform user; she is a budget gatekeeper who expects her team to manage vendors.",
+          "decision_style": "Financially driven and risk-averse by absence \u2014 she approves renewals when the status quo feels safe and the cost of switching seems higher than staying. She is unlikely to champion the platform proactively but will cut it if a visible operational failure (like Dayo's leave going unmanaged) makes the risk of staying feel higher than the risk of leaving.",
+          "what_they_say_vs_mean": "Surface: 'We'll cross that bridge when we come to it' re: Q4 coverage. Subtext: She has not thought about this seriously, does not feel the platform is her problem to manage, and is implicitly delegating renewal risk to Dayo \u2014 who will be on leave. She is not hostile; she is disengaged, which is equally dangerous at renewal.",
+          "approach_recommendation": "Do not pitch features or send usage reports \u2014 she will not read them. Engage her exclusively on operational continuity and business risk framing. A senior peer outreach (not an account manager cold email) requesting a short call to 'make sure Q4 runs smoothly during Dayo's leave' is the right entry point. Once she is in the room, present a one-page summary: what the platform does for her operation, who will own it during the leave, and what continuity looks like. Make her feel that renewing is the low-effort, low-risk choice."
+        },
+        "secondary_contacts": [
+          {
+            "name_title": "Dayo Okafor (title not specified \u2014 likely Operations Analyst or similar)",
+            "note": "The de facto platform owner and only meaningful power user with 212 logins in August. He is the internal champion and source of all operational value, but he is a secondary contact because he has no budget authority and will be on parental leave starting October 2026 \u2014 the exact period that overlaps with renewal."
+          },
+          {
+            "name_title": "Freya (title not specified \u2014 likely Regional Lead based on login data)",
+            "note": "An enthusiastic internal advocate who has praised Dayo's work publicly in MBR context. She has 2 logins in August, suggesting she consumes outputs rather than operates the platform. Potentially useful as a secondary voice of value to Astrid if activated, but has no decision-making authority."
+          },
+          {
+            "name_title": "Finance Analyst (name not specified)",
+            "note": "4 logins in August. Minimal engagement raises a flag \u2014 if procurement or budget approval runs through this person, their disengagement is a latent risk that has not been surfaced yet."
+          }
+        ],
+        "section_sources": {
+          "situation": [
+            "Internal notes",
+            "CSV data",
+            "MBR notes"
+          ],
+          "contact_read": [
+            "Internal notes",
+            "MBR notes",
+            "CSV data"
+          ],
+          "where_to_press": [
+            "Internal notes",
+            "MBR notes",
+            "CSV data"
+          ],
+          "do_this_today": [
+            "Internal notes",
+            "MBR notes"
+          ]
+        },
+        "data_gaps": [
+          "No documented business outcomes or ROI metrics \u2014 what has Dayo's reporting actually delivered in measurable operational terms? Without this, there is no renewal narrative for Astrid.",
+          "Dayo's manager's name and title are unknown \u2014 she is responsible for the handoff plan and is a critical escalation point for knowledge transfer, but is completely unidentified in the sources.",
+          "Finance Analyst identity and role in the procurement or renewal approval process is unknown \u2014 if they are involved in sign-off, their disengagement is a separate risk thread.",
+          "No visibility into whether Astrid has received any formal value communication (QBR, business review, ROI summary) since the 2025 review \u2014 unclear if her disengagement is passive or the result of feeling underserved.",
+          "Dayo's leave start and return dates relative to the exact renewal date are not confirmed \u2014 the overlap window needs to be mapped precisely to know how much of the renewal decision period is effectively unmanaged."
+        ],
+        "confidence": "medium",
+        "confidence_note": "The risk pattern is clearly legible and high-severity, but confidence is capped at medium because Astrid's actual renewal intent is unknown \u2014 she has not said she is at risk of churning, only that she is disengaged. A single direct conversation with her would immediately sharpen this to high or low confidence. Additionally, no primary source (kick-off deck, QBR, contract notes) exists to confirm what she originally committed to or what success was defined as at implementation.",
+        "suggested_questions": [
+          "Has anyone on your team had a direct conversation with Astrid Halvorsen in 2026 outside of the 2025 review \u2014 and if so, what was her tone toward the platform?",
+          "Is there a documented success plan or agreed set of outcomes from the original implementation that we can reference to build a renewal business case?",
+          "Who is Dayo's manager, and has she been looped into the parental leave handoff risk conversation yet \u2014 or is this still sitting as an informal comment in internal notes?"
+        ]
+      }
+    },
+    {
+      "case": "reduced-footprint",
+      "meta": {
+        "contract": "prompt",
+        "parse_path": "native",
+        "stop_reason": "end_turn",
+        "input_tokens": 1349,
+        "output_tokens": 1833,
+        "latency_ms": 40448
+      },
+      "error": null,
+      "raw_head": null,
+      "scores": {
+        "risk": {
+          "recall": 1.0,
+          "precision": 1.0,
+          "hit": true
+        },
+        "buyer": true,
+        "attribution": {
+          "coverage": 1.0,
+          "missing": []
+        },
+        "gaps_ok": true,
+        "empty": false
+      },
+      "total_ms": 48348,
+      "docs": 3,
+      "media": 0,
+      "hard_fail": false,
+      "run": 1,
+      "expected_risk": [
+        "Reduced footprint"
+      ],
+      "brief": {
+        "situation": "Saltmarsh Energy is 50 days from renewal with a confirmed 56% seat reduction (80\u219235) driven by failed field team adoption \u2014 a planned Q1 field rollout was cancelled, and active usage has actually declined from 36 to 33 users over 6 months against an 80-seat license. The finance and planning teams are genuinely satisfied (close cycle improved 2 days YoY), and VP Finance Priya Raman has explicitly framed this as right-sizing rather than departure, but she is cost-conscious and has already flagged overpaying as a specific grievance. The AE has committed to a 35-seat proposal, so the commercial path is partially scoped, but the underlying adoption failure has not been diagnosed or addressed \u2014 meaning the retained 35 seats are also at risk if the root cause is organizational rather than situational.",
+        "risk_type": "Reduced footprint",
+        "risk_severity": "high",
+        "data_sources_detected": [
+          "Email thread",
+          "MBR notes",
+          "CSV usage data"
+        ],
+        "leverage_points": [
+          {
+            "rank": 1,
+            "what": "Deliver the 35-seat proposal with tiered options as committed, but anchor it explicitly to the finance team's proven ROI \u2014 the 2-day close cycle improvement \u2014 and frame the right-sizing as a deliberate, validated scope rather than a failure narrative.",
+            "why": "Priya Raman has already drawn a boundary and is expecting the proposal. Leading with the finance team's measurable win neutralizes the cost grievance with evidence and gives her language to justify the retained spend internally. Missing or softening this commitment will erode trust at exactly the wrong moment.",
+            "timeline": "this week"
+          },
+          {
+            "rank": 2,
+            "what": "Run a structured post-mortem on the field rollout cancellation \u2014 not a QBR recap, but a direct conversation with Priya or whoever owned the field initiative \u2014 to determine whether it was a change-management failure, a product fit miss, or a business priority shift.",
+            "why": "The MBR and usage data confirm the field teams never came online, but no source explains why. If it was change management, there is a recovery path. If it was product fit or a strategic deprioritization, the 35-seat base is the ceiling and should be treated as a defensive hold. The answer shapes every future play.",
+            "timeline": "this month"
+          },
+          {
+            "rank": 3,
+            "what": "Build a formal success plan for the retained 35-seat finance and planning cohort \u2014 defined outcomes, usage benchmarks, and a named exec sponsor \u2014 to create documented proof of value before the next renewal cycle.",
+            "why": "Right now the only defensible value is anecdotal (close cycle improvement). If that metric is not formalized and expanded, the next renewal conversation will start from the same cost-pressure position. A success plan converts a satisfied but passive user base into a referenceable, renewal-ready account.",
+            "timeline": "this quarter"
+          }
+        ],
+        "do_this_today": "Send Priya Raman the 35-seat proposal as committed \u2014 include a one-paragraph summary that names the 2-day close cycle improvement as the anchor ROI, confirms the right-sizing is a logical next step, and requests a 20-minute call this week to walk through tiering options together. Do not let the commitment slip past its deadline; Priya is tracking it.",
+        "contact_persona": {
+          "primary_contact": "Priya Raman, VP Finance",
+          "comm_style": "Direct, professional, and boundary-setting. She communicates with precision \u2014 she named the exact overpayment problem (45 unused seats), set a clear expectation (proposal by end of week), and used explicitly non-departure language to manage the vendor relationship. She does not escalate emotionally; she escalates structurally.",
+          "decision_style": "Data-driven and cost-conscious. She has budget authority and exercises it proactively \u2014 she identified the utilization gap herself and drove the seat reduction conversation rather than waiting for the vendor to catch up. Decisions appear to be made on measurable efficiency and defensible spend, not relationship loyalty.",
+          "what_they_say_vs_mean": "She says 'this is right-sizing, not a departure signal' \u2014 which is true on its face and should be taken at face value as a primary source signal. But the subtext is: 'I am giving you a chance to fix this cleanly. If the proposal is late, off-base, or doesn't reflect what I told you, I will revisit whether even 35 seats is justified.' She is extending professional courtesy, not enthusiasm.",
+          "approach_recommendation": "Meet every commitment on time and on spec. Lead all communication with data she can use internally \u2014 ROI metrics, efficiency gains, utilization benchmarks. Do not pitch expansion or upsell at this meeting; she will read it as tone-deaf given the active reduction conversation. Position yourself as the partner who helped her rationalize intelligently, then earn the right to grow again in Q3-Q4 once the 35-seat base is stable and documented."
+        },
+        "secondary_contacts": [
+          {
+            "name_title": "Unknown \u2014 field team owner or operations lead",
+            "note": "The cancelled Q1 field rollout implies there was an internal owner for that initiative. This person is unidentified in all available sources but is critical to understanding why adoption failed. They are secondary because they have no apparent budget authority, but they hold the diagnostic key to whether the account can ever expand again."
+          }
+        ],
+        "section_sources": {
+          "situation": [
+            "Email thread",
+            "MBR notes",
+            "CSV usage data"
+          ],
+          "contact_read": [
+            "Email thread",
+            "MBR notes"
+          ],
+          "where_to_press": [
+            "Email thread",
+            "MBR notes",
+            "CSV usage data"
+          ],
+          "do_this_today": [
+            "Email thread",
+            "MBR notes"
+          ]
+        },
+        "data_gaps": [
+          "Root cause of field rollout cancellation \u2014 was it a product fit issue, a change management failure, a budget reprioritization, or a personnel change? This is the single most important unknown.",
+          "Identity and title of the internal champion or owner for the field rollout \u2014 this person may still be an expansion path or may have already exited.",
+          "Whether Priya Raman has evaluated or is evaluating competitive alternatives \u2014 the email thread describes professional engagement but no source confirms or rules out a vendor comparison.",
+          "Specific modules or features used by the retained 34 finance/planning users \u2014 needed to assess stickiness and protect the core cohort.",
+          "Contractual terms and any auto-renewal clauses \u2014 with 50 days to renewal, knowing whether Priya can unilaterally reduce or must negotiate matters to urgency calibration."
+        ],
+        "confidence": "medium",
+        "confidence_note": "Three sources are present and directionally consistent, which is a solid triangulation. Confidence is capped at medium because the field rollout failure \u2014 the central event driving this reduction \u2014 is described in outcome only, not cause. Without understanding why the rollout was cancelled, it is impossible to assess whether the 35-seat base is stable or merely the next step down.",
+        "suggested_questions": [
+          "When the Q1 field rollout was cancelled, what was the primary reason \u2014 was it a resourcing decision, a product fit concern, or a change in business strategy for that team?",
+          "For the finance and planning users who are actively using the platform, what workflows or outputs are they most dependent on \u2014 and are there adjacent use cases they've asked about but haven't had capacity to explore?",
+          "As you think about the 35-seat structure going forward, what would 'success' look like for you at the next renewal \u2014 what would need to be true for you to feel confident in the investment?"
+        ]
+      }
+    },
+    {
+      "case": "relationship-gap",
+      "meta": {
+        "contract": "prompt",
+        "parse_path": "recovered_by_parser",
+        "stop_reason": "end_turn",
+        "input_tokens": 1353,
+        "output_tokens": 1908,
+        "latency_ms": 42676
+      },
+      "error": null,
+      "raw_head": null,
+      "scores": {
+        "risk": {
+          "recall": 1.0,
+          "precision": 1.0,
+          "hit": true
+        },
+        "buyer": true,
+        "attribution": {
+          "coverage": 1.0,
+          "missing": []
+        },
+        "gaps_ok": true,
+        "empty": false
+      },
+      "total_ms": 51456,
+      "docs": 3,
+      "media": 0,
+      "hard_fail": false,
+      "run": 1,
+      "expected_risk": [
+        "Relationship gap"
+      ],
+      "brief": {
+        "situation": "Oakhurst Capital is 45 days from a $72,000 renewal with zero director-level engagement: budget owner Miriam Feld has deflected three outreach attempts and delegated entirely to analyst Kevin Tran, citing a fund close as the reason for unavailability. Kevin is experiencing real product friction (stale benchmark data, export limitations) but is working around it quietly rather than escalating, while Miriam herself is not logging into the platform at all. The combination of a shielded decision-maker, passive renewal language, unresolved end-user friction, and a vague 'data stack review' in CRM notes creates a compounding risk profile where administrative drift and silent dissatisfaction could produce a late-stage churn surprise.",
+        "risk_type": "Relationship gap",
+        "risk_severity": "high",
+        "data_sources_detected": [
+          "CRM notes",
+          "Email thread",
+          "Slack thread"
+        ],
+        "leverage_points": [
+          {
+            "rank": 1,
+            "what": "Escalate internally to your exec sponsor and request a warm peer-to-peer outreach from your VP or C-level to Miriam Feld directly \u2014 not another AE email \u2014 framed around a brief strategic check-in, not renewal paperwork",
+            "why": "CRM notes confirm three failed outreach attempts to Miriam with no response; email thread shows she delegated renewal to Kevin rather than engaging. At 45 days out this is not a scheduling problem, it is a relationship gap. Only an executive-to-executive touch can break the deflection pattern before the window closes.",
+            "timeline": "this week"
+          },
+          {
+            "rank": 2,
+            "what": "Resolve Kevin's specific product friction \u2014 stale benchmark data refresh and export format options \u2014 and deliver a documented fix or workaround with a clear roadmap commit, then use that resolution as the hook to schedule a results walkthrough with both Kevin and Miriam",
+            "why": "Slack thread shows Kevin is silently absorbing friction without escalating, which is a disengagement signal. Fixing his pain proactively and visibly converts a passive detractor into a potential internal advocate ahead of Miriam's renewal decision. The results walkthrough the AE offered (email thread) has no taker yet \u2014 resolving Kevin's issues first gives him a reason to pull Miriam in.",
+            "timeline": "this month"
+          },
+          {
+            "rank": 3,
+            "what": "Diagnose and respond to the 'data stack review' signal by preparing a competitive displacement defense \u2014 map your platform's unique value against likely consolidation candidates and brief your exec sponsor before QBR season",
+            "why": "CRM notes flag a vague 'data stack review' which may indicate a vendor consolidation or competitive evaluation in progress. This is a primary source signal and cannot be dismissed. If Miriam is mid-fund-close and also running a stack review, the renewal may be contingent on that outcome. Getting ahead of it with a clear differentiation narrative protects the renewal even if you cannot get direct access to Miriam before October 1st.",
+            "timeline": "this quarter"
+          }
+        ],
+        "do_this_today": "Send your VP or exec sponsor a one-paragraph brief on Miriam's avoidance pattern and the 45-day clock, and ask them to send a short, direct peer-to-peer note to Miriam today \u2014 not a forwarded chain, a fresh message \u2014 acknowledging the fund close timing and asking for 20 minutes at her convenience before October 1st. This bypasses the delegation wall without escalating in a way that signals alarm.",
+        "contact_persona": {
+          "primary_contact": "Miriam Feld, Director (or equivalent budget owner/decision-maker \u2014 title not explicitly stated in sources but inferred from budget authority and delegation behavior)",
+          "comm_style": "Operates through delegation under pressure; capacity-constrained rather than communicative during high-workload periods (fund close). Does not proactively flag concerns \u2014 silence and redirection are her signals. Has not objected to the product, which means dissatisfaction, if present, will not surface until it is too late.",
+          "decision_style": "Likely a pragmatic, low-friction decision-maker who will renew on autopilot if nothing forces a review \u2014 but the 'data stack review' suggests she may also be running a deliberate consolidation process in parallel. Decisions appear to be made privately and announced rather than workshopped with vendors.",
+          "what_they_say_vs_mean": "Surface: 'I'm busy with a fund close, Kevin can handle it.' Subtext: Either genuine capacity constraint with low renewal risk (email thread read) OR active deprioritization of the relationship while evaluating alternatives (CRM read). The absence of any positive renewal signal leans toward the latter. 'Fine with how things are going' from Kevin almost certainly reflects Miriam's words passed down \u2014 passivity, not endorsement.",
+          "approach_recommendation": "Do not send another email from the AE or CSM \u2014 she has already filtered those out. The only effective move is an executive peer touch that is brief, non-transactional, and acknowledges her actual context (fund close). Frame it as a relationship check-in with a specific, low-ask request: 20 minutes before October 1st. If she engages at all, lead with value delivered, not renewal paperwork."
+        },
+        "secondary_contacts": [
+          {
+            "name_title": "Kevin Tran, Analyst",
+            "note": "Day-to-day user and current sole point of contact by default; heavily present in Slack thread and email thread but has no budget authority or vendor decision-making power. He is useful as an internal advocate if his product friction is resolved, but he is also a gatekeeper who may be filtering Miriam's actual sentiment. He should not be the only relationship managed into renewal."
+          }
+        ],
+        "section_sources": {
+          "situation": [
+            "CRM notes",
+            "Email thread",
+            "Slack thread"
+          ],
+          "contact_read": [
+            "CRM notes",
+            "Email thread",
+            "Slack thread"
+          ],
+          "where_to_press": [
+            "CRM notes",
+            "Email thread",
+            "Slack thread"
+          ],
+          "do_this_today": [
+            "CRM notes",
+            "Email thread"
+          ]
+        },
+        "data_gaps": [
+          "Miriam Feld's exact title and seniority level \u2014 'budget owner' is inferred, not confirmed, which affects how hard to escalate and at what level",
+          "What the 'data stack review' specifically covers \u2014 whether it includes this platform's category is unknown and changes the competitive risk materially",
+          "Product usage data / login analytics \u2014 knowing whether Miriam ever logged in historically vs. recently dropped off would distinguish new disengagement from longstanding intermediary behavior",
+          "Whether Kevin Tran has any directional read on Miriam's renewal intent \u2014 he has not been directly asked in any documented touchpoint",
+          "Contract terms \u2014 auto-renew vs. active signature required changes the urgency of securing Miriam's engagement before October 1st"
+        ],
+        "confidence": "medium",
+        "confidence_note": "Three source types are present but all are secondary-to-medium weight (no all-hands, QBR, or kickoff deck). CRM notes and email thread are primary sources and align on the deflection pattern, which anchors the read. The Slack thread adds texture but Kevin's low-urgency framing may understate risk. Confidence would increase significantly with a direct read on Miriam's intent, usage data, and clarity on the data stack review scope.",
+        "suggested_questions": [
+          "Kevin, when you mentioned to Miriam that renewal paperwork had come through, what was her exact reaction \u2014 did she say anything about timing, the tool, or whether anything had changed on her end?",
+          "Is the 'data stack review' something Kevin mentioned unprompted, or did it surface in a specific context \u2014 and do you know if it covers the category our platform sits in?",
+          "Does the contract auto-renew or require active signature from Miriam, and has legal or procurement been looped in on either side?"
+        ]
+      }
+    },
+    {
+      "case": "silent-decay",
+      "meta": {
+        "contract": "prompt",
+        "parse_path": "recovered_by_parser",
+        "stop_reason": "end_turn",
+        "input_tokens": 1640,
+        "output_tokens": 1744,
+        "latency_ms": 40225
+      },
+      "error": null,
+      "raw_head": null,
+      "scores": {
+        "risk": {
+          "recall": 1.0,
+          "precision": 1.0,
+          "hit": true
+        },
+        "buyer": true,
+        "attribution": {
+          "coverage": 0.0,
+          "missing": [
+            "CSV data"
+          ]
+        },
+        "gaps_ok": true,
+        "empty": false
+      },
+      "total_ms": 47343,
+      "docs": 3,
+      "media": 1,
+      "hard_fail": false,
+      "run": 1,
+      "expected_risk": [
+        "Silent decay"
+      ],
+      "brief": {
+        "situation": "Northwind Analytics is in active silent decay with weekly active users collapsing 63% over 12 weeks (41\u219215) against 50 licensed seats, a consistent downward trajectory with zero stabilization. The account team has not had a direct conversation with Ibrahim Hassan about the usage drop, and Ibrahim has been largely unavailable citing a migration project, creating a communication blackout during a critical 100-day renewal window. Zero support tickets across the period reinforces the pattern: this is not a frustrated customer escalating, it is a disengaging one quietly walking away. The AE appears to be assuming automatic renewal while the CSM has flagged high churn risk \u2014 a dangerous internal misalignment when the data is this unambiguous.",
+        "risk_type": "Silent decay",
+        "risk_severity": "high",
+        "data_sources_detected": [
+          "CRM notes",
+          "Internal notes",
+          "CSV usage export",
+          "Usage chart (admin console export)"
+        ],
+        "leverage_points": [
+          {
+            "rank": 1,
+            "what": "Send Ibrahim a direct, data-informed outreach this week \u2014 not a meeting request, but a short message acknowledging the migration context and surfacing the usage trend explicitly, asking one pointed question: whether the platform is still in the plan post-migration.",
+            "why": "Ibrahim's unavailability is real but the renewal clock is at 100 days and usage has hit 15 of 50 seats. Waiting until 'post-September' risks hitting the renewal window with no established intent. A low-friction, no-meeting-required message respects his bandwidth while forcing a signal from him.",
+            "timeline": "this week"
+          },
+          {
+            "rank": 2,
+            "what": "Diagnose the migration: determine whether the platform was deprioritized temporarily during the migration or whether users have been migrated onto a competing or internal tool that is replacing it.",
+            "why": "The CRM notes frame the usage decline as a side effect of migration distraction, but the 63% straight-line drop over 12 consecutive weeks with zero support tickets suggests the cause may be structural displacement, not temporary distraction. These two scenarios require completely different renewal plays.",
+            "timeline": "this month"
+          },
+          {
+            "rank": 3,
+            "what": "Run a formal business review with Ibrahim before day 70 of the renewal window, anchored to a re-onboarding or re-adoption plan if the platform is still in scope \u2014 or a frank right-sizing conversation if it is not.",
+            "why": "If the platform survives the migration context, the account needs a structured path back to meaningful adoption. If it does not, a proactive right-sizing conversation preserves relationship and partial ARR better than a surprise non-renewal. Either path requires Ibrahim in the room before the renewal decision is made without you.",
+            "timeline": "this quarter"
+          }
+        ],
+        "do_this_today": "Send Ibrahim a two-sentence message \u2014 not a calendar invite \u2014 that names the migration context empathetically, references that you are seeing lighter platform activity, and asks one direct question: 'Is the platform still part of your stack post-migration, or has something shifted I should know about?' Make it easy to reply in under 60 seconds. Log the outreach and the response (or non-response) in CRM immediately.",
+        "contact_persona": {
+          "primary_contact": "Ibrahim Hassan, Director of Data",
+          "comm_style": "Ibrahim presents as operationally heads-down with low vendor communication tolerance during high-priority internal projects. His non-response to newsletter outreach and pre-renewal scheduling suggests he deprioritizes vendor touchpoints when under project pressure \u2014 not hostility, but selective attention. He is unlikely to proactively raise concerns; he will simply go quiet and make the renewal decision internally.",
+          "decision_style": "Likely analytical and internally-driven: he controls the data stack and will make or heavily influence the renewal call based on whether the tool fits his post-migration architecture, not based on relationship warmth or vendor outreach volume. Decisions are probably made before the formal renewal conversation happens.",
+          "what_they_say_vs_mean": "Surface: 'We're heads down on migration, let's reconnect in September.' Subtext: 'I haven't decided if this platform survives our migration and I'm not going to tell you that until I have to.' The silence is not a scheduling problem \u2014 it is a signal that the value case has not been re-established in his mind.",
+          "approach_recommendation": "Do not send another meeting request. Send a short, direct message that shows you have looked at the data and are not assuming everything is fine. Frame it as a check-in from a partner who is aware of his context, not a vendor chasing a renewal. Give him one easy question to answer asynchronously. If he responds, move immediately to a diagnostic call. If he does not respond within 5 business days, escalate internally to determine whether there is another stakeholder at Northwind with visibility into the migration and platform decisions."
+        },
+        "secondary_contacts": [
+          {
+            "name_title": "Unknown \u2014 no secondary contacts identified in source data",
+            "note": "No other named stakeholders appear in any source. A significant data gap is the absence of any other Northwind contact \u2014 there is no champion, no admin, and no economic buyer identified below or above Ibrahim. This is a single-threaded account, which amplifies the risk of his silence."
+          }
+        ],
+        "section_sources": {
+          "situation": [
+            "CRM notes",
+            "Internal notes",
+            "CSV usage export"
+          ],
+          "contact_read": [
+            "CRM notes",
+            "Internal notes"
+          ],
+          "where_to_press": [
+            "CSV usage export",
+            "CRM notes",
+            "Internal notes"
+          ],
+          "do_this_today": [
+            "CRM notes",
+            "Internal notes",
+            "CSV usage export"
+          ]
+        },
+        "data_gaps": [
+          "No clarity on what the migration is \u2014 what system, what timeline, and whether the current platform overlaps with or is being replaced by the migration target",
+          "No login or feature-level usage data to distinguish whether the 15 remaining active users are core power users or casual ones \u2014 this changes the severity read",
+          "No secondary contact at Northwind identified \u2014 the account is single-threaded through Ibrahim, making his silence a complete information blackout",
+          "No AE or CSM call notes or transcripts \u2014 the internal notes flag AE complacency but there is no record of what was actually said to the customer in recent months",
+          "No information on whether Ibrahim has budget authority alone or whether renewal requires sign-off above him"
+        ],
+        "confidence": "medium",
+        "confidence_note": "Usage data is clear and consistent \u2014 the decline signal is high confidence. The interpretation of why (migration distraction vs. platform displacement) is low confidence without a direct conversation or feature-level usage data. Contact read is inferred from behavioral signals only; no transcript or direct communication from Ibrahim exists in the source material.",
+        "suggested_questions": [
+          "Has anyone on the team spoken directly with Ibrahim in the last 60 days, and if so, what did he say about the platform's role post-migration?",
+          "Do we know what the migration is \u2014 is Northwind moving to a new data warehouse, a new BI tool, or consolidating vendors \u2014 and does our platform overlap with any of those systems?",
+          "Are the 15 remaining weekly active users identifiable by role \u2014 are they analysts, engineers, or leadership \u2014 and does that tell us anything about which use cases are still alive?"
+        ]
+      }
+    },
+    {
+      "case": "stalled-expansion",
+      "meta": {
+        "contract": "prompt",
+        "parse_path": "recovered_by_parser",
+        "stop_reason": "end_turn",
+        "input_tokens": 2904,
+        "output_tokens": 1605,
+        "latency_ms": 40371
+      },
+      "error": null,
+      "raw_head": null,
+      "scores": {
+        "risk": {
+          "recall": 1.0,
+          "precision": 1.0,
+          "hit": true
+        },
+        "buyer": true,
+        "attribution": {
+          "coverage": 1.0,
+          "missing": []
+        },
+        "gaps_ok": true,
+        "empty": false
+      },
+      "total_ms": 44620,
+      "docs": 2,
+      "media": 1,
+      "hard_fail": false,
+      "run": 1,
+      "expected_risk": [
+        "Stalled expansion"
+      ],
+      "brief": {
+        "situation": "Corvid Media is a healthy, high-adoption account (40 seats, 92% WAU, NPS 61) with base renewal confirmed for 1 December 2026 and 102 days out. Expansion to Audience Insights (+$38k ARR) and 25 additional sales seats was proposed at the 22 July Annual Review but explicitly deferred by VP Product Marcus Whitfield due to a company-wide finance freeze tied to an internal reorg, with a clear re-engagement window named as October. The block is entirely budget/structural \u2014 not a product objection \u2014 and Marcus has signaled genuine intent to revisit, making this a timing problem, not a value problem. The editorial team's organic interest in Audience Insights creates bottom-up demand that can be cultivated now so the October conversation is pre-loaded.",
+        "risk_type": "Stalled expansion",
+        "risk_severity": "low",
+        "data_sources_detected": [
+          "Annual review deck",
+          "CRM notes",
+          "Email thread"
+        ],
+        "leverage_points": [
+          {
+            "rank": 1,
+            "what": "Send Marcus a brief, low-ask email confirming the October re-engagement date and offering to prepare a tailored Audience Insights business case in advance so he has something concrete to bring to finance when the freeze lifts.",
+            "why": "Marcus set a specific timeline and committed to re-engage \u2014 meeting him on that commitment professionally keeps trust intact and positions you as prepared rather than pushy. The email thread confirms his tone is collaborative and deadline-oriented.",
+            "timeline": "this week"
+          },
+          {
+            "rank": 2,
+            "what": "Work through the editorial team's existing Audience Insights curiosity: share a use-case one-pager or a short demo tailored to editorial workflows, building internal advocacy that Marcus can point to when making the case to finance.",
+            "why": "CRM notes flag that the editorial team is already asking about Audience Insights, creating organic bottom-up pull. Converting that curiosity into a documented internal use case reduces the sales burden on Marcus and lowers friction at the October decision point.",
+            "timeline": "this month"
+          },
+          {
+            "rank": 3,
+            "what": "Build and deliver a pre-packaged expansion business case (ROI framing, sales team seat justification, Audience Insights value story) timed to arrive the first week of October, aligned with when Marcus indicated the freeze would lift.",
+            "why": "The reorg is the only blocker; when it resolves, whoever has a ready-to-approve document in hand wins the budget conversation. The $38k expansion plus 25 seats represents a 45%+ ARR uplift \u2014 worth the preparation investment.",
+            "timeline": "this quarter"
+          }
+        ],
+        "do_this_today": "Log the October re-engagement date as a hard-dated task in CRM, then send Marcus a one-paragraph email acknowledging the freeze, confirming you'll return in October with a tailored Audience Insights business case, and asking if there is anyone else internally (e.g., a finance lead or sales team head) he would want looped in when that conversation begins.",
+        "contact_persona": {
+          "primary_contact": "Marcus Whitfield, VP Product",
+          "comm_style": "Direct and time-bounded \u2014 his Annual Review response was a single clear deferral with a named date, no ambiguity. Email tone is professional and collaborative without being effusive. He communicates decisions cleanly and respects vendors who do the same.",
+          "decision_style": "Structurally constrained but intellectually engaged \u2014 he does not object on value grounds, he defers on process grounds. Decisions appear to be made within organizational guardrails (finance freeze, reorg approval cycles) rather than by personal discretion alone. He names conditions and timelines rather than giving soft no's.",
+          "what_they_say_vs_mean": "Saying 'not this quarter, come back in October' means: I like this, I want this, I cannot approve it now, and I am giving you the exact window to try again \u2014 do not mistake the deferral for disinterest. The explicit invite to return is the signal.",
+          "approach_recommendation": "Honor his stated timeline precisely \u2014 do not re-engage on expansion before October. Use the interim period to build internal demand through the editorial team and prepare a finance-ready business case so Marcus has something to champion, not just consider. Frame October outreach as delivering on what was agreed, not re-pitching."
+        },
+        "secondary_contacts": [
+          {
+            "name_title": "Editorial team (unnamed members)",
+            "note": "Day-to-day power users who organically reference the dashboard as 'the morning read' and are already asking about Audience Insights. They are secondary because they lack budget authority, but they represent the strongest internal advocacy engine for the expansion conversation \u2014 worth nurturing through content and use-case materials."
+          }
+        ],
+        "section_sources": {
+          "situation": [
+            "Annual review deck",
+            "CRM notes",
+            "Email thread"
+          ],
+          "contact_read": [
+            "Annual review deck",
+            "Email thread",
+            "CRM notes"
+          ],
+          "where_to_press": [
+            "CRM notes",
+            "Email thread",
+            "Annual review deck"
+          ],
+          "do_this_today": [
+            "Email thread",
+            "CRM notes",
+            "Annual review deck"
+          ]
+        },
+        "data_gaps": [
+          "No named contact on the editorial team \u2014 identifying a specific editorial stakeholder who champions Audience Insights would create a second internal advocate independent of Marcus.",
+          "No visibility into who owns the sales team expansion decision \u2014 the +25 seat proposal targets sales, but no sales leader is named in any source, creating a potential second approval chain.",
+          "Reorg scope and outcome unknown \u2014 understanding whether Marcus's role, team, or budget envelope changes post-reorg would significantly affect October re-engagement strategy.",
+          "No information on competitors being evaluated during the freeze period \u2014 budget pauses sometimes create evaluation windows."
+        ],
+        "confidence": "medium",
+        "confidence_note": "Both primary sources (Annual Review deck, CRM notes) and the email thread are tightly aligned \u2014 the read is consistent and clear. Confidence is medium rather than high because the reorg outcome is unknown, no secondary contacts are named, and there is no visibility into the internal finance approval process Marcus would need to navigate in October.",
+        "suggested_questions": [
+          "Marcus, as the reorg settles, is there a finance stakeholder or sales leader you'd want us to include in the October conversation so we can come in with the right approvals already mapped?",
+          "Is there anything specific the editorial team would need to see from Audience Insights before you'd feel confident bringing the expansion to finance?",
+          "Has the scope of your team's remit changed through the reorg in any way that would affect how you think about the sales team seat expansion we discussed in July?"
+        ]
+      }
+    },
+    {
+      "case": "truncated-transcript",
+      "meta": {
+        "contract": "prompt",
+        "parse_path": "native",
+        "stop_reason": "end_turn",
+        "input_tokens": 1200,
+        "output_tokens": 1544,
+        "latency_ms": 33877
+      },
+      "error": null,
+      "raw_head": null,
+      "scores": {
+        "risk": {
+          "recall": 0.5,
+          "precision": 1.0,
+          "hit": true
+        },
+        "buyer": true,
+        "attribution": {
+          "coverage": 1.0,
+          "missing": []
+        },
+        "gaps_ok": true,
+        "empty": false
+      },
+      "total_ms": 38601,
+      "docs": 2,
+      "media": 0,
+      "hard_fail": false,
+      "run": 1,
+      "expected_risk": [
+        "Reduced footprint",
+        "Adoption failure"
+      ],
+      "brief": {
+        "situation": "Ashgrove Robotics is 90 days from renewal and has explicitly signaled intent to downgrade from their current tier to a starter tier. A platform team reorg reduced engineering headcount from 12 to 4, collapsing active usage to just 2 users \u2014 making the current contract tier structurally indefensible. Hannah Lee, the budget owner, communicated this directly and candidly on a call, framing it not as dissatisfaction but as a resource reality; her tone suggests fatigue rather than hostility, and she is oriented toward a clean, low-friction downgrade rather than full churn.",
+        "risk_type": "Reduced footprint",
+        "risk_severity": "high",
+        "data_sources_detected": [
+          "call transcript",
+          "CRM notes"
+        ],
+        "leverage_points": [
+          {
+            "rank": 1,
+            "what": "Deliver a tailored starter-tier proposal with a defined, minimal onboarding plan built specifically around the 2 confirmed power users (Raj and one other)",
+            "why": "Hannah explicitly asked for this on the call and the CSM committed to it \u2014 delay now signals unreliability and increases churn risk. The window to retain any ARR depends on honoring that commitment before her decision hardens.",
+            "timeline": "this week"
+          },
+          {
+            "rank": 2,
+            "what": "Schedule a focused 30-minute session with Raj and the second active user to document their use cases, quantify output or time saved, and build a mini value narrative Hannah can use internally if she chooses to advocate",
+            "why": "Hannah said she's 'not sure it's a fight I want to have this year' \u2014 she's not opposed to retaining, she's just not resourced to champion it. Equipping Raj with a concrete value story reduces the activation energy required for Hannah to justify even the starter tier.",
+            "timeline": "this month"
+          },
+          {
+            "rank": 3,
+            "what": "Establish a 60-day post-downgrade check-in cadence tied to Ashgrove's next hiring or team growth signal, positioning the platform as the default tool when headcount recovers",
+            "why": "Robotics companies with reorg-driven contractions often re-expand. Locking in goodwill and a re-expansion trigger now \u2014 while Hannah is transparent and not hostile \u2014 protects future ARR and avoids a cold re-acquisition motion later.",
+            "timeline": "this quarter"
+          }
+        ],
+        "do_this_today": "Send Hannah a brief, direct email acknowledging the downgrade request, confirming the starter-tier proposal is being prepared, and naming a specific delivery date \u2014 this closes the loop the CSM opened on the call and prevents disengagement from filling the silence.",
+        "contact_persona": {
+          "primary_contact": "Hannah Lee, VP Engineering",
+          "comm_style": "Direct, low-drama, and candid \u2014 she surfaces bad news proactively rather than ghosting or escalating. She communicates efficiently and expects the same in return; her mid-call tone shift to disengagement signals she's already mentally moved on and will not re-engage without a concrete, fast response.",
+          "decision_style": "Pragmatic and resource-constrained. She makes decisions based on organizational reality (headcount, budget pressure) rather than product sentiment. She is not looking to be sold to \u2014 she is looking for a path that creates the least friction for her team.",
+          "what_they_say_vs_mean": "She says 'not sure it's a fight I want to have this year' \u2014 which means she has already decided the math doesn't support the current tier and is not willing to spend political capital defending it. Transparency here is a courtesy, not an opening for a save pitch. She wants a clean exit to a lower tier, not a retention negotiation.",
+          "approach_recommendation": "Do not lead with product value or upsell language \u2014 she will disengage immediately. Lead with speed and precision: deliver the starter-tier proposal exactly as requested, acknowledge the team contraction without minimizing it, and make the path forward frictionless. Any retention conversation should be framed around the 2 active users and positioned as her choice, not a CSM agenda. Earn trust now to protect future expansion when headcount recovers."
+        },
+        "secondary_contacts": [
+          {
+            "name_title": "Raj (name only \u2014 title unknown)",
+            "note": "Identified as one of the 2 active power users on the platform. He signaled willingness to retain on the call, making him the key internal advocate for continued usage. He is secondary because he lacks budget authority, but he is the most viable influence path for preserving even the starter-tier foothold."
+          }
+        ],
+        "section_sources": {
+          "situation": [
+            "call transcript",
+            "CRM notes"
+          ],
+          "contact_read": [
+            "call transcript",
+            "CRM notes"
+          ],
+          "where_to_press": [
+            "call transcript",
+            "CRM notes"
+          ],
+          "do_this_today": [
+            "call transcript"
+          ]
+        },
+        "data_gaps": [
+          "Raj's full name and title \u2014 needed to assess his internal influence and whether he could escalate or champion a future re-expansion",
+          "Identity of the second active user beyond Raj \u2014 understanding their role and use case would strengthen the value narrative built around retained users",
+          "Whether the headcount reduction is permanent or tied to a funding/hiring cycle \u2014 this determines whether re-expansion is a realistic near-term motion or a 12+ month horizon",
+          "Current contract tier and exact ARR at risk from downgrade versus starter-tier pricing \u2014 needed to quantify contraction impact and set internal expectations",
+          "Any product feedback or specific failure points that contributed to low adoption across the broader team \u2014 distinguishing org-driven collapse from product-driven abandonment affects the recovery strategy"
+        ],
+        "confidence": "high",
+        "confidence_note": "Both available sources are in strong agreement and the primary source (call transcript with the budget owner) is explicit and direct. Confidence would increase further with contract tier details, Raj's full profile, and clarity on whether the reorg is permanent.",
+        "suggested_questions": [
+          "When you think about the 2 engineers still using the platform, what would need to be true for that to feel worth maintaining even at the starter tier?",
+          "Is the headcount reduction expected to be permanent, or is there a scenario where the platform team grows again in the next 6-12 months?",
+          "What would a clean, low-effort transition look like from your side \u2014 is there anything beyond the tier change that would make renewal easier for your team?"
+        ]
+      }
+    },
+    {
+      "case": "vibe-risk",
+      "meta": {
+        "contract": "prompt",
+        "parse_path": "native",
+        "stop_reason": "end_turn",
+        "input_tokens": 1317,
+        "output_tokens": 1665,
+        "latency_ms": 36811
+      },
+      "error": null,
+      "raw_head": null,
+      "scores": {
+        "risk": {
+          "recall": 1.0,
+          "precision": 1.0,
+          "hit": true
+        },
+        "buyer": true,
+        "attribution": {
+          "coverage": 1.0,
+          "missing": []
+        },
+        "gaps_ok": true,
+        "empty": false
+      },
+      "total_ms": 44038,
+      "docs": 3,
+      "media": 0,
+      "hard_fail": false,
+      "run": 1,
+      "expected_risk": [
+        "Vibe risk"
+      ],
+      "brief": {
+        "situation": "Cobalt Studios is 85 days from renewal with strong product utilization (22/24 seats active, Post team onboarding successful) but a budget owner \u2014 Jules Moreau \u2014 who has visibly disengaged since May. The MBR was cut short with no questions asked, Teams chat has shifted from enthusiastic and specific to monosyllabic, and the CRM flags an unknown root cause for the sentiment shift. The product is performing; the relationship is deteriorating. This is a renewal at risk not because of adoption failure but because of an undiagnosed relational or strategic break with the decision-maker.",
+        "risk_type": "Vibe risk",
+        "risk_severity": "high",
+        "data_sources_detected": [
+          "CRM notes",
+          "MBR notes",
+          "Teams chat logs"
+        ],
+        "leverage_points": [
+          {
+            "rank": 1,
+            "what": "Book a direct, agenda-light 1:1 with Jules Moreau \u2014 not a QBR, not a renewal conversation. Frame it as a check-in on whether the platform is still aligned with where Cobalt's production work is heading.",
+            "why": "Every primary source (CRM, MBR notes) flags Jules as disengaged and identifies the root cause as unknown. The CRM explicitly warns that presenting value before diagnosing the issue will backfire. The diagnostic conversation must happen before anything else.",
+            "timeline": "this week"
+          },
+          {
+            "rank": 2,
+            "what": "Run a quiet internal audit: map which of the 22 active seats belong to the Post team vs. other production staff, and identify whether Jules personally uses the product or only governs the budget.",
+            "why": "If Jules has no day-to-day product contact, the relationship is purely administrative \u2014 making disengagement much easier and renewal much more vulnerable. Understanding Jules's personal stake (or lack of it) shapes how to reconstruct value.",
+            "timeline": "this month"
+          },
+          {
+            "rank": 3,
+            "what": "Build a renewal narrative anchored in production outcomes Cobalt cares about \u2014 scheduling efficiency, team adoption stickiness \u2014 and get it in front of Jules at least 45 days before renewal, not at the 11th hour.",
+            "why": "22/24 seat utilization and successful Post team onboarding are real proof points, but they have not been surfaced or landed with Jules. With 85 days on the clock, the window for a deliberate value conversation is closing fast.",
+            "timeline": "this quarter"
+          }
+        ],
+        "do_this_today": "Draft and send a short, direct message to Jules \u2014 not through a scheduling tool, but a personal note via Teams or email \u2014 saying something like: 'Jules, I want to make sure we're still aligned on what you need from us. Can we find 20 minutes this week, just the two of us?' No agenda attachment, no metrics deck. The goal is to re-open the human channel before the renewal window forces a transactional conversation.",
+        "contact_persona": {
+          "primary_contact": "Jules Moreau, Head of Production",
+          "comm_style": "Early signals from Teams chat show Jules is capable of specific, enthusiastic engagement when value is tangible and UX-level details resonate. Current pattern \u2014 single-word responses, shortened meetings \u2014 suggests Jules is either deliberately rationing engagement or has mentally deprioritized this vendor relationship. Not a verbose communicator under stress.",
+          "decision_style": "Budget owner with enough authority to cut meetings short and set the pace of the relationship. Likely makes decisions based on strategic fit and operational value to their production function, not feature lists. The fact that Jules raised no questions at the MBR \u2014 despite being the budget owner \u2014 suggests either complete disengagement or a decision already being privately processed.",
+          "what_they_say_vs_mean": "Surface: 'Fine,' 'Noted' \u2014 compliance without enthusiasm. Subtext: either 'I no longer see this as a priority relationship' or 'something has changed in my world that I haven't shared with you.' The absence of complaints is not a green flag here \u2014 it's a warning sign that Jules has stopped investing in the dialogue.",
+          "approach_recommendation": "Do not pitch, do not present metrics, do not send a deck. Jules needs to feel heard and consulted, not managed. Open with a genuine question about where Cobalt's production priorities are heading over the next 6-12 months, and listen for what has changed since May. If there is a budget constraint, a reorg, a competitive evaluation, or a personal frustration, it will only surface in a low-pressure, peer-level conversation. Match Jules's brevity \u2014 short ask, clear purpose, no fluff."
+        },
+        "secondary_contacts": [
+          {
+            "name_title": "Post Team Lead or Onboarding Contact (name unknown)",
+            "note": "The Post team completed onboarding in June and remains active with apparent stickiness. This person or group represents the day-to-day user base and could provide ground-level signal on how the product is actually being used and whether there are unspoken frustrations \u2014 but they do not hold budget authority and cannot save the renewal alone."
+          }
+        ],
+        "section_sources": {
+          "situation": [
+            "CRM notes",
+            "MBR notes",
+            "Teams chat logs"
+          ],
+          "contact_read": [
+            "CRM notes",
+            "MBR notes",
+            "Teams chat logs"
+          ],
+          "where_to_press": [
+            "CRM notes",
+            "MBR notes",
+            "Teams chat logs"
+          ],
+          "do_this_today": [
+            "CRM notes",
+            "MBR notes"
+          ]
+        },
+        "data_gaps": [
+          "Root cause of Jules's disengagement since May \u2014 no source identifies whether this is budget pressure, a reorg, a competitive evaluation, or a personal/relational issue with the rep or product",
+          "Jules's personal product usage \u2014 unclear whether Jules uses the platform directly or only holds the budget, which significantly affects renewal leverage",
+          "Whether there has been any leadership change or strategic shift at Cobalt Studios since May that would explain the tone shift",
+          "Identity and engagement level of the Post team lead or any champion within the active user base who could provide an internal advocate",
+          "Whether any competitor has been in contact with Cobalt Studios recently"
+        ],
+        "confidence": "medium",
+        "confidence_note": "The directional read \u2014 disengaged budget owner, unknown root cause, high renewal risk \u2014 is consistent across all three sources. Confidence would increase significantly after a direct 1:1 with Jules that surfaces the actual reason for the sentiment shift. Without that conversation, the risk type and severity are best estimates, not confirmed diagnoses.",
+        "suggested_questions": [
+          "Jules, since we last spoke in depth, has anything shifted in how your team is thinking about production tooling or the budget around it?",
+          "What would need to be true about the platform over the next 12 months for it to feel like an obvious keep for you?",
+          "Is there anything about how we've been working together that hasn't been working for you \u2014 cadence, content, the way we run these check-ins?"
+        ]
+      }
+    }
+  ]
+}
