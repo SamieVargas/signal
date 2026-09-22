@@ -75,6 +75,30 @@ def main():
         code = run.main(["--only", "most-mentioned-not-buyer", "--out", tmp], client=failing)
         check("a failed parse is a hard fail (exit 1)", code == 1)
 
+    print("an interrupted run writes what it has, marked partial")
+
+    class Interrupting:
+        """Answers like the fake client until the Nth analysis call, then raises the way Ctrl+C does."""
+        def __init__(self, inner, after):
+            self.inner, self.after, self.calls = inner, after, 0
+            self.messages = self
+        def create(self, **kw):
+            self.calls += 1
+            if self.calls > self.after:
+                raise KeyboardInterrupt
+            return self.inner.messages.create(**kw)
+
+    with tempfile.TemporaryDirectory() as tmp:
+        client = Interrupting(FakeClient(analysis_reply=json.dumps(brief)), after=6)
+        code = run.main(["--only", "most-mentioned-not-buyer", "--contract", "native", "--runs", "3", "--out", tmp], client=client)
+        files = sorted(os.listdir(tmp))
+        check("exit 130 on interrupt", code == 130)
+        check("files carry the partial suffix", any(f.endswith("-partial.md") for f in files) and any(f.endswith("-partial.json") for f in files))
+        data = json.loads(Path(tmp, next(f for f in files if f.endswith("-partial.json"))).read_text(encoding="utf-8"))
+        check("json records completed and planned", data["partial"] is True and 0 < data["completed"] < data["planned"])
+        md = Path(tmp, next(f for f in files if f.endswith("-partial.md"))).read_text(encoding="utf-8")
+        check("table header says PARTIAL", "PARTIAL" in md.splitlines()[0])
+
     print("\nALL CHECKS PASSED")
 
 
