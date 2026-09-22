@@ -270,35 +270,50 @@ def main(argv=None, client=None) -> int:
         client = config.get_client()
 
     results = []
-    for run in range(1, args.runs + 1):
-        for c in cases:
-            print(f"[{run}/{args.runs}] {c['id']} …", end=" ", flush=True)
-            r = run_case(client, c, mode=args.mode, contract=args.contract, weighted=weighted)
-            r["run"] = run
-            r["expected_risk"] = c["expected"].get("risk_types", [])
-            results.append(r)
-            sc = r["scores"]
-            print(f"risk={(r['brief'] or {}).get('risk_type')!s:<26} recall={sc['risk']['recall']:.2f} "
-                  f"buyer={'✓' if sc['buyer'] else '✗'} parse={(r['meta'] or {}).get('parse_path')}"
-                  + (f"  ERROR {r['error'][:80]}" if r["error"] else ""))
+    interrupted = False
+    planned = args.runs * len(cases)
+    try:
+        for run in range(1, args.runs + 1):
+            for c in cases:
+                print(f"[{run}/{args.runs}] {c['id']} …", end=" ", flush=True)
+                r = run_case(client, c, mode=args.mode, contract=args.contract, weighted=weighted)
+                r["run"] = run
+                r["expected_risk"] = c["expected"].get("risk_types", [])
+                results.append(r)
+                sc = r["scores"]
+                print(f"risk={(r['brief'] or {}).get('risk_type')!s:<26} recall={sc['risk']['recall']:.2f} "
+                      f"buyer={'✓' if sc['buyer'] else '✗'} parse={(r['meta'] or {}).get('parse_path')}"
+                      + (f"  ERROR {r['error'][:80]}" if r["error"] else ""))
+    except KeyboardInterrupt:
+        # Ctrl+C, or credit running out mid-run, used to lose every finished
+        # case. Write what completed, marked partial, and say so.
+        interrupted = True
+        print(f"\ninterrupted after {len(results)} of {planned} case-runs; writing the partial table", file=sys.stderr)
+    if not results:
+        return 130 if interrupted else 1
 
     agg = aggregate(results)
     table = render_table(results, agg, mode=args.mode, contract=args.contract, arm=args.arm, runs=args.runs)
+    if interrupted:
+        table = table.replace("\n", f" · PARTIAL: {len(results)} of {planned} case-runs\n", 1)
     print("\n" + table)
 
     out = Path(args.out); out.mkdir(parents=True, exist_ok=True)
     # More than one run per case gets a suffix, so a twenty-run table never
     # overwrites the single pass written earlier the same day.
-    stem = f"{date.today().isoformat()}-{args.mode}-{args.contract}-{args.arm}" + (f"-x{args.runs}" if args.runs > 1 else "")
+    stem = f"{date.today().isoformat()}-{args.mode}-{args.contract}-{args.arm}" + (f"-x{args.runs}" if args.runs > 1 else "") + ("-partial" if interrupted else "")
     # Explicit UTF-8: Windows defaults to cp1252, which cannot encode the table.
     (out / f"{stem}.md").write_text(table, encoding="utf-8")
     (out / f"{stem}.json").write_text(json.dumps({
         "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "mode": args.mode, "contract": args.contract, "arm": args.arm, "runs": args.runs,
+        "completed": len(results), "planned": planned, "partial": interrupted,
         "models": config.MODELS, "aggregate": agg,
         "results": [{k: v for k, v in r.items() if k != "brief"} | {"brief": r["brief"]} for r in results],
     }, indent=2, default=str), encoding="utf-8")
     print(f"Wrote {out / (stem + '.md')} and .json")
+    if interrupted:
+        return 130
     if agg["hard_fails"]:
         print(f"HARD FAIL: {agg['hard_fails']} case(s) failed to parse or returned an empty brief with expected risks.",
               file=sys.stderr)
