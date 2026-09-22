@@ -163,8 +163,9 @@ contact, whitespace and case normalized), attribution coverage (every
 required source label appears somewhere in `section_sources`), data gaps
 present when expected, the parse path (`native`, `recovered_by_parser`, or
 `failed`), and tokens and latency for the analysis call. Results go to
-`evals/results/<date>-<mode>-<contract>-<arm>.md` with the raw briefs beside
-them as JSON. A failed parse, or an empty brief on a case with expected
+`evals/results/<date>-<mode>-<contract>-<arm>.md`, with `-x<runs>` on the end
+when there is more than one run per case, and the raw briefs beside them as
+JSON. A failed parse, or an empty brief on a case with expected
 risks, is a hard fail and exits 1.
 
 **Two contracts.** `--contract prompt` is the original: the JSON shape is
@@ -185,24 +186,43 @@ economic-buyer-over-most-mentioned rule) and changes nothing else. Twenty
 runs per arm on the same set. The case built to separate the arms is
 `most-mentioned-not-buyer`; if it does not, that is the finding.
 
-**Results.** Not yet run. The runs below need an `ANTHROPIC_API_KEY`; from
-the dry-run figures, one full pass is roughly 15k Haiku input tokens for the
-summaries plus at most 30k Sonnet input tokens and around 20k output tokens
-for the analyses, on the order of half a dollar. The two contract passes and
-the forty ablation passes together are in the low tens of dollars.
+**Results.** Two of the three runs are in `evals/results/`, measured on
+2026-09-21 with the models in `config.py`. The single native pass and the
+twenty-run arm A share a configuration, so one row covers both. Arm B
+started, reached eleven of its twenty passes, and stopped when the API credit
+ran out. The runner writes its files at the end of a run, so nothing from it
+is recorded, and the row stays pending until it runs again.
 
 | Run | Risk recall | Risk precision | Buyer accuracy | Attribution | Parse native / recovered / failed |
 | --- | --- | --- | --- | --- | --- |
-| prompt contract, weighted | pending | pending | pending | pending | pending |
-| native contract, weighted | pending | pending | pending | pending | pending |
-| ablation arm A, weighted, 20 runs | pending | pending | pending | pending | pending |
-| ablation arm B, unweighted, 20 runs | pending | pending | pending | pending | pending |
+| prompt contract, weighted, 1 run | 96% | 100% | 92% | 92% | 5 / 8 / 0 |
+| native contract, weighted, 20 runs (ablation arm A) | 90% | 94% | 93% | 92% | 260 / 0 / 0 |
+| native contract, unweighted, 20 runs (ablation arm B) | pending | pending | pending | pending | pending |
 
-Fill the table from the four results files:
+What the 260 native runs say, case by case:
+
+- `most-mentioned-not-buyer`, the case built to separate the arms, came back
+  right in 18 of 20 runs with the weighting block in place. The eleven
+  unrecorded arm B passes named the wrong buyer on it, and on
+  `adoption-failure` and `relationship-gap`, every time, which is the effect
+  the block exists to produce. That stays a preliminary reading until arm B
+  is rerun and written.
+- `vibe-risk` is the unstable case: right in 7 of 20 runs, otherwise read as
+  sentiment mismatch or silent decay. The fixture describes a mood rather
+  than an event, and the taxonomy has two neighbors for that.
+- `truncated-transcript` expects two risks and the brief names one of them
+  every time, so it scores 50% on every run and holds recall below 100% on
+  its own.
+- `champion-loss` misses the economic buyer in 19 of 20 runs, and
+  `silent-decay` loses attribution coverage in 19 of 20 because the brief
+  never cites the CSV. Both are the same kind of miss: a source that was in
+  the packet and was not credited.
+- The prompt contract recovered 8 of 13 replies through the parser; the
+  native contract needed it on none of 260. That is the row the parser
+  section above is about.
+
+Arm B fills from:
 
 ```bash
-python evals/run.py --contract prompt
-python evals/run.py --contract native
-python evals/run.py --contract native --arm weighted --runs 20
 python evals/run.py --contract native --arm unweighted --runs 20
 ```

@@ -9,7 +9,7 @@
 
 Reuses the CLI's pipeline functions (ingest, summarize, analyze) rather than
 re-implementing them, so a score here is a score for the real pipeline.
-Writes a markdown table to evals/results/<date>-<mode>-<contract>-<arm>.md and
+Writes a markdown table to evals/results/<date>-<mode>-<contract>-<arm>.md (-x<runs> on the end when runs > 1) and
 the raw briefs beside it as JSON.
 """
 from __future__ import annotations
@@ -287,7 +287,9 @@ def main(argv=None, client=None) -> int:
     print("\n" + table)
 
     out = Path(args.out); out.mkdir(parents=True, exist_ok=True)
-    stem = f"{date.today().isoformat()}-{args.mode}-{args.contract}-{args.arm}"
+    # More than one run per case gets a suffix, so a twenty-run table never
+    # overwrites the single pass written earlier the same day.
+    stem = f"{date.today().isoformat()}-{args.mode}-{args.contract}-{args.arm}" + (f"-x{args.runs}" if args.runs > 1 else "")
     # Explicit UTF-8: Windows defaults to cp1252, which cannot encode the table.
     (out / f"{stem}.md").write_text(table, encoding="utf-8")
     (out / f"{stem}.json").write_text(json.dumps({
