@@ -7,6 +7,7 @@ import os
 import sys
 import tempfile
 from pathlib import Path
+from types import SimpleNamespace
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
@@ -17,6 +18,52 @@ sys.path.insert(0, str(HERE / "tools"))
 import run  # noqa: E402
 import recost  # noqa: E402
 from test_pipeline import FakeClient, SAMPLE_BRIEF, check  # noqa: E402
+
+
+class FakeBatches:
+    """Stands in for client.messages.batches: create / retrieve / results.
+
+    Answers each request by calling the stub's messages.create with the
+    request's own params, so a batched reply is exactly what the live path
+    would have got. `polls` is how many retrieve() calls report in_progress
+    before "ended"; `fail_ids` come back as errored results; results are
+    yielded in reverse order because the real API promises no order."""
+
+    def __init__(self, messages, *, polls=2, fail_ids=()):
+        self.messages, self.polls, self.fail_ids = messages, polls, set(fail_ids)
+        self.created, self.retrieves = [], 0
+
+    def _counts(self, n, done):
+        return SimpleNamespace(processing=0 if done else n, succeeded=n if done else 0,
+                               errored=0, canceled=0, expired=0)
+
+    def create(self, requests):
+        requests = list(requests)
+        self.created.append(requests)
+        return SimpleNamespace(id="msgbatch_test", processing_status="in_progress",
+                               request_counts=self._counts(len(requests), False))
+
+    def retrieve(self, batch_id):
+        self.retrieves += 1
+        done = self.retrieves > self.polls
+        return SimpleNamespace(id=batch_id, processing_status="ended" if done else "in_progress",
+                               request_counts=self._counts(len(self.created[-1]), done))
+
+    def results(self, batch_id):
+        for req in reversed(self.created[-1]):
+            if req["custom_id"] in self.fail_ids:
+                err = SimpleNamespace(type="error", error=SimpleNamespace(type="invalid_request_error",
+                                                                          message="max_tokens exceeds the model limit"))
+                yield SimpleNamespace(custom_id=req["custom_id"], result=SimpleNamespace(type="errored", error=err))
+            else:
+                yield SimpleNamespace(custom_id=req["custom_id"],
+                                      result=SimpleNamespace(type="succeeded", message=self.messages.create(**req["params"])))
+
+
+def batch_client(polls=2, fail_ids=(), usage=(3000, 1500), **kw):
+    client = FakeClient(usage=usage, **kw)
+    client.messages.batches = FakeBatches(client.messages, polls=polls, fail_ids=fail_ids)
+    return client
 
 
 def main():
@@ -136,6 +183,76 @@ def main():
         failing = FakeClient(analysis_reply="not json at all")
         code = run.main(["--only", "most-mentioned-not-buyer", "--out", tmp], client=failing)
         check("a failed parse is a hard fail (exit 1)", code == 1)
+
+    print("batch mode: request construction")
+    reply = json.dumps(brief)
+    live = FakeClient(analysis_reply=reply, usage=(3000, 1500))
+    live_r = run.run_case(live, case, mode="full", contract="native", weighted=True)
+    live_params = {k: v for k, v in live.messages.calls[-1].items() if k != "system"}  # the stub logs system=None
+    with tempfile.TemporaryDirectory() as tmp:
+        client = batch_client(analysis_reply=reply)
+        sleeps = []
+        code = run.main(["--batch", "--only", "most-mentioned-not-buyer", "--contract", "native", "--runs", "2", "--out", tmp],
+                        client=client, sleep=sleeps.append)
+        reqs = client.messages.batches.created[-1]
+        check("one batch, one request per case-run", len(client.messages.batches.created) == 1 and len(reqs) == 2)
+        check("custom_id is case-run-arm-contract",
+              [r["custom_id"] for r in reqs] == ["most-mentioned-not-buyer-1-weighted-native", "most-mentioned-not-buyer-2-weighted-native"])
+        check("each request carries the live path's params (model, max_tokens, messages, output_config)",
+              all(r["params"] == live_params for r in reqs))
+        check("native contract puts output_config in the batch request",
+              reqs[0]["params"]["output_config"]["format"]["type"] == "json_schema")
+        check("summaries were made live, one call per document per run",
+              len([c for c in client.messages.calls if "output_config" not in c]) == 2 * live_r["docs"])
+
+        print("batch mode: polling until ended")
+        check("polled until processing_status was ended", client.messages.batches.retrieves == 3)
+        check("slept between polls with backoff", sleeps == [5.0, 10.0])
+
+        print("batch mode: results mapped back to case and run")
+        check("exit 0", code == 0)
+        files = sorted(os.listdir(tmp))
+        check("results filename carries -batch", any(f.endswith("-x2-batch.md") for f in files) and any(f.endswith("-x2-batch.json") for f in files))
+        data = json.loads(Path(tmp, next(f for f in files if f.endswith("-batch.json"))).read_text(encoding="utf-8"))
+        check("json says batch", data["batch"] is True and data["pricing"]["batch"] is True)
+        check("two results in table order despite reversed delivery",
+              [(r["case"], r["run"]) for r in data["results"]] == [("most-mentioned-not-buyer", 1), ("most-mentioned-not-buyer", 2)])
+        check("each result remembers its custom_id", data["results"][1]["custom_id"] == "most-mentioned-not-buyer-2-weighted-native")
+        check("same scoring path: recall, buyer, attribution, parse path as the live run",
+              all(r["scores"] == live_r["scores"] and r["meta"]["parse_path"] == live_r["meta"]["parse_path"] for r in data["results"]))
+        check("no latency in batch mode, so the column is blank",
+              data["results"][0]["meta"]["latency_ms"] is None)
+        md = Path(tmp, next(f for f in files if f.endswith("-batch.md"))).read_text(encoding="utf-8")
+        check("table header says batch", "· batch" in md.splitlines()[0])
+
+        print("batch mode: cost with the multiplier")
+        check("live cost at list from 3,000 / 1,500 tokens", round(live_r["meta"]["cost_usd"], 4) == 0.0315)
+        check("batch cost is half", round(data["results"][0]["meta"]["cost_usd"], 4) == 0.0158
+              and abs(data["results"][0]["meta"]["cost_usd"] - live_r["meta"]["cost_usd"] / 2) < 1e-12)
+        check("aggregate rows: per run and whole run at batch price",
+              "| Cost per run (analysis call, USD) | $0.0158 |" in md
+              and "| Cost for the whole run (analysis calls, USD) | $0.0315 |" in md
+              and f"| Prices | batch (0.5× list), read {run.config.PRICES_DATED} |" in md)
+
+    print("batch mode: an errored result")
+    with tempfile.TemporaryDirectory() as tmp:
+        client = batch_client(analysis_reply=reply, polls=0, fail_ids=["most-mentioned-not-buyer-2-weighted-native"])
+        code = run.main(["--batch", "--only", "most-mentioned-not-buyer", "--contract", "native", "--runs", "2", "--out", tmp],
+                        client=client, sleep=lambda s: None)
+        check("an errored result is a hard fail (exit 1)", code == 1)
+        data = json.loads(Path(tmp, next(f for f in sorted(os.listdir(tmp)) if f.endswith(".json"))).read_text(encoding="utf-8"))
+        ok, bad = data["results"]
+        check("the other case-run still scored", ok["scores"]["risk"]["recall"] == 1.0 and ok["error"] is None)
+        check("the errored one counts as a failed parse", bad["meta"]["parse_path"] == "failed" and bad["hard_fail"] is True)
+        check("with the cause recorded", bad["error"] == "batch result errored (invalid_request_error: max_tokens exceeds the model limit)")
+        check("and no tokens, so no cost", bad["meta"]["cost_usd"] is None)
+        check("parse-path accounting counts it", data["aggregate"]["parse_paths"] == {"native": 1, "recovered_by_parser": 0, "failed": 1})
+
+    print("batch mode: dry run is unchanged")
+    with tempfile.TemporaryDirectory() as tmp:
+        client = batch_client(analysis_reply=reply)
+        code = run.main(["--batch", "--dry-run", "--only", "most-mentioned-not-buyer", "--out", tmp], client=client)
+        check("dry run exits 0 and creates no batch", code == 0 and not client.messages.batches.created and not os.listdir(tmp))
 
     print("an interrupted run writes what it has, marked partial")
 

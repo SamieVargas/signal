@@ -48,16 +48,20 @@ def _block(text):
     return SimpleNamespace(type="text", text=text)
 
 
-def _msg(text, stop_reason="end_turn"):
-    return SimpleNamespace(content=[_block(text)], stop_reason=stop_reason)
+def _msg(text, stop_reason="end_turn", usage=None):
+    m = SimpleNamespace(content=[_block(text)], stop_reason=stop_reason)
+    if usage:  # (input_tokens, output_tokens), the way the API reports them
+        m.usage = SimpleNamespace(input_tokens=usage[0], output_tokens=usage[1])
+    return m
 
 
 class FakeMessages:
-    def __init__(self, analysis_reply=None, stop_reason="end_turn"):
+    def __init__(self, analysis_reply=None, stop_reason="end_turn", usage=None):
         self.calls = []
         # What Call 2 returns; tests swap this to exercise the parse paths.
         self.analysis_reply = analysis_reply or ("```json\n" + json.dumps(SAMPLE_BRIEF) + "\n```")
         self.stop_reason = stop_reason
+        self.usage = usage  # analysis-call tokens, None for "not recorded"
 
     def create(self, model, max_tokens, messages, system=None, **kwargs):
         self.calls.append({"model": model, "max_tokens": max_tokens,
@@ -66,15 +70,15 @@ class FakeMessages:
         # Media requests carry a list of blocks; the prompt is the first text block.
         user_text = content if isinstance(content, str) else next(b["text"] for b in content if b.get("type") == "text")
         if user_text.lstrip().startswith("You are Signal, an expert CS strategist. Analyze"):
-            return _msg(self.analysis_reply, self.stop_reason)               # Call 2
+            return _msg(self.analysis_reply, self.stop_reason, self.usage)   # Call 2
         if system is not None:
             return _msg("Here's my read on that.")                          # chat
         return _msg("Tight 3-sentence summary of the doc.")                 # Call 1
 
 
 class FakeClient:
-    def __init__(self, analysis_reply=None, stop_reason="end_turn"):
-        self.messages = FakeMessages(analysis_reply, stop_reason)
+    def __init__(self, analysis_reply=None, stop_reason="end_turn", usage=None):
+        self.messages = FakeMessages(analysis_reply, stop_reason, usage)
 
 
 def check(name, cond):

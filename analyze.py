@@ -94,14 +94,14 @@ def _usage(resp, key: str):
     return getattr(usage, key, None) if usage is not None else None
 
 
-def analyze_brief(client, prompt: str, *, contract: str = "prompt", media=None,
-                  mode: str = "full", model: str | None = None,
-                  max_tokens: int | None = None) -> tuple[dict, dict]:
-    """Run the analysis call and return (brief, meta).
+def build_analysis_request(prompt: str, *, contract: str = "prompt", media=None,
+                           mode: str = "full", model: str | None = None,
+                           max_tokens: int | None = None) -> dict:
+    """The `messages.create` keyword arguments for one analysis call.
 
-    meta: contract, parse_path, stop_reason, input_tokens, output_tokens,
-    latency_ms. Raises ParseFailure when neither path yields JSON, after
-    filling meta["parse_path"] = "failed" on the exception for the caller.
+    The live path and the Batch API path both build their request here, so a
+    batched case-run carries exactly the parameters a live one would,
+    `output_config` under the native contract included.
     """
     if contract not in CONTRACTS:
         raise ValueError(f"unknown contract {contract!r}; expected one of {CONTRACTS}")
@@ -113,13 +113,16 @@ def analyze_brief(client, prompt: str, *, contract: str = "prompt", media=None,
     )
     if contract == "native":
         kwargs["output_config"] = schema.output_config()
+    return kwargs
 
-    t0 = time.perf_counter()
-    resp = client.messages.create(**kwargs)
-    latency_ms = round((time.perf_counter() - t0) * 1000)
+
+def finish_analysis(resp, *, contract: str, request: dict, latency_ms=None) -> tuple[dict, dict]:
+    """Turn a Messages API response into (brief, meta), or raise ParseFailure
+    with `meta` attached. Shared by the live call and the Batch API path so
+    a batched reply goes through the same parse-path accounting."""
     raw = _text(resp)
     meta = {
-        "model": kwargs["model"],
+        "model": request["model"],
         "contract": contract,
         "parse_path": "failed",
         "stop_reason": getattr(resp, "stop_reason", None),
@@ -130,7 +133,7 @@ def analyze_brief(client, prompt: str, *, contract: str = "prompt", media=None,
     # A reply cut off at the output cap is not a parsing problem, and it is
     # worth naming as what it is, because raising max_tokens is the fix.
     if meta["stop_reason"] == "max_tokens":
-        e = ParseFailure(raw, f"reply cut off at max_tokens={kwargs['max_tokens']}; raise the budget", reason="max_tokens")
+        e = ParseFailure(raw, f"reply cut off at max_tokens={request['max_tokens']}; raise the budget", reason="max_tokens")
         e.meta = meta
         raise e
     try:
@@ -140,6 +143,24 @@ def analyze_brief(client, prompt: str, *, contract: str = "prompt", media=None,
         raise
     meta["parse_path"] = path
     return brief, meta
+
+
+def analyze_brief(client, prompt: str, *, contract: str = "prompt", media=None,
+                  mode: str = "full", model: str | None = None,
+                  max_tokens: int | None = None) -> tuple[dict, dict]:
+    """Run the analysis call and return (brief, meta).
+
+    meta: model, contract, parse_path, stop_reason, input_tokens,
+    output_tokens, latency_ms. Raises ParseFailure when neither path yields
+    JSON, after filling meta["parse_path"] = "failed" on the exception for
+    the caller.
+    """
+    kwargs = build_analysis_request(prompt, contract=contract, media=media, mode=mode,
+                                    model=model, max_tokens=max_tokens)
+    t0 = time.perf_counter()
+    resp = client.messages.create(**kwargs)
+    latency_ms = round((time.perf_counter() - t0) * 1000)
+    return finish_analysis(resp, contract=contract, request=kwargs, latency_ms=latency_ms)
 
 
 def analyze(client, prompt: str) -> dict:

@@ -186,6 +186,20 @@ economic-buyer-over-most-mentioned rule) and changes nothing else. Twenty
 runs per arm on the same set. The case built to separate the arms is
 `most-mentioned-not-buyer`; if it does not, that is the finding.
 
+**Batch API.** `--batch` sends the analysis calls, the ones the cost column
+counts, through the Message Batches API instead of one live call at a time:
+one request per case-run with `custom_id` `<case>-<run>-<arm>-<contract>`,
+built by the same function as the live request so it carries the same
+parameters (`output_config` included under the native contract), polled
+until the batch ends, then every result goes through the same parse and
+scoring path as a live reply, so the numbers stay comparable and the parse
+column still counts. A result that errored or expired is recorded as a
+failed parse with the cause. The per-document summaries stay live. Costs
+in the table use the 0.5 batch multiplier and the results file gets
+`-batch` on its name, so a twenty-run ablation arm runs at half the
+analysis-call price with no change to what is scored. Nothing here has been
+run through it yet; the three results above were live calls.
+
 **Results.** All three runs are in `evals/results/`, with the models in
 `config.py`: the single prompt-contract pass and arm A on 2026-09-21, arm B
 on 2026-09-22 after a first attempt stopped at eleven passes when the API
