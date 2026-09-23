@@ -12,12 +12,13 @@ from types import SimpleNamespace
 # Make the package importable when run as a plain script from anywhere.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from config import MODELS
+from config import MODELS, PRICES, PRICES_DATED, BATCH_MULTIPLIER, cost_usd
 from ingest import read_docs, make_doc, smart_truncate, detect_type
 from summarize import summarize_all
 from analyze import build_analysis_prompt, analyze, analyze_brief, extract_json, parse_brief, ParseFailure
 from prompts import RISK_TYPES, SOURCE_WEIGHTING
 import schema
+import tracing
 from chat import chat_loop
 
 MOCK_DIR = os.path.join(os.path.dirname(__file__), "mock_docs")
@@ -48,16 +49,20 @@ def _block(text):
     return SimpleNamespace(type="text", text=text)
 
 
-def _msg(text, stop_reason="end_turn"):
-    return SimpleNamespace(content=[_block(text)], stop_reason=stop_reason)
+def _msg(text, stop_reason="end_turn", usage=None):
+    m = SimpleNamespace(content=[_block(text)], stop_reason=stop_reason)
+    if usage:  # (input_tokens, output_tokens), the way the API reports them
+        m.usage = SimpleNamespace(input_tokens=usage[0], output_tokens=usage[1])
+    return m
 
 
 class FakeMessages:
-    def __init__(self, analysis_reply=None, stop_reason="end_turn"):
+    def __init__(self, analysis_reply=None, stop_reason="end_turn", usage=None):
         self.calls = []
         # What Call 2 returns; tests swap this to exercise the parse paths.
         self.analysis_reply = analysis_reply or ("```json\n" + json.dumps(SAMPLE_BRIEF) + "\n```")
         self.stop_reason = stop_reason
+        self.usage = usage  # analysis-call tokens, None for "not recorded"
 
     def create(self, model, max_tokens, messages, system=None, **kwargs):
         self.calls.append({"model": model, "max_tokens": max_tokens,
@@ -66,15 +71,15 @@ class FakeMessages:
         # Media requests carry a list of blocks; the prompt is the first text block.
         user_text = content if isinstance(content, str) else next(b["text"] for b in content if b.get("type") == "text")
         if user_text.lstrip().startswith("You are Signal, an expert CS strategist. Analyze"):
-            return _msg(self.analysis_reply, self.stop_reason)               # Call 2
+            return _msg(self.analysis_reply, self.stop_reason, self.usage)   # Call 2
         if system is not None:
             return _msg("Here's my read on that.")                          # chat
         return _msg("Tight 3-sentence summary of the doc.")                 # Call 1
 
 
 class FakeClient:
-    def __init__(self, analysis_reply=None, stop_reason="end_turn"):
-        self.messages = FakeMessages(analysis_reply, stop_reason)
+    def __init__(self, analysis_reply=None, stop_reason="end_turn", usage=None):
+        self.messages = FakeMessages(analysis_reply, stop_reason, usage)
 
 
 def check(name, cond):
@@ -190,11 +195,85 @@ def main():
     check("chat sent system prompt", client.messages.calls[-1]["system"] is not None)
     check("chat routed to chat model", client.messages.calls[-1]["model"] == MODELS["chat"])
 
+    print("cost per call")
+    check("price table names both models the pipeline calls",
+          MODELS["analysis"] in PRICES and MODELS["summary"] in PRICES and len(PRICES_DATED) == 10)
+    check("one million tokens each way at Sonnet list price",
+          cost_usd("claude-sonnet-4-6", 1_000_000, 1_000_000) == 18.0)
+    check("Haiku list price", cost_usd("claude-haiku-4-5", 1_000_000, 1_000_000) == 6.0)
+    check("batch applies the multiplier",
+          BATCH_MULTIPLIER == 0.5 and cost_usd("claude-sonnet-4-6", 1_000_000, 1_000_000, batch=True) == 9.0)
+    check("the recorded run: 4,579 in / 1,974 out costs $0.0433 at list",
+          round(cost_usd("claude-sonnet-4-6", 4579, 1974), 4) == 0.0433)
+    check("missing tokens give None, not zero", cost_usd("claude-sonnet-4-6", None, 10) is None)
+    try:
+        cost_usd("claude-nonexistent", 1, 1)
+        check("an unpriced model raises", False)
+    except KeyError:
+        check("an unpriced model raises", True)
+    check("analysis meta records the model it called", meta_n["model"] == MODELS["analysis"])
+
+    print("tracing: the shim")
+    with tracing.span("signal.test", a=1, b=None) as sp:
+        sp.set_attribute("c", None)
+        sp.set_attributes({"d": 2, "e": None})
+    check("span() works as a context manager whether or not OpenTelemetry is installed", True)
+    check("NoopSpan accepts attributes and returns nothing", tracing.NoopSpan().set_attribute("k", 1) is None)
+    check("clean() drops None and stringifies the rest",
+          tracing.clean({"a": None, "b": 1, "c": [1, 2], "d": "x"}) == {"b": 1, "c": "[1, 2]", "d": "x"})
+    check("the extra is optional: requirements.txt does not pull OpenTelemetry in",
+          "opentelemetry" not in open(os.path.join(os.path.dirname(MOCK_DIR), "..", "requirements.txt")).read())
+    import signal_cli
+    check("the CLI takes --trace", signal_cli.parse_args(["--account", "K", "--docs", MOCK_DIR, "--trace", "t.json"]).trace == "t.json")
+    if tracing.HAVE_OTEL:
+        print("tracing: the real path (OpenTelemetry is installed here)")
+        import tempfile
+        tmp = tempfile.mkdtemp()
+        trace_path = os.path.join(tmp, "trace.json")
+        tracing.install_json_exporter(trace_path)
+        traced = FakeClient(analysis_reply=json.dumps(SAMPLE_BRIEF), usage=(3000, 1500))
+        with tracing.span("signal.brief", account="Koala", mode="full", contract="native", arm="weighted"):
+            tdocs = read_docs(MOCK_DIR)
+            tsum = summarize_all(traced, tdocs)
+            analyze_brief(traced, build_analysis_prompt("Koala", "", None, "", tsum), contract="native", arm="weighted")
+        spans = tracing.read_trace(trace_path)
+        by_name = {}
+        for sp in spans:
+            by_name.setdefault(sp["name"], []).append(sp)
+        root = by_name["signal.brief"][0]
+        check("one root span per brief with no parent", len(by_name["signal.brief"]) == 1 and root["parent"] is None)
+        check("one ingest span per document with label, kind and chars",
+              len(by_name["signal.ingest"]) == 3 and all(sp["parent"] == root["span_id"] for sp in by_name["signal.ingest"])
+              and all({"label", "kind", "chars"} <= set(sp["attributes"]) for sp in by_name["signal.ingest"])
+              and {sp["attributes"]["label"] for sp in by_name["signal.ingest"]} == {"Kick-off deck", "MBR notes", "Teams chat"})
+        check("one summarize span per call with model and latency",
+              len(by_name["signal.summarize"]) == 3
+              and all(sp["attributes"]["model"] == MODELS["summary"] and "latency_ms" in sp["attributes"] for sp in by_name["signal.summarize"]))
+        an = by_name["signal.analyze"][0]
+        check("analyze span carries model, contract, arm, parse_path, stop_reason and tokens",
+              an["parent"] == root["span_id"] and an["attributes"]["model"] == MODELS["analysis"]
+              and an["attributes"]["contract"] == "native" and an["attributes"]["arm"] == "weighted"
+              and an["attributes"]["parse_path"] == "native" and an["attributes"]["stop_reason"] == "end_turn"
+              and an["attributes"]["input_tokens"] == 3000 and an["attributes"]["output_tokens"] == 1500)
+        pa = by_name["signal.parse"][0]
+        check("parse span is a child of analyze and records the path",
+              pa["parent"] == an["span_id"] and pa["attributes"]["parse_path"] == "native")
+        check("spans nest in time", root["start"] <= an["start"] <= pa["start"] <= pa["end"] <= an["end"] <= root["end"])
+        check("each line has name, parent, start, end, attributes",
+              all({"name", "parent", "start", "end", "attributes", "span_id"} <= set(sp) for sp in spans))
+    else:
+        print("tracing: OpenTelemetry not installed, real path not exercised here (pip install -r requirements-trace.txt)")
+
     print("paste-mode doc")
     d = make_doc("pasted_input.txt", "Sarah said churn risk is high.")
     check("paste builds a doc dict", d["name"] == "pasted_input.txt" and d["raw"])
 
     print("\nALL CHECKS PASSED")
+
+
+def test_pipeline():
+    """pytest entry point: the checks above, in one collected test."""
+    main()
 
 
 if __name__ == "__main__":

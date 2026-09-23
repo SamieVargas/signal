@@ -11,6 +11,7 @@ import base64
 from pathlib import Path
 
 from config import MAX_DOC_TOKENS, CHARS_PER_TOKEN
+import tracing
 
 # Filename keyword patterns -> human label. Priority order: first match wins,
 # so put more specific multi-keyword patterns before broad single-keyword ones.
@@ -120,18 +121,21 @@ def read_docs(docs_dir: str) -> list[dict]:
         ext = fp.suffix.lower()
         if ext and ext not in TEXT_EXTENSIONS:
             continue  # skip likely-binary files (.pdf, .docx, .png, ...)
-        try:
-            content = fp.read_text(encoding="utf-8", errors="replace").strip()
-        except Exception:
-            continue
-        if not content:
-            continue
-        docs.append({
-            "name": fp.name,
-            "type": detect_type(fp.name, content),
-            "raw": content,
-            "content": smart_truncate(content),
-        })
+        with tracing.span("signal.ingest", name=fp.name, kind="text") as sp:
+            try:
+                content = fp.read_text(encoding="utf-8", errors="replace").strip()
+            except Exception:
+                continue
+            if not content:
+                continue
+            label = detect_type(fp.name, content)
+            sp.set_attributes({"label": label, "chars": len(content)})
+            docs.append({
+                "name": fp.name,
+                "type": label,
+                "raw": content,
+                "content": smart_truncate(content),
+            })
     return docs
 
 
@@ -162,7 +166,9 @@ def read_media(docs_dir: str) -> list[dict]:
         if not fp.is_file() or not kind:
             continue
         block_type, media_type = kind
-        data = base64.b64encode(fp.read_bytes()).decode("ascii")
+        with tracing.span("signal.ingest", name=fp.name, kind=block_type, label=media_type) as sp:
+            data = base64.b64encode(fp.read_bytes()).decode("ascii")
+            sp.set_attribute("chars", len(data))  # base64 characters, what the request carries
         blocks.append({
             "type": block_type,
             "source": {"type": "base64", "media_type": media_type, "data": data},

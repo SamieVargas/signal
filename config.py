@@ -40,3 +40,29 @@ def get_client():
     """
     import anthropic
     return anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from the environment
+
+
+# ── Prices ──
+# List prices per million tokens, read from https://www.anthropic.com/pricing
+# on PRICES_DATED. Re-check them against that page before quoting any dollar
+# figure computed here; they change without notice. Batch API requests are
+# billed at BATCH_MULTIPLIER of list.
+PRICES_DATED = "2026-09-23"
+PRICES = {
+    "claude-sonnet-4-6": {"input": 3.00, "output": 15.00},
+    "claude-haiku-4-5": {"input": 1.00, "output": 5.00},
+}
+BATCH_MULTIPLIER = 0.5
+
+
+def cost_usd(model: str, input_tokens, output_tokens, batch: bool = False):
+    """Dollars for one call at list price, or None when a token count is
+    missing (results files written before tokens were recorded). Unknown
+    models raise, because a silent zero would be quoted as a real number."""
+    if model not in PRICES:
+        raise KeyError(f"no price on file for {model!r}; add it to config.PRICES")
+    if input_tokens is None or output_tokens is None:
+        return None
+    p = PRICES[model]
+    usd = (input_tokens * p["input"] + output_tokens * p["output"]) / 1_000_000
+    return usd * (BATCH_MULTIPLIER if batch else 1.0)

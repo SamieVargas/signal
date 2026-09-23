@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="390" viewBox="0 0 900 390" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif" font-size="12">
+<rect width="900" height="390" fill="#ffffff"/>
+<text x="8" y="16" font-weight="600">Signal trace · 12 spans · 2.14 ms wall clock</text>
+<line x1="300.0" y1="28" x2="300.0" y2="322" stroke="#e5e7eb" stroke-width="1"/>
+<text x="300.0" y="24" text-anchor="start" fill="#6b7280" font-size="10">0.00 ms</text>
+<line x1="416.8" y1="28" x2="416.8" y2="322" stroke="#e5e7eb" stroke-width="1"/>
+<text x="416.8" y="24" text-anchor="middle" fill="#6b7280" font-size="10">0.43 ms</text>
+<line x1="533.6" y1="28" x2="533.6" y2="322" stroke="#e5e7eb" stroke-width="1"/>
+<text x="533.6" y="24" text-anchor="middle" fill="#6b7280" font-size="10">0.86 ms</text>
+<line x1="650.4" y1="28" x2="650.4" y2="322" stroke="#e5e7eb" stroke-width="1"/>
+<text x="650.4" y="24" text-anchor="middle" fill="#6b7280" font-size="10">1.29 ms</text>
+<line x1="767.2" y1="28" x2="767.2" y2="322" stroke="#e5e7eb" stroke-width="1"/>
+<text x="767.2" y="24" text-anchor="middle" fill="#6b7280" font-size="10">1.72 ms</text>
+<line x1="884.0" y1="28" x2="884.0" y2="322" stroke="#e5e7eb" stroke-width="1"/>
+<text x="884.0" y="24" text-anchor="end" fill="#6b7280" font-size="10">2.14 ms</text>
+<rect x="300.0" y="39" width="584.0" height="14" rx="2" fill="#4b5563" fill-opacity="0.85"/>
+<text x="8" y="50" fill="#111827">brief silent-decay</text>
+<text x="306.0" y="50" text-anchor="start" fill="#ffffff" font-size="11">2.14 ms · contract=native · arm=weighted</text>
+<rect x="0" y="58" width="900" height="24" fill="#f9fafb"/>
+<rect x="347.9" y="63" width="22.9" height="14" rx="2" fill="#2563eb" fill-opacity="0.85"/>
+<text x="22" y="74" fill="#111827">ingest account.json</text>
+<text x="376.8" y="74" text-anchor="start" fill="#374151" font-size="11">0.08 ms · chars=130</text>
+<rect x="424.0" y="87" width="16.6" height="14" rx="2" fill="#2563eb" fill-opacity="0.85"/>
+<text x="22" y="98" fill="#111827">ingest crm_notes.txt</text>
+<text x="446.6" y="98" text-anchor="start" fill="#374151" font-size="11">0.06 ms · chars=422</text>
+<rect x="0" y="106" width="900" height="24" fill="#f9fafb"/>
+<rect x="472.7" y="111" width="14.9" height="14" rx="2" fill="#2563eb" fill-opacity="0.85"/>
+<text x="22" y="122" fill="#111827">ingest expected.json</text>
+<text x="493.6" y="122" text-anchor="start" fill="#374151" font-size="11">0.06 ms · chars=343</text>
+<rect x="516.5" y="135" width="23.8" height="14" rx="2" fill="#2563eb" fill-opacity="0.85"/>
+<text x="22" y="146" fill="#111827">ingest internal_notes.txt</text>
+<text x="546.4" y="146" text-anchor="start" fill="#374151" font-size="11">0.09 ms · chars=219</text>
+<rect x="0" y="154" width="900" height="24" fill="#f9fafb"/>
+<rect x="572.3" y="159" width="13.6" height="14" rx="2" fill="#2563eb" fill-opacity="0.85"/>
+<text x="22" y="170" fill="#111827">ingest usage_export.csv</text>
+<text x="591.9" y="170" text-anchor="start" fill="#374151" font-size="11">0.05 ms · chars=290</text>
+<rect x="634.7" y="183" width="21.0" height="14" rx="2" fill="#2563eb" fill-opacity="0.85"/>
+<text x="22" y="194" fill="#111827">ingest weekly_active_users.png</text>
+<text x="661.7" y="194" text-anchor="start" fill="#374151" font-size="11">0.08 ms · chars=14160 · image</text>
+<rect x="0" y="202" width="900" height="24" fill="#f9fafb"/>
+<rect x="692.6" y="207" width="6.4" height="14" rx="2" fill="#d97706" fill-opacity="0.85"/>
+<text x="22" y="218" fill="#111827">summarize crm_notes.txt</text>
+<text x="705.1" y="218" text-anchor="start" fill="#374151" font-size="11">0.02 ms</text>
+<rect x="727.6" y="231" width="4.3" height="14" rx="2" fill="#d97706" fill-opacity="0.85"/>
+<text x="22" y="242" fill="#111827">summarize internal_notes.txt</text>
+<text x="721.6" y="242" text-anchor="end" fill="#374151" font-size="11">0.02 ms</text>
+<rect x="0" y="250" width="900" height="24" fill="#f9fafb"/>
+<rect x="753.9" y="255" width="3.9" height="14" rx="2" fill="#d97706" fill-opacity="0.85"/>
+<text x="22" y="266" fill="#111827">summarize usage_export.csv</text>
+<text x="747.9" y="266" text-anchor="end" fill="#374151" font-size="11">0.01 ms</text>
+<rect x="791.6" y="279" width="35.0" height="14" rx="2" fill="#dc2626" fill-opacity="0.85"/>
+<text x="22" y="290" fill="#111827">analyze</text>
+<text x="785.6" y="290" text-anchor="end" fill="#374151" font-size="11">0.13 ms · parse_path=native · stop_reason=end_turn · contract=native · arm=weighted</text>
+<rect x="0" y="298" width="900" height="24" fill="#f9fafb"/>
+<rect x="807.0" y="303" width="8.0" height="14" rx="2" fill="#16a34a" fill-opacity="0.85"/>
+<text x="36" y="314" fill="#111827">parse</text>
+<text x="801.0" y="314" text-anchor="end" fill="#374151" font-size="11">0.03 ms · parse_path=native · stop_reason=end_turn · contract=native</text>
+<text x="8" y="342" fill="#6b7280" font-size="11">Stub-client run of golden case silent-decay (evals/run.py --only silent-decay --contract native --trace). Ingest and parse timings are real; the model</text>
+<text x="8" y="358" fill="#6b7280" font-size="11">calls are near zero because the stub answers instantly. A real run replaces this with: python signal_cli.py --account NAME --docs DIR --trace</text>
+<text x="8" y="374" fill="#6b7280" font-size="11">trace.json &amp;&amp; python evals/tools/render_trace.py trace.json docs/trace.svg</text>
+</svg>

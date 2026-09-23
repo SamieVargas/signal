@@ -1,8 +1,11 @@
 """Call 1: summarize each document individually (cheap, keeps tokens small)."""
 from __future__ import annotations
 
+import time
+
 from config import MODELS, MAX_SUMMARY_TOKENS
 from prompts import SUMMARIZE_PROMPT
+import tracing
 
 
 def _text(resp) -> str:
@@ -16,11 +19,20 @@ def summarize_doc(client, doc: dict) -> str:
         doc_name=doc["name"],
         content=doc["content"],
     )
-    resp = client.messages.create(
-        model=MODELS["summary"],
-        max_tokens=MAX_SUMMARY_TOKENS,
-        messages=[{"role": "user", "content": prompt}],
-    )
+    usage = None
+    with tracing.span("signal.summarize", model=MODELS["summary"], name=doc["name"], label=doc["type"]) as sp:
+        t0 = time.perf_counter()
+        resp = client.messages.create(
+            model=MODELS["summary"],
+            max_tokens=MAX_SUMMARY_TOKENS,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        usage = getattr(resp, "usage", None)
+        sp.set_attributes({
+            "latency_ms": round((time.perf_counter() - t0) * 1000),
+            "input_tokens": getattr(usage, "input_tokens", None),
+            "output_tokens": getattr(usage, "output_tokens", None),
+        })
     return _text(resp)
 
 
