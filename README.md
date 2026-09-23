@@ -1,5 +1,7 @@
 # Signal v0.3
 
+[![tests](https://github.com/SamieVargas/signal/actions/workflows/tests.yml/badge.svg)](https://github.com/SamieVargas/signal/actions/workflows/tests.yml)
+
 **Paste the mess --> get the read.**  
 AI-powered account intelligence for CS teams.
 
