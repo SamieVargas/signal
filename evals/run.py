@@ -32,6 +32,7 @@ sys.path.insert(0, str(ROOT))
 
 import config  # noqa: E402
 import dryrun  # noqa: E402
+import tracing  # noqa: E402
 from analyze import CONTRACTS, ParseFailure, analyze_brief, build_analysis_prompt, build_analysis_request, finish_analysis  # noqa: E402
 from ingest import read_docs, read_media, media_names  # noqa: E402
 from prompts import FOCUS_INSTRUCTIONS, RISK_TYPES  # noqa: E402
@@ -169,7 +170,8 @@ def run_case(client, case: dict, *, mode: str, contract: str, weighted: bool) ->
     prep = prepare_case(client, case, mode=mode, contract=contract, weighted=weighted)
     brief, meta, error, raw_head = None, None, None, None
     try:
-        brief, meta = analyze_brief(client, prep["prompt"], contract=contract, media=prep["media"], mode=mode)
+        brief, meta = analyze_brief(client, prep["prompt"], contract=contract, media=prep["media"], mode=mode,
+                                    arm="weighted" if weighted else "unweighted")
     except ParseFailure as e:
         meta = getattr(e, "meta", {"parse_path": "failed"})
         error = str(e)
@@ -214,21 +216,27 @@ def run_batch(client, jobs: list[dict], *, sleep=time.sleep, first_wait: float =
         cid = custom_id(j["case"]["id"], j["run"], j["arm"], j["prep"]["contract"])
         by_id[cid] = j
         requests.append({"custom_id": cid, "params": j["prep"]["request"]})
-    batch = client.messages.batches.create(requests=requests)
-    log(f"batch {batch.id}: {len(requests)} request(s) submitted, polling until it ends")
+    with tracing.span("signal.batch", requests=len(requests)) as sp:
+        batch = client.messages.batches.create(requests=requests)
+        sp.set_attribute("batch_id", batch.id)
+        log(f"batch {batch.id}: {len(requests)} request(s) submitted, polling until it ends")
 
-    wait = first_wait
-    while True:
-        batch = client.messages.batches.retrieve(batch.id)
-        counts = getattr(batch, "request_counts", None)
-        log(f"batch {batch.id}: {batch.processing_status}"
-            + (f" · processing {counts.processing} · succeeded {counts.succeeded} · errored {counts.errored}"
-               if counts is not None else ""))
-        if batch.processing_status == "ended":
-            break
-        sleep(wait)
-        wait = min(wait * 2, max_wait)
+        wait = first_wait
+        while True:
+            batch = client.messages.batches.retrieve(batch.id)
+            counts = getattr(batch, "request_counts", None)
+            log(f"batch {batch.id}: {batch.processing_status}"
+                + (f" · processing {counts.processing} · succeeded {counts.succeeded} · errored {counts.errored}"
+                   if counts is not None else ""))
+            if batch.processing_status == "ended":
+                break
+            sleep(wait)
+            wait = min(wait * 2, max_wait)
+        outcomes = _collect_batch(client, batch, by_id, log)
+    return _score_batch(by_id, outcomes, log)
 
+
+def _collect_batch(client, batch, by_id: dict, log) -> dict:
     outcomes = {}
     for item in client.messages.batches.results(batch.id):
         j = by_id.get(item.custom_id)
@@ -248,7 +256,10 @@ def run_batch(client, jobs: list[dict], *, sleep=time.sleep, first_wait: float =
             meta = _failed_meta(prep["request"], contract)
             error = _batch_error(item.result)
         outcomes[item.custom_id] = (brief, meta, error, raw_head)
+    return outcomes
 
+
+def _score_batch(by_id: dict, outcomes: dict, log) -> list[dict]:
     results = []
     for cid, j in by_id.items():
         brief, meta, error, raw_head = outcomes.get(cid) or (
@@ -415,6 +426,8 @@ def parse_args(argv=None):
                    help="send the analysis calls through the Message Batches API (half price, same scoring); "
                         "the per-document summaries stay live")
     p.add_argument("--out", default=str(RESULTS))
+    p.add_argument("--trace", metavar="FILE.json", default=None,
+                   help="write one OpenTelemetry span per line to this file (pip install -r requirements-trace.txt)")
     return p.parse_args(argv)
 
 
@@ -422,6 +435,8 @@ def main(argv=None, client=None, sleep=time.sleep) -> int:
     args = parse_args(argv)
     cases = load_cases(Path(args.golden), args.only)
     weighted = ARMS[args.arm]
+    if args.trace:
+        tracing.install_json_exporter(args.trace)
     if args.dry_run:
         print_dry_run(cases, mode=args.mode, weighted=weighted)
         return 0
@@ -441,14 +456,16 @@ def main(argv=None, client=None, sleep=time.sleep) -> int:
             for run in range(1, args.runs + 1):
                 for c in cases:
                     print(f"[{run}/{args.runs}] {c['id']}: summarizing and preparing the analysis request", flush=True)
-                    prep = prepare_case(client, c, mode=args.mode, contract=args.contract, weighted=weighted)
+                    with tracing.span("signal.brief", case=c["id"], run=run, mode=args.mode, contract=args.contract, arm=args.arm):
+                        prep = prepare_case(client, c, mode=args.mode, contract=args.contract, weighted=weighted)
                     jobs.append({"case": c, "run": run, "arm": args.arm, "prep": prep})
             results = run_batch(client, jobs, sleep=sleep)
         else:
             for run in range(1, args.runs + 1):
                 for c in cases:
                     print(f"[{run}/{args.runs}] {c['id']} …", end=" ", flush=True)
-                    r = run_case(client, c, mode=args.mode, contract=args.contract, weighted=weighted)
+                    with tracing.span("signal.brief", case=c["id"], run=run, mode=args.mode, contract=args.contract, arm=args.arm):
+                        r = run_case(client, c, mode=args.mode, contract=args.contract, weighted=weighted)
                     r["run"] = run
                     r["expected_risk"] = c["expected"].get("risk_types", [])
                     results.append(r)

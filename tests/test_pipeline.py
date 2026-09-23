@@ -18,6 +18,7 @@ from summarize import summarize_all
 from analyze import build_analysis_prompt, analyze, analyze_brief, extract_json, parse_brief, ParseFailure
 from prompts import RISK_TYPES, SOURCE_WEIGHTING
 import schema
+import tracing
 from chat import chat_loop
 
 MOCK_DIR = os.path.join(os.path.dirname(__file__), "mock_docs")
@@ -211,6 +212,57 @@ def main():
     except KeyError:
         check("an unpriced model raises", True)
     check("analysis meta records the model it called", meta_n["model"] == MODELS["analysis"])
+
+    print("tracing: the shim")
+    with tracing.span("signal.test", a=1, b=None) as sp:
+        sp.set_attribute("c", None)
+        sp.set_attributes({"d": 2, "e": None})
+    check("span() works as a context manager whether or not OpenTelemetry is installed", True)
+    check("NoopSpan accepts attributes and returns nothing", tracing.NoopSpan().set_attribute("k", 1) is None)
+    check("clean() drops None and stringifies the rest",
+          tracing.clean({"a": None, "b": 1, "c": [1, 2], "d": "x"}) == {"b": 1, "c": "[1, 2]", "d": "x"})
+    check("the extra is optional: requirements.txt does not pull OpenTelemetry in",
+          "opentelemetry" not in open(os.path.join(os.path.dirname(MOCK_DIR), "..", "requirements.txt")).read())
+    import signal_cli
+    check("the CLI takes --trace", signal_cli.parse_args(["--account", "K", "--docs", MOCK_DIR, "--trace", "t.json"]).trace == "t.json")
+    if tracing.HAVE_OTEL:
+        print("tracing: the real path (OpenTelemetry is installed here)")
+        import tempfile
+        tmp = tempfile.mkdtemp()
+        trace_path = os.path.join(tmp, "trace.json")
+        tracing.install_json_exporter(trace_path)
+        traced = FakeClient(analysis_reply=json.dumps(SAMPLE_BRIEF), usage=(3000, 1500))
+        with tracing.span("signal.brief", account="Koala", mode="full", contract="native", arm="weighted"):
+            tdocs = read_docs(MOCK_DIR)
+            tsum = summarize_all(traced, tdocs)
+            analyze_brief(traced, build_analysis_prompt("Koala", "", None, "", tsum), contract="native", arm="weighted")
+        spans = tracing.read_trace(trace_path)
+        by_name = {}
+        for sp in spans:
+            by_name.setdefault(sp["name"], []).append(sp)
+        root = by_name["signal.brief"][0]
+        check("one root span per brief with no parent", len(by_name["signal.brief"]) == 1 and root["parent"] is None)
+        check("one ingest span per document with label, kind and chars",
+              len(by_name["signal.ingest"]) == 3 and all(sp["parent"] == root["span_id"] for sp in by_name["signal.ingest"])
+              and all({"label", "kind", "chars"} <= set(sp["attributes"]) for sp in by_name["signal.ingest"])
+              and {sp["attributes"]["label"] for sp in by_name["signal.ingest"]} == {"Kick-off deck", "MBR notes", "Teams chat"})
+        check("one summarize span per call with model and latency",
+              len(by_name["signal.summarize"]) == 3
+              and all(sp["attributes"]["model"] == MODELS["summary"] and "latency_ms" in sp["attributes"] for sp in by_name["signal.summarize"]))
+        an = by_name["signal.analyze"][0]
+        check("analyze span carries model, contract, arm, parse_path, stop_reason and tokens",
+              an["parent"] == root["span_id"] and an["attributes"]["model"] == MODELS["analysis"]
+              and an["attributes"]["contract"] == "native" and an["attributes"]["arm"] == "weighted"
+              and an["attributes"]["parse_path"] == "native" and an["attributes"]["stop_reason"] == "end_turn"
+              and an["attributes"]["input_tokens"] == 3000 and an["attributes"]["output_tokens"] == 1500)
+        pa = by_name["signal.parse"][0]
+        check("parse span is a child of analyze and records the path",
+              pa["parent"] == an["span_id"] and pa["attributes"]["parse_path"] == "native")
+        check("spans nest in time", root["start"] <= an["start"] <= pa["start"] <= pa["end"] <= an["end"] <= root["end"])
+        check("each line has name, parent, start, end, attributes",
+              all({"name", "parent", "start", "end", "attributes", "span_id"} <= set(sp) for sp in spans))
+    else:
+        print("tracing: OpenTelemetry not installed, real path not exercised here (pip install -r requirements-trace.txt)")
 
     print("paste-mode doc")
     d = make_doc("pasted_input.txt", "Sarah said churn risk is high.")

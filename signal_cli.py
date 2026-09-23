@@ -32,6 +32,7 @@ from summarize import summarize_all
 from analyze import build_analysis_prompt, analyze_brief, ParseFailure, CONTRACTS
 from prompts import FOCUS_INSTRUCTIONS
 import dryrun
+import tracing
 from chat import chat_loop
 
 console = Console()
@@ -188,11 +189,21 @@ def parse_args(argv=None):
     p.add_argument("--contract", choices=list(CONTRACTS), default="prompt",
                    help="how the JSON shape is enforced: described in the prompt, "
                         "or sent as a JSON Schema via the API's structured outputs")
+    p.add_argument("--trace", metavar="FILE.json", default=None,
+                   help="write one OpenTelemetry span per line to this file "
+                        "(needs pip install -r requirements-trace.txt); render it with evals/tools/render_trace.py")
     return p.parse_args(argv)
 
 
 def main(argv=None) -> None:
     args = parse_args(argv)
+    if args.trace:
+        tracing.install_json_exporter(args.trace)
+    with tracing.span("signal.brief", account=args.account, mode=args.mode, contract=args.contract, arm="weighted"):
+        run_pipeline(args)
+
+
+def run_pipeline(args) -> None:
     docs = gather_docs(args)
     if not docs:
         console.print("[red]No readable documents found.[/]")
@@ -225,7 +236,7 @@ def main(argv=None) -> None:
         media = read_media(args.docs) if args.docs else []
         if media:
             console.print(f"[dim]Attaching {len(media)} image/document block(s) to the analysis call[/]")
-        brief, meta = analyze_brief(client, prompt, contract=args.contract, media=media, mode=args.mode)
+        brief, meta = analyze_brief(client, prompt, contract=args.contract, media=media, mode=args.mode, arm="weighted")
     except ParseFailure as e:
         console.print(f"\n[red]The model's reply was not JSON on either path.[/] First 300 chars:\n{e.raw[:300]}")
         sys.exit(1)

@@ -25,6 +25,23 @@ Browser renders brief + chat
 
 The API key never touches the browser. 
 
+**Tracing.** `--trace trace.json` on the CLI and on `evals/run.py` writes
+one OpenTelemetry span per line: a root `signal.brief` per brief, a
+`signal.ingest` per document (label, kind, chars), a `signal.summarize` per
+summary call (model, tokens, latency), `signal.analyze` for the analysis
+call (model, contract, arm, parse path, stop reason, tokens) and
+`signal.parse` for parsing and validation. The packages are an optional
+extra (`pip install -r requirements-trace.txt`); without them the spans are
+a no-op shim and nothing changes. `evals/tools/render_trace.py` turns the
+file into an SVG waterfall.
+
+![Trace of a stub-client run](docs/trace-stub.svg)
+
+The figure is a stub-client run of the golden case `silent-decay`, so the
+ingest and parse timings are real and the model calls are near zero because
+the stub answers instantly. A real run replaces it with
+`python signal_cli.py --account NAME --docs DIR --trace trace.json && python evals/tools/render_trace.py trace.json docs/trace.svg`.
+
 ---
 
 ## New in v0.3

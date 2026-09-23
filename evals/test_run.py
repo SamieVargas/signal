@@ -17,6 +17,7 @@ sys.path.insert(0, str(HERE / "tools"))
 
 import run  # noqa: E402
 import recost  # noqa: E402
+import render_trace  # noqa: E402
 from test_pipeline import FakeClient, SAMPLE_BRIEF, check  # noqa: E402
 
 
@@ -253,6 +254,39 @@ def main():
         client = batch_client(analysis_reply=reply)
         code = run.main(["--batch", "--dry-run", "--only", "most-mentioned-not-buyer", "--out", tmp], client=client)
         check("dry run exits 0 and creates no batch", code == 0 and not client.messages.batches.created and not os.listdir(tmp))
+
+    print("render_trace: a waterfall from a trace file")
+    t0 = 1_700_000_000_000_000_000
+    spans = [
+        {"name": "signal.brief", "span_id": "a", "parent": None, "start": t0, "end": t0 + 50_000_000, "duration_ms": 50.0,
+         "attributes": {"case": "healthy"}},
+        {"name": "signal.analyze", "span_id": "c", "parent": "a", "start": t0 + 20_000_000, "end": t0 + 48_000_000, "duration_ms": 28.0,
+         "attributes": {"model": "m", "input_tokens": 3000, "output_tokens": 1500, "parse_path": "native"}},
+        {"name": "signal.parse", "span_id": "d", "parent": "c", "start": t0 + 47_000_000, "end": t0 + 47_500_000, "duration_ms": 0.5,
+         "attributes": {"parse_path": "native"}},
+        {"name": "signal.ingest", "span_id": "b", "parent": "a", "start": t0 + 1_000_000, "end": t0 + 2_000_000, "duration_ms": 1.0,
+         "attributes": {"name": "mbr_notes.txt", "label": "MBR notes", "kind": "text", "chars": 1200}},
+    ]
+    ordered = [(s["name"], d) for s, d in render_trace.order_spans(spans)]
+    check("rows are depth-first in time order, indented by depth",
+          ordered == [("signal.brief", 0), ("signal.ingest", 1), ("signal.analyze", 1), ("signal.parse", 2)])
+    svg = render_trace.render_svg(spans, caption="stub run")
+    check("it is an SVG 900 wide with no external references",
+          svg.startswith("<svg") and 'width="900"' in svg and "http://" not in svg.replace("http://www.w3.org/2000/svg", "")
+          and "<image" not in svg and "@import" not in svg)
+    check("one bar per span", svg.count('rx="2"') == 4)
+    check("labels carry duration and tokens",
+          "3000 in / 1500 out" in svg and "28 ms" in svg and "ingest mbr_notes.txt" in svg and "chars=1200" in svg)
+    check("the caption is under the chart", "stub run" in svg)
+    with tempfile.TemporaryDirectory() as tmp:
+        Path(tmp, "t.json").write_text("\n".join(json.dumps(s) for s in spans) + "\n", encoding="utf-8")
+        check("main renders a JSON-lines file", render_trace.main([str(Path(tmp, "t.json")), str(Path(tmp, "t.svg"))]) == 0
+              and Path(tmp, "t.svg").read_text(encoding="utf-8").startswith("<svg"))
+        Path(tmp, "l.json").write_text(json.dumps(spans), encoding="utf-8")
+        check("and a JSON list", render_trace.main([str(Path(tmp, "l.json")), str(Path(tmp, "l.svg"))]) == 0)
+    check("the committed stub trace is the same renderer's output",
+          (run.ROOT / "docs" / "trace-stub.svg").read_text(encoding="utf-8").startswith("<svg")
+          and "silent-decay" in (run.ROOT / "docs" / "trace-stub.svg").read_text(encoding="utf-8"))
 
     print("an interrupted run writes what it has, marked partial")
 

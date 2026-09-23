@@ -18,6 +18,7 @@ import time
 from config import MODELS, MAX_ANALYSIS_TOKENS
 from prompts import ANALYZE_PROMPT, FOCUS_INSTRUCTIONS, FOCUS_MAX_TOKENS, RISK_TYPES, SOURCE_WEIGHTING
 import schema
+import tracing
 
 CONTRACTS = ("prompt", "native")
 PARSE_PATHS = ("native", "recovered_by_parser", "failed")
@@ -130,37 +131,49 @@ def finish_analysis(resp, *, contract: str, request: dict, latency_ms=None) -> t
         "output_tokens": _usage(resp, "output_tokens"),
         "latency_ms": latency_ms,
     }
-    # A reply cut off at the output cap is not a parsing problem, and it is
-    # worth naming as what it is, because raising max_tokens is the fix.
-    if meta["stop_reason"] == "max_tokens":
-        e = ParseFailure(raw, f"reply cut off at max_tokens={request['max_tokens']}; raise the budget", reason="max_tokens")
-        e.meta = meta
-        raise e
-    try:
-        brief, path = parse_brief(raw)
-    except ParseFailure as e:
-        e.meta = meta
-        raise
-    meta["parse_path"] = path
+    with tracing.span("signal.parse", contract=contract, stop_reason=meta["stop_reason"]) as sp:
+        # A reply cut off at the output cap is not a parsing problem, and it
+        # is worth naming as what it is, because raising max_tokens is the fix.
+        if meta["stop_reason"] == "max_tokens":
+            sp.set_attributes({"parse_path": "failed", "reason": "max_tokens"})
+            e = ParseFailure(raw, f"reply cut off at max_tokens={request['max_tokens']}; raise the budget", reason="max_tokens")
+            e.meta = meta
+            raise e
+        try:
+            brief, path = parse_brief(raw)
+        except ParseFailure as e:
+            sp.set_attributes({"parse_path": "failed", "reason": "parse"})
+            e.meta = meta
+            raise
+        meta["parse_path"] = path
+        sp.set_attribute("parse_path", path)
     return brief, meta
 
 
 def analyze_brief(client, prompt: str, *, contract: str = "prompt", media=None,
                   mode: str = "full", model: str | None = None,
-                  max_tokens: int | None = None) -> tuple[dict, dict]:
+                  max_tokens: int | None = None, arm: str | None = None) -> tuple[dict, dict]:
     """Run the analysis call and return (brief, meta).
 
     meta: model, contract, parse_path, stop_reason, input_tokens,
     output_tokens, latency_ms. Raises ParseFailure when neither path yields
     JSON, after filling meta["parse_path"] = "failed" on the exception for
-    the caller.
+    the caller. `arm` only labels the trace span.
     """
     kwargs = build_analysis_request(prompt, contract=contract, media=media, mode=mode,
                                     model=model, max_tokens=max_tokens)
-    t0 = time.perf_counter()
-    resp = client.messages.create(**kwargs)
-    latency_ms = round((time.perf_counter() - t0) * 1000)
-    return finish_analysis(resp, contract=contract, request=kwargs, latency_ms=latency_ms)
+    with tracing.span("signal.analyze", model=kwargs["model"], contract=contract, arm=arm,
+                      mode=mode, max_tokens=kwargs["max_tokens"]) as sp:
+        t0 = time.perf_counter()
+        resp = client.messages.create(**kwargs)
+        latency_ms = round((time.perf_counter() - t0) * 1000)
+        try:
+            brief, meta = finish_analysis(resp, contract=contract, request=kwargs, latency_ms=latency_ms)
+        except ParseFailure as e:
+            sp.set_attributes({k: e.meta.get(k) for k in ("parse_path", "stop_reason", "input_tokens", "output_tokens", "latency_ms")})
+            raise
+        sp.set_attributes({k: meta.get(k) for k in ("parse_path", "stop_reason", "input_tokens", "output_tokens", "latency_ms")})
+    return brief, meta
 
 
 def analyze(client, prompt: str) -> dict:
