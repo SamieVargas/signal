@@ -119,6 +119,7 @@ def analyze_brief(client, prompt: str, *, contract: str = "prompt", media=None,
     latency_ms = round((time.perf_counter() - t0) * 1000)
     raw = _text(resp)
     meta = {
+        "model": kwargs["model"],
         "contract": contract,
         "parse_path": "failed",
         "stop_reason": getattr(resp, "stop_reason", None),

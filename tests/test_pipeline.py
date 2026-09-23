@@ -12,7 +12,7 @@ from types import SimpleNamespace
 # Make the package importable when run as a plain script from anywhere.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from config import MODELS
+from config import MODELS, PRICES, PRICES_DATED, BATCH_MULTIPLIER, cost_usd
 from ingest import read_docs, make_doc, smart_truncate, detect_type
 from summarize import summarize_all
 from analyze import build_analysis_prompt, analyze, analyze_brief, extract_json, parse_brief, ParseFailure
@@ -190,11 +190,34 @@ def main():
     check("chat sent system prompt", client.messages.calls[-1]["system"] is not None)
     check("chat routed to chat model", client.messages.calls[-1]["model"] == MODELS["chat"])
 
+    print("cost per call")
+    check("price table names both models the pipeline calls",
+          MODELS["analysis"] in PRICES and MODELS["summary"] in PRICES and len(PRICES_DATED) == 10)
+    check("one million tokens each way at Sonnet list price",
+          cost_usd("claude-sonnet-4-6", 1_000_000, 1_000_000) == 18.0)
+    check("Haiku list price", cost_usd("claude-haiku-4-5", 1_000_000, 1_000_000) == 6.0)
+    check("batch applies the multiplier",
+          BATCH_MULTIPLIER == 0.5 and cost_usd("claude-sonnet-4-6", 1_000_000, 1_000_000, batch=True) == 9.0)
+    check("the recorded run: 4,579 in / 1,974 out costs $0.0433 at list",
+          round(cost_usd("claude-sonnet-4-6", 4579, 1974), 4) == 0.0433)
+    check("missing tokens give None, not zero", cost_usd("claude-sonnet-4-6", None, 10) is None)
+    try:
+        cost_usd("claude-nonexistent", 1, 1)
+        check("an unpriced model raises", False)
+    except KeyError:
+        check("an unpriced model raises", True)
+    check("analysis meta records the model it called", meta_n["model"] == MODELS["analysis"])
+
     print("paste-mode doc")
     d = make_doc("pasted_input.txt", "Sarah said churn risk is high.")
     check("paste builds a doc dict", d["name"] == "pasted_input.txt" and d["raw"])
 
     print("\nALL CHECKS PASSED")
+
+
+def test_pipeline():
+    """pytest entry point: the checks above, in one collected test."""
+    main()
 
 
 if __name__ == "__main__":

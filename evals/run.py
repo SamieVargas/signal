@@ -150,6 +150,7 @@ def run_case(client, case: dict, *, mode: str, contract: str, weighted: bool) ->
         error = str(e)
         raw_head = (e.raw or "")[:800]  # kept in the JSON so a failure can be diagnosed
     total_ms = round((time.perf_counter() - t0) * 1000)
+    attach_cost(meta)
     scores = score_case(case["expected"], brief)
     return {
         "case": case["id"], "brief": brief, "meta": meta, "error": error, "raw_head": raw_head,
@@ -159,7 +160,30 @@ def run_case(client, case: dict, *, mode: str, contract: str, weighted: bool) ->
     }
 
 
-def aggregate(results: list[dict]) -> dict:
+# ── Cost ─────────────────────────────────────────────────────────────
+# Only the analysis call records tokens; the per-document summary calls do
+# not, so every dollar figure below covers the analysis call and says so.
+COST_COVERS = "analysis call"
+
+
+def attach_cost(meta: dict | None, *, batch: bool = False, model: str | None = None) -> dict | None:
+    """Add `cost_usd` to a meta dict from its recorded tokens. None when the
+    tokens were not recorded, so a table can say so instead of guessing."""
+    if meta is None:
+        return None
+    meta["cost_usd"] = config.cost_usd(
+        model or meta.get("model") or config.MODELS["analysis"],
+        meta.get("input_tokens"), meta.get("output_tokens"), batch=batch,
+    )
+    return meta
+
+
+def pricing(batch: bool = False) -> dict:
+    return {"dated": config.PRICES_DATED, "batch": batch,
+            "multiplier": config.BATCH_MULTIPLIER if batch else 1.0, "covers": COST_COVERS}
+
+
+def aggregate(results: list[dict], *, batch: bool = False) -> dict:
     n = len(results) or 1
     s = [r["scores"] for r in results]
     paths = {p: 0 for p in ("native", "recovered_by_parser", "failed")}
@@ -168,6 +192,7 @@ def aggregate(results: list[dict]) -> dict:
     tok_in = [r["meta"].get("input_tokens") for r in results if r["meta"] and r["meta"].get("input_tokens") is not None]
     tok_out = [r["meta"].get("output_tokens") for r in results if r["meta"] and r["meta"].get("output_tokens") is not None]
     lat = [r["meta"].get("latency_ms") for r in results if r["meta"] and r["meta"].get("latency_ms") is not None]
+    costs = [r["meta"].get("cost_usd") for r in results if r["meta"] and r["meta"].get("cost_usd") is not None]
     return {
         "n": len(results),
         "risk_recall": sum(x["risk"]["recall"] for x in s) / n,
@@ -179,6 +204,12 @@ def aggregate(results: list[dict]) -> dict:
         "mean_input_tokens": (sum(tok_in) / len(tok_in)) if tok_in else None,
         "mean_output_tokens": (sum(tok_out) / len(tok_out)) if tok_out else None,
         "mean_latency_ms": (sum(lat) / len(lat)) if lat else None,
+        # Per run is one case, one pass; whole run is every case-run summed.
+        # Both cover the analysis call only, at list or batch price.
+        "cost_per_run_usd": (sum(costs) / len(costs)) if costs else None,
+        "cost_total_usd": sum(costs) if costs else None,
+        "cost_covers": COST_COVERS,
+        "pricing": pricing(batch),
         "hard_fails": sum(1 for r in results if r["hard_fail"]),
     }
 
@@ -191,9 +222,30 @@ def _num(x, unit="") -> str:
     return "—" if x is None else f"{x:,.0f}{unit}"
 
 
-def render_table(results: list[dict], agg: dict, *, mode: str, contract: str, arm: str, runs: int) -> str:
+def _usd(x) -> str:
+    return "not recorded" if x is None else f"${x:.4f}"
+
+
+def cost_rows(agg: dict) -> list[str]:
+    """The three cost rows of the aggregate block; recost.py rewrites these
+    into older tables, so they live in one place."""
+    p = agg.get("pricing") or pricing()
+    basis = f"batch ({p['multiplier']:g}× list)" if p.get("batch") else "list"
+    return [
+        f"| Cost per run ({COST_COVERS}, USD) | {_usd(agg.get('cost_per_run_usd'))} |",
+        f"| Cost for the whole run ({COST_COVERS}s, USD) | {_usd(agg.get('cost_total_usd'))} |",
+        f"| Prices | {basis}, read {p['dated']} |",
+    ]
+
+
+CASE_HEADER = "| Case | Expected risk | Predicted | Recall | Buyer | Attribution | Gaps | Parse | ms | Cost |"
+
+
+def render_table(results: list[dict], agg: dict, *, mode: str, contract: str, arm: str, runs: int,
+                 batch: bool = False) -> str:
     lines = [
-        f"# Signal eval — {date.today().isoformat()} · mode `{mode}` · contract `{contract}` · arm `{arm}` · {runs} run(s) per case",
+        f"# Signal eval — {date.today().isoformat()} · mode `{mode}` · contract `{contract}` · arm `{arm}` · {runs} run(s) per case"
+        + (" · batch" if batch else ""),
         "",
         "| Metric | Value |",
         "| --- | --- |",
@@ -206,10 +258,11 @@ def render_table(results: list[dict], agg: dict, *, mode: str, contract: str, ar
         f"| Parse: native / recovered / failed | {agg['parse_paths']['native']} / {agg['parse_paths']['recovered_by_parser']} / {agg['parse_paths']['failed']} |",
         f"| Mean tokens in / out (analysis call) | {_num(agg['mean_input_tokens'])} / {_num(agg['mean_output_tokens'])} |",
         f"| Mean analysis latency | {_num(agg['mean_latency_ms'], ' ms')} |",
+        *cost_rows(agg),
         f"| Hard fails | {agg['hard_fails']} |",
         "",
-        "| Case | Expected risk | Predicted | Recall | Buyer | Attribution | Gaps | Parse | ms |",
-        "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+        CASE_HEADER,
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     for r in results:
         exp = ", ".join(r["expected_risk"]) or "(none)"
@@ -217,10 +270,12 @@ def render_table(results: list[dict], agg: dict, *, mode: str, contract: str, ar
         sc = r["scores"]
         attr = sc["attribution"]
         attr_s = _pct(attr["coverage"]) + (f" (missing {', '.join(attr['missing'])})" if attr["missing"] else "")
+        meta = r["meta"] or {}
+        lat = meta.get("latency_ms")
         lines.append(
             f"| {r['case']}{' #' + str(r['run']) if runs > 1 else ''} | {exp} | {pred} | {_pct(sc['risk']['recall'])} | "
             f"{'✓' if sc['buyer'] else '✗'} | {attr_s} | {'✓' if sc['gaps_ok'] else '✗'} | "
-            f"{(r['meta'] or {}).get('parse_path', 'failed')} | {(r['meta'] or {}).get('latency_ms', '—')} |"
+            f"{meta.get('parse_path', 'failed')} | {'—' if lat is None else lat} | {_usd(meta.get('cost_usd'))} |"
         )
     return "\n".join(lines) + "\n"
 
@@ -308,7 +363,7 @@ def main(argv=None, client=None) -> int:
         "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "mode": args.mode, "contract": args.contract, "arm": args.arm, "runs": args.runs,
         "completed": len(results), "planned": planned, "partial": interrupted,
-        "models": config.MODELS, "aggregate": agg,
+        "models": config.MODELS, "pricing": agg["pricing"], "aggregate": agg,
         "results": [{k: v for k, v in r.items() if k != "brief"} | {"brief": r["brief"]} for r in results],
     }, indent=2, default=str), encoding="utf-8")
     print(f"Wrote {out / (stem + '.md')} and .json")

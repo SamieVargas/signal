@@ -12,8 +12,10 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 sys.path.insert(0, str(HERE.parent / "tests"))
 sys.path.insert(0, str(HERE))
+sys.path.insert(0, str(HERE / "tools"))
 
 import run  # noqa: E402
+import recost  # noqa: E402
 from test_pipeline import FakeClient, SAMPLE_BRIEF, check  # noqa: E402
 
 
@@ -64,6 +66,62 @@ def main():
     check("aggregate recall 100%", agg["risk_recall"] == 1.0)
     check("table has the case row", "| most-mentioned-not-buyer |" in table and "Relationship gap" in table)
 
+    print("cost column and rows")
+    check("stub client records no tokens, so cost is None", r["meta"]["cost_usd"] is None)
+    check("aggregate says so", agg["cost_per_run_usd"] is None and agg["cost_total_usd"] is None
+          and agg["pricing"] == {"dated": run.config.PRICES_DATED, "batch": False, "multiplier": 1.0, "covers": "analysis call"})
+    check("table rows say not recorded",
+          "| Cost per run (analysis call, USD) | not recorded |" in table
+          and "| Cost for the whole run (analysis calls, USD) | not recorded |" in table
+          and f"| Prices | list, read {run.config.PRICES_DATED} |" in table
+          and table.splitlines()[-1].endswith("| not recorded |"))
+    check("case table header ends with Cost", "| Parse | ms | Cost |" in table)
+    priced = [dict(r, meta=dict(r["meta"], input_tokens=3000, output_tokens=1500)),
+              dict(r, meta=dict(r["meta"], input_tokens=1000, output_tokens=500))]
+    for x in priced:
+        run.attach_cost(x["meta"])
+    check("cost per case-run from its tokens", round(priced[0]["meta"]["cost_usd"], 4) == 0.0315
+          and round(priced[1]["meta"]["cost_usd"], 4) == 0.0105)
+    pagg = run.aggregate(priced)
+    check("cost per run is the mean, whole run the sum",
+          round(pagg["cost_per_run_usd"], 4) == 0.0210 and round(pagg["cost_total_usd"], 4) == 0.0420)
+    ptable = run.render_table(priced, pagg, mode="full", contract="native", arm="weighted", runs=2)
+    check("four decimals in the table", "| Cost per run (analysis call, USD) | $0.0210 |" in ptable
+          and "| Cost for the whole run (analysis calls, USD) | $0.0420 |" in ptable
+          and ptable.splitlines()[-1].endswith("| $0.0105 |"))
+    bagg = run.aggregate(priced, batch=True)
+    check("aggregate pricing records the batch basis", bagg["pricing"]["batch"] is True and bagg["pricing"]["multiplier"] == 0.5)
+
+    print("recost rewrites only the cost cells of an existing table")
+    old_lines = ptable.splitlines()
+    stripped = []
+    for line in old_lines:
+        if line.startswith(("| Cost per run", "| Cost for the whole run", "| Prices |")):
+            continue
+        if line.startswith(("| Case |", "| --- | --- | --- |", "| most-mentioned")):
+            line = line.rstrip()[: line.rstrip().rfind("|", 0, -1) + 1]  # drop the last cell
+        stripped.append(line)
+    old_md = "\n".join(stripped) + "\n"
+    check("the stripped table has no dollars", "$" not in old_md and "| Cost |" not in old_md)
+    data = {"runs": 2, "models": run.config.MODELS,
+            "results": [{k: v for k, v in x.items() if k != "brief"} | {"meta": {k: v for k, v in x["meta"].items() if k != "cost_usd"}} for x in priced]}
+    new_results, new_agg = recost.recost_results(data)
+    rewritten = recost.rewrite_table(old_md, new_results, new_agg, 2)
+    check("recost reproduces the runner's table exactly", rewritten == ptable)
+    check("recost is idempotent", recost.rewrite_table(rewritten, new_results, new_agg, 2) == ptable)
+    check("recost with batch=true in the JSON halves the figures",
+          round(recost.recost_results(dict(data, batch=True))[1]["cost_total_usd"], 4) == 0.0210)
+    with tempfile.TemporaryDirectory() as tmp:
+        Path(tmp, "x.json").write_text(json.dumps(data), encoding="utf-8")
+        Path(tmp, "x.md").write_text(old_md, encoding="utf-8")
+        recost.main([str(Path(tmp, "x.json"))])
+        check("recost.main rewrites the .md beside the .json", Path(tmp, "x.md").read_text(encoding="utf-8") == ptable)
+    try:
+        recost.rewrite_table(old_md, new_results[:1], new_agg, 2)
+        check("recost refuses a row count that does not match the JSON", False)
+    except SystemExit:
+        check("recost refuses a row count that does not match the JSON", True)
+
     print("main() with a stub client writes results")
     with tempfile.TemporaryDirectory() as tmp:
         code = run.main(["--only", "most-mentioned-not-buyer", "--contract", "native", "--out", tmp],
@@ -71,6 +129,10 @@ def main():
         files = sorted(os.listdir(tmp))
         check("exit 0", code == 0)
         check("wrote .md and .json", any(f.endswith(".md") for f in files) and any(f.endswith(".json") for f in files))
+        written = json.loads(Path(tmp, next(f for f in files if f.endswith(".json"))).read_text(encoding="utf-8"))
+        check("json carries the pricing and the cost fields",
+              written["pricing"]["dated"] == run.config.PRICES_DATED and "cost_per_run_usd" in written["aggregate"]
+              and "cost_total_usd" in written["aggregate"] and "cost_usd" in written["results"][0]["meta"])
         failing = FakeClient(analysis_reply="not json at all")
         code = run.main(["--only", "most-mentioned-not-buyer", "--out", tmp], client=failing)
         check("a failed parse is a hard fail (exit 1)", code == 1)
@@ -100,6 +162,11 @@ def main():
         check("table header says PARTIAL", "PARTIAL" in md.splitlines()[0])
 
     print("\nALL CHECKS PASSED")
+
+
+def test_eval_runner():
+    """pytest entry point: the checks above, in one collected test."""
+    main()
 
 
 if __name__ == "__main__":

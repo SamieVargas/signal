@@ -193,11 +193,18 @@ credit ran out (the runner now writes a partial file when that happens; it
 did not then). The single native pass and the twenty-run arm A share a
 configuration, so one row covers both.
 
-| Run | Risk recall | Risk precision | Buyer accuracy | Attribution | Parse native / recovered / failed |
-| --- | --- | --- | --- | --- | --- |
-| prompt contract, weighted, 1 run | 96% | 100% | 92% | 92% | 5 / 8 / 0 |
-| native contract, weighted, 20 runs (ablation arm A) | 90% | 94% | 93% | 92% | 260 / 0 / 0 |
-| native contract, unweighted, 20 runs (ablation arm B) | 90% | 93% | 69% | 95% | 260 / 0 / 0 |
+| Date | Run | Risk recall | Risk precision | Buyer accuracy | Attribution | Parse native / recovered / failed | Cost per run / whole run |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-09-21 | prompt contract, weighted, 1 run | 96% | 100% | 92% | 92% | 5 / 8 / 0 | $0.0323 / $0.4205 |
+| 2026-09-21 | native contract, weighted, 20 runs (ablation arm A) | 90% | 94% | 93% | 92% | 260 / 0 / 0 | $0.0308 / $7.9974 |
+| 2026-09-22 | native contract, unweighted, 20 runs (ablation arm B) | 90% | 93% | 69% | 95% | 260 / 0 / 0 | $0.0292 / $7.6039 |
+
+Cost is the analysis call only (the per-document summary calls do not record
+tokens), priced from the tokens in each results JSON at the list prices in
+`config.PRICES` (read 2026-09-23; re-check them against the pricing page
+before quoting). "Per run" is one case, one pass, averaged; "whole run" is
+every case-run summed. `evals/tools/recost.py` recomputes both from the JSON
+files without re-running anything.
 
 What the 520 native runs say, case by case:
 
